@@ -14,11 +14,11 @@ class ThreeJSApp {
   private controls: OrbitControls;
   private container: HTMLElement;
 
-  constructor(container: HTMLElement) {
+  constructor(container: HTMLElement, scene: THREE.Scene) {
     this.container = container;
 
     // Set up the scene
-    this.scene = new THREE.Scene();
+    this.scene = scene;
 
     // Set up the renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -27,9 +27,6 @@ class ThreeJSApp {
 
     // Setup the default perspective camera
     [this.camera, this.controls] = this.setupPerspectiveCamera();
-
-    // Add a default object
-    this.addDefaultGeometry();
 
     // Handle window resizing
     window.addEventListener("resize", this.onWindowResize.bind(this));
@@ -47,21 +44,6 @@ class ThreeJSApp {
     const cameraFolder = gui.addFolder("Camera");
     cameraFolder.add(setCamera, "orthographic").name("Orthographic");
     cameraFolder.add(setCamera, "perspective").name("Perspective");
-  }
-
-  // Add a default geometry (a rotating cube)
-  private addDefaultGeometry(): void {
-    const points = [];
-    for (let i = 0; i < 10; i++) {
-      points.push(new THREE.Vector2(Math.sin(i * 0.2) * 10 + 5, (i - 5) * 2));
-    }
-    const geometry = new THREE.LatheGeometry(points);
-    const material = new THREE.MeshNormalMaterial({ wireframe: true });
-    const lathe = new THREE.Mesh(geometry, material);
-    this.scene.add(lathe);
-
-    const axesHelper = new THREE.AxesHelper( 5 );
-    this.scene.add( axesHelper );
   }
 
   // Handle window resize events
@@ -136,7 +118,66 @@ class ThreeJSApp {
   }
 }
 
-// Initialize the app
-const container = document.body; // Or a specific DOM element
-const app = new ThreeJSApp(container);
-app.animate(); // Start the animation loop
+function makeLine(start: Array<number>, end: Array<number>) {
+  const material = new THREE.LineBasicMaterial({ color: 0xffa724 });
+
+  const points = [];
+  points.push(new THREE.Vector3().fromArray(start));
+  points.push(new THREE.Vector3().fromArray(end));
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  return new THREE.Line(geometry, material);
+}
+
+function makeSurface(points: Array<Array<number>>) {
+  const segments = 50;
+  // threejs lathe surface makes a revolution around the Y axis
+  // but we want a revolution around the X axis
+  // So the procedure is:
+  // 1. Swap X/Y coordinates (mirror about the X=Y line)
+  // 2. Ask threejs to create the 3D geometry by lathe around the Y axis
+  // 3. Swap back by mirroring around the X=Y plane
+
+  const flip = new THREE.Matrix4(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
+  const tpoints = points.map((p) => new THREE.Vector2(p[1], p[0]));
+
+  const geometry = new THREE.LatheGeometry(tpoints, segments);
+  const material = new THREE.MeshNormalMaterial({side: THREE.DoubleSide});
+  const lathe = new THREE.Mesh(geometry, material);
+  lathe.applyMatrix4(flip);
+  lathe.position.x = 10;
+  return lathe;
+}
+
+function makeScene(data: any) {
+  const scene = new THREE.Scene();
+
+  for (const ray of data["rays"]) {
+    const start = ray[0];
+    const end = ray[1];
+
+    const line = makeLine(start, end);
+    scene.add(line);
+  }
+
+  for (const points of data["surfaces"]) {
+    const lathe = makeSurface(points);
+    scene.add(lathe);
+  }
+
+  const axesHelper = new THREE.AxesHelper(5);
+  scene.add(axesHelper);
+
+  return scene;
+}
+
+// tlmviewer entry point
+export function tlmviewer(data: any) {
+  const scene = makeScene(data);
+
+  // Initialize the app
+  const container = document.body;
+  const app = new ThreeJSApp(container, scene);
+  app.animate();
+}

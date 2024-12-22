@@ -3,10 +3,46 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Three.js TypeScript Tutorials by Sean Bradley : https://sbcode.net/threejs</title>
+    <title>tlmviewer test</title>
   </head>
 
   <body>
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module">
+      import { tlmviewer } from "/src/main.ts";
+
+      const data = {
+        rays: [
+          [
+            [0, 0, 0],
+            [10, 10, 10],
+          ],
+          [
+            [10, 10, 10],
+            [20, 0, 0],
+          ],
+        ],
+        surfaces: [
+          [
+            [0.0, 0.0],
+            [0.3125, 2.5],
+            [1.25, 5.0],
+            [2.8125, 7.5],
+            [5.0, 10.0],
+          ],
+          [
+            [-0.0, 0.0],
+            [-0.3125, 2.5],
+            [-1.25, 5.0],
+            [-2.8125, 7.5],
+            [-5.0, 10.0],
+          ],
+        ],
+      };
+
+      // Use window.onload to ensure the DOM is fully loaded
+      window.onload = () => {
+        tlmviewer(data);
+      };
+    </script>
   </body>
 </html>
