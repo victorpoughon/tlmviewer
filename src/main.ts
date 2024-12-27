@@ -1,11 +1,9 @@
-import "./style.css";
 import * as THREE from "three";
 
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-import Stats from "three/addons/libs/stats.module.js";
-
 import { GUI } from "dat.gui";
+
 
 class ThreeJSApp {
   private scene: THREE.Scene;
@@ -22,7 +20,8 @@ class ThreeJSApp {
 
     // Set up the renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    const rect = container.getBoundingClientRect();
+    this.renderer.setSize(rect.width, rect.height);
     this.container.appendChild(this.renderer.domElement);
 
     // Setup the default perspective camera
@@ -67,7 +66,8 @@ class ThreeJSApp {
     THREE.PerspectiveCamera | THREE.OrthographicCamera,
     OrbitControls
   ] {
-    const aspect = window.innerWidth / window.innerHeight;
+    const rect = this.container.getBoundingClientRect();
+    const aspect = rect.width / rect.height;
     const newCamera = new THREE.OrthographicCamera(
       -aspect * 10,
       aspect * 10,
@@ -92,7 +92,8 @@ class ThreeJSApp {
     THREE.PerspectiveCamera | THREE.OrthographicCamera,
     OrbitControls
   ] {
-    const aspect = window.innerWidth / window.innerHeight;
+    const rect = this.container.getBoundingClientRect();
+    const aspect = rect.width / rect.height;
     const newCamera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
 
     newCamera.position.set(10, 10, 10);
@@ -143,11 +144,20 @@ function makeSurface(points: Array<Array<number>>) {
   const tpoints = points.map((p) => new THREE.Vector2(p[1], p[0]));
 
   const geometry = new THREE.LatheGeometry(tpoints, segments);
-  const material = new THREE.MeshNormalMaterial({side: THREE.DoubleSide});
+  const material = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide });
   const lathe = new THREE.Mesh(geometry, material);
   lathe.applyMatrix4(flip);
   lathe.position.x = 10;
   return lathe;
+}
+
+function makePoints(vertices: Array<number>) {
+  console.log(vertices);
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices.flat(), 3));
+  const material = new THREE.PointsMaterial({ color: 0xffffff });
+  const points = new THREE.Points(geometry, material);
+  return points;
 }
 
 function makeScene(data: any) {
@@ -166,6 +176,10 @@ function makeScene(data: any) {
     scene.add(lathe);
   }
 
+  // Points
+  const vertices = data["points"];
+  scene.add(makePoints(vertices));
+
   const axesHelper = new THREE.AxesHelper(5);
   scene.add(axesHelper);
 
@@ -173,11 +187,11 @@ function makeScene(data: any) {
 }
 
 // tlmviewer entry point
-export function tlmviewer(data: any) {
+export function tlmviewer(container: HTMLElement, data: any) {
   const scene = makeScene(data);
 
-  // Initialize the app
-  const container = document.body;
   const app = new ThreeJSApp(container, scene);
   app.animate();
 }
+
+console.log("tlmviewer loaded");
