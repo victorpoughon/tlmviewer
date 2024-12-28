@@ -2,8 +2,6 @@ import * as THREE from "three";
 
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-import { GUI } from "dat.gui";
-
 
 class ThreeJSApp {
   private scene: THREE.Scene;
@@ -27,22 +25,11 @@ class ThreeJSApp {
     // Setup the default perspective camera
     [this.camera, this.controls] = this.setupPerspectiveCamera();
 
+    //[this.camera, this.controls] = this.setupOrthographicCamera();
+
     // Handle window resizing
-    window.addEventListener("resize", this.onWindowResize.bind(this));
+    //window.addEventListener("resize", this.onWindowResize.bind(this));
 
-    const setCamera = {
-      orthographic: () => {
-        [this.camera, this.controls] = this.setupOrthographicCamera();
-      },
-      perspective: () => {
-        [this.camera, this.controls] = this.setupPerspectiveCamera();
-      },
-    };
-
-    const gui = new GUI();
-    const cameraFolder = gui.addFolder("Camera");
-    cameraFolder.add(setCamera, "orthographic").name("Orthographic");
-    cameraFolder.add(setCamera, "perspective").name("Perspective");
   }
 
   // Handle window resize events
@@ -88,6 +75,7 @@ class ThreeJSApp {
     return [newCamera, newControls];
   }
 
+  // @ts-ignore
   private setupPerspectiveCamera(): [
     THREE.PerspectiveCamera | THREE.OrthographicCamera,
     OrbitControls
@@ -147,7 +135,6 @@ function makeSurface(points: Array<Array<number>>) {
   const material = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide });
   const lathe = new THREE.Mesh(geometry, material);
   lathe.applyMatrix4(flip);
-  lathe.position.x = 10;
   return lathe;
 }
 
@@ -163,23 +150,31 @@ function makePoints(vertices: Array<number>) {
 function makeScene(data: any) {
   const scene = new THREE.Scene();
 
-  for (const ray of data["rays"]) {
-    const start = ray[0];
-    const end = ray[1];
+  if ('rays' in data) {
+    for (const ray of data["rays"]) {
+      const start = ray[0];
+      const end = ray[1];
 
-    const line = makeLine(start, end);
-    scene.add(line);
+      const line = makeLine(start, end);
+      scene.add(line);
+    }
   }
 
-  for (const points of data["surfaces"]) {
-    const lathe = makeSurface(points);
-    scene.add(lathe);
+  if ('surfaces' in data) {
+    for (const points of data["surfaces"]) {
+      // TODO: check that points are all Y > 0
+      const lathe = makeSurface(points);
+      scene.add(lathe);
+    }
   }
 
   // Points
-  const vertices = data["points"];
-  scene.add(makePoints(vertices));
+  if ('points' in data) {
+    console.log("adding points");
+    const vertices = data["points"];
+    scene.add(makePoints(vertices));
 
+  }
   const axesHelper = new THREE.AxesHelper(5);
   scene.add(axesHelper);
 
