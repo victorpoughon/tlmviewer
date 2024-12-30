@@ -109,12 +109,14 @@ class ThreeJSApp {
   }
 }
 
-function makeLine(start: Array<number>, end: Array<number>) {
+function makeLine(ray: number[]) {
+  console.assert(ray.length == 6);
+
   const material = new THREE.LineBasicMaterial({ color: 0xffa724 });
 
   const points = [];
-  points.push(new THREE.Vector3().fromArray(start));
-  points.push(new THREE.Vector3().fromArray(end));
+  points.push(new THREE.Vector3().fromArray(ray.slice(0, 3)));
+  points.push(new THREE.Vector3().fromArray(ray.slice(3, 6)));
 
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
   return new THREE.Line(geometry, material);
@@ -147,9 +149,20 @@ function makePoints(vertices: Array<number>) {
   console.log(vertices);
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices.flat(), 3));
-  const material = new THREE.PointsMaterial({ color: 0xffffff });
+  const material = new THREE.PointsMaterial({ color: 0xffffff, size: 1});
   const points = new THREE.Points(geometry, material);
   return points;
+}
+
+function makeOpticalAxis(start: number, end: number) {
+  const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+
+  const points = [];
+  points.push(new THREE.Vector3(start, 0, 0));
+  points.push(new THREE.Vector3(end, 0, 0));
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  return new THREE.Line(geometry, material);
 }
 
 function makeScene(data: any) {
@@ -157,10 +170,8 @@ function makeScene(data: any) {
 
   if ('rays' in data) {
     for (const ray of data["rays"]) {
-      const start = ray[0];
-      const end = ray[1];
-
-      const line = makeLine(start, end);
+      console.assert(ray.length == 6);
+      const line = makeLine(ray);
       scene.add(line);
     }
   }
@@ -182,8 +193,13 @@ function makeScene(data: any) {
     scene.add(makePoints(vertices));
 
   }
+
+  // Axes helper
   const axesHelper = new THREE.AxesHelper(5);
   scene.add(axesHelper);
+
+  // Optical Axis
+  scene.add(makeOpticalAxis(-500, 500));
 
   return scene;
 }
