@@ -33,6 +33,7 @@ class ThreeJSApp {
   }
 
   // Handle window resize events
+  // @ts-ignore
   private onWindowResize(): void {
     const aspect = window.innerWidth / window.innerHeight;
 
@@ -49,6 +50,7 @@ class ThreeJSApp {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
+  // @ts-ignore
   private setupOrthographicCamera(): [
     THREE.PerspectiveCamera | THREE.OrthographicCamera,
     OrbitControls
@@ -118,7 +120,7 @@ function makeLine(start: Array<number>, end: Array<number>) {
   return new THREE.Line(geometry, material);
 }
 
-function makeSurface(points: Array<Array<number>>) {
+function makeSurface(position: [number, number, number], samples: Array<Array<number>>) {
   const segments = 50;
   // threejs lathe surface makes a revolution around the Y axis
   // but we want a revolution around the X axis
@@ -127,14 +129,17 @@ function makeSurface(points: Array<Array<number>>) {
   // 2. Ask threejs to create the 3D geometry by lathe around the Y axis
   // 3. Swap back by mirroring around the X=Y plane
 
+
+
   const flip = new THREE.Matrix4(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
-  const tpoints = points.map((p) => new THREE.Vector2(p[1], p[0]));
+  const tpoints = samples.map((p) => new THREE.Vector2(p[1], p[0]));
 
   const geometry = new THREE.LatheGeometry(tpoints, segments);
   const material = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide });
   const lathe = new THREE.Mesh(geometry, material);
   lathe.applyMatrix4(flip);
+  lathe.position.set(...position);
   return lathe;
 }
 
@@ -161,9 +166,11 @@ function makeScene(data: any) {
   }
 
   if ('surfaces' in data) {
-    for (const points of data["surfaces"]) {
+    for (const surface of data["surfaces"]) {
       // TODO: check that points are all Y > 0
-      const lathe = makeSurface(points);
+      const position = surface["position"];
+      const samples = surface["samples"];
+      const lathe = makeSurface(position, samples);
       scene.add(lathe);
     }
   }
@@ -183,10 +190,16 @@ function makeScene(data: any) {
 
 // tlmviewer entry point
 export function tlmviewer(container: HTMLElement, data: any) {
-  const scene = makeScene(data);
 
-  const app = new ThreeJSApp(container, scene);
-  app.animate();
+  try {
+
+    const scene = makeScene(data);
+    
+    const app = new ThreeJSApp(container, scene);
+    app.animate();
+  } catch(error) {
+    container.innerHTML = "tlmviewer error: " + error;
+  }
 }
 
 console.log("tlmviewer loaded");
