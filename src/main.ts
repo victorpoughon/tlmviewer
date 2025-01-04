@@ -122,7 +122,25 @@ function makeLine(ray: number[]) {
   return new THREE.Line(geometry, material);
 }
 
-function makeSurface(position: [number, number, number], samples: Array<Array<number>>) {
+
+function arrayToMatrix4(array: Array<Array<number>>): THREE.Matrix4 {
+  if (array.length !== 4 || array.some(row => row.length !== 4)) {
+    throw new Error('Input must be a 4x4 array');
+  }
+
+  const matrix = new THREE.Matrix4();
+  
+  // Transpose the array (convert from row-major to column-major)
+  const transposedArray = array[0].map((_, colIndex) => array.map(row => row[colIndex]));
+  
+  // Flatten the transposed array and create the Matrix4
+  matrix.fromArray(transposedArray.flat());
+
+  return matrix;
+}
+
+
+function makeSurface(matrix4: Array<Array<number>>, samples: Array<Array<number>>) {
   const segments = 50;
   // threejs lathe surface makes a revolution around the Y axis
   // but we want a revolution around the X axis
@@ -130,28 +148,45 @@ function makeSurface(position: [number, number, number], samples: Array<Array<nu
   // 1. Swap X/Y coordinates (mirror about the X=Y line)
   // 2. Ask threejs to create the 3D geometry by lathe around the Y axis
   // 3. Swap back by mirroring around the X=Y plane
+  // 4. Compose with the matrix4 in the data
 
 
-
+  // Make the composed transform
   const flip = new THREE.Matrix4(0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+  const userTransform = arrayToMatrix4(matrix4);
+  const transform = new THREE.Matrix4();
+  transform.multiplyMatrices(userTransform, flip);
 
   const tpoints = samples.map((p) => new THREE.Vector2(p[1], p[0]));
 
   const geometry = new THREE.LatheGeometry(tpoints, segments);
   const material = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide });
   const lathe = new THREE.Mesh(geometry, material);
-  lathe.applyMatrix4(flip);
-  lathe.position.set(...position);
+  lathe.applyMatrix4(transform);
   return lathe;
 }
 
+// @ts-ignore
 function makePoints(vertices: Array<number>) {
-  console.log(vertices);
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices.flat(), 3));
   const material = new THREE.PointsMaterial({ color: 0xffffff, size: 1});
   const points = new THREE.Points(geometry, material);
   return points;
+}
+
+function makePointsSpheres(vertices: Array<[number, number, number]>) {
+  const group = new THREE.Group();
+  for (const point of vertices) {
+    const geometry = new THREE.SphereGeometry(0.1, 8, 8);
+    const material = new THREE.MeshBasicMaterial({ color: 0xe34242 });
+    const sphere = new THREE.Mesh(geometry, material);
+    sphere.position.set(...point);
+
+    group.add(sphere);
+  }
+
+  return group;
 }
 
 function makeOpticalAxis(start: number, end: number) {
@@ -179,18 +214,17 @@ function makeScene(data: any) {
   if ('surfaces' in data) {
     for (const surface of data["surfaces"]) {
       // TODO: check that points are all Y > 0
-      const position = surface["position"];
+      const matrix = surface["matrix"];
       const samples = surface["samples"];
-      const lathe = makeSurface(position, samples);
+      const lathe = makeSurface(matrix, samples);
       scene.add(lathe);
     }
   }
 
   // Points
   if ('points' in data) {
-    console.log("adding points");
     const vertices = data["points"];
-    scene.add(makePoints(vertices));
+    scene.add(makePointsSpheres(vertices));
 
   }
 
