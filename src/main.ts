@@ -205,10 +205,10 @@ function makeScene(data: any) {
 }
 
 // tlmviewer entry point
-export function tlmviewer(container: HTMLElement, data: any) {
+export function tlmviewer(container: HTMLElement, json_data: string) {
 
   try {
-
+    const data = JSON.parse(json_data);
     const scene = makeScene(data);
     
     const app = new ThreeJSApp(container, scene);

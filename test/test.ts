@@ -8,7 +8,7 @@ function runTests(json) {
         const div = document.createElement("div");
         main.appendChild(div);
 
-        tlmviewer(div, test);
+        tlmviewer(div, JSON.stringify(test));
     }
 }
 
