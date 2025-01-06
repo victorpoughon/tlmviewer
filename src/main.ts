@@ -189,6 +189,25 @@ function makePointsSpheres(vertices: Array<[number, number, number]>) {
   return group;
 }
 
+function makeArrows(
+  arrows: Array<[number, number, number, number, number, number, number]>
+) {
+  const group = new THREE.Group();
+
+  for (const arrow of arrows) {
+    const dir = new THREE.Vector3(...arrow.slice(0, 3));
+    dir.normalize();
+    const origin = new THREE.Vector3(...arrow.slice(3, 6));
+    const length = arrow[6];
+    const color = 0xffff00;
+
+    const arrowHelper = new THREE.ArrowHelper(dir, origin, length, color);
+    group.add(arrowHelper);
+  }
+
+  return group;
+}
+
 function makeOpticalAxis(start: number, end: number) {
   const material = new THREE.LineBasicMaterial({ color: 0xffffff });
 
@@ -226,6 +245,11 @@ function makeScene(data: any) {
     const vertices = data["points"];
     scene.add(makePointsSpheres(vertices));
 
+  }
+
+  // Arrows
+  if ('arrows' in data) {
+    scene.add(makeArrows(data['arrows']));
   }
 
   // Axes helper
