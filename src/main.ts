@@ -219,37 +219,49 @@ function makeOpticalAxis(start: number, end: number) {
   return new THREE.Line(geometry, material);
 }
 
-function makeScene(data: any) {
-  const scene = new THREE.Scene();
+function makeGroup(data_group: any) {
+  const type = data_group["type"];
+  const data = data_group["data"];
 
-  if ('rays' in data) {
-    for (const ray of data["rays"]) {
+  const group = new THREE.Group();
+
+  if (type == "rays") {
+    for (const ray of data) {
       console.assert(ray.length == 6);
       const line = makeLine(ray);
-      scene.add(line);
+      group.add(line);
     }
   }
 
-  if ('surfaces' in data) {
-    for (const surface of data["surfaces"]) {
+  if (type == 'surfaces') {
+    for (const surface of data) {
       // TODO: check that points are all Y > 0
       const matrix = surface["matrix"];
       const samples = surface["samples"];
       const lathe = makeSurface(matrix, samples);
-      scene.add(lathe);
+      group.add(lathe);
     }
   }
 
   // Points
-  if ('points' in data) {
-    const vertices = data["points"];
-    scene.add(makePointsSpheres(vertices));
+  if (type == 'points') {
+    group.add(makePointsSpheres(data));
 
   }
 
   // Arrows
-  if ('arrows' in data) {
-    scene.add(makeArrows(data['arrows']));
+  if (type == 'arrows') {
+    group.add(makeArrows(data));
+  }
+
+  return group;
+}
+
+function makeScene(data: any) {
+  const scene = new THREE.Scene();
+
+  for (const data_group of data) {
+    scene.add(makeGroup(data_group));
   }
 
   // Axes helper
