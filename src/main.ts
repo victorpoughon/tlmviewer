@@ -175,11 +175,11 @@ function makePoints(vertices: Array<number>) {
   return points;
 }
 
-function makePointsSpheres(vertices: Array<[number, number, number]>) {
+function makePointsSpheres(vertices: Array<[number, number, number]>, color: string) {
   const group = new THREE.Group();
   for (const point of vertices) {
     const geometry = new THREE.SphereGeometry(0.1, 8, 8);
-    const material = new THREE.MeshBasicMaterial({ color: 0xe34242 });
+    const material = new THREE.MeshBasicMaterial({ color: color});
     const sphere = new THREE.Mesh(geometry, material);
     sphere.position.set(...point);
 
@@ -245,7 +245,8 @@ function makeGroup(data_group: any) {
 
   // Points
   if (type == 'points') {
-    group.add(makePointsSpheres(data));
+    const color = data_group.color ?? "#ffffff";
+    group.add(makePointsSpheres(data, color));
 
   }
 
