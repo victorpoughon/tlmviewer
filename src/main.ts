@@ -20,12 +20,13 @@ class ThreeJSApp {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     const rect = container.getBoundingClientRect();
     this.renderer.setSize(rect.width, rect.height);
+    this.renderer.localClippingEnabled = true;
     this.container.appendChild(this.renderer.domElement);
 
     // Setup the default perspective camera
-    [this.camera, this.controls] = this.setupPerspectiveCamera();
+    //[this.camera, this.controls] = this.setupPerspectiveCamera();
 
-    //[this.camera, this.controls] = this.setupOrthographicCamera();
+    [this.camera, this.controls] = this.setupOrthographicCamera();
 
     // Handle window resizing
     //window.addEventListener("resize", this.onWindowResize.bind(this));
@@ -62,8 +63,8 @@ class ThreeJSApp {
       aspect * 10,
       10,
       -10,
-      0.1,
-      1000
+      -10000,
+      10000
     );
 
     newCamera.position.set(10, 10, 10);
@@ -109,6 +110,7 @@ class ThreeJSApp {
   }
 }
 
+
 function makeLine(ray: number[]) {
   console.assert(ray.length == 6);
 
@@ -139,8 +141,16 @@ function arrayToMatrix4(array: Array<Array<number>>): THREE.Matrix4 {
   return matrix;
 }
 
+// The four normal vectors for the four clipping planes
+// used to make squared outlines around the X axis
+const squareClipVectors = [
+  new THREE.Vector3( 0, 1, 0 ),
+  new THREE.Vector3( 0, -1, 0 ),
+  new THREE.Vector3( 0, 0, 1 ),
+  new THREE.Vector3( 0, 0, -1 )
+];
 
-function makeSurface(matrix4: Array<Array<number>>, samples: Array<Array<number>>) {
+function makeSurface(matrix4: Array<Array<number>>, samples: Array<Array<number>>, side_length: number | undefined) {
   const segments = 50;
   // threejs lathe surface makes a revolution around the Y axis
   // but we want a revolution around the X axis
@@ -160,7 +170,25 @@ function makeSurface(matrix4: Array<Array<number>>, samples: Array<Array<number>
   const tpoints = samples.map((p) => new THREE.Vector2(p[1], p[0]));
 
   const geometry = new THREE.LatheGeometry(tpoints, segments);
-  const material = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide });
+
+  // If 'square' is in the data
+  // form a square of the given side length
+  // Side length of the clipping square
+  const clipPlanes: THREE.Plane[] =
+    side_length === undefined
+      ? []
+      : squareClipVectors.map(
+          (v) =>
+            new THREE.Plane(
+              v,
+              v
+                .clone()
+                .multiplyScalar(side_length / 2)
+                .length()
+            )
+        );
+
+  const material = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide, clippingPlanes: clipPlanes });
   const lathe = new THREE.Mesh(geometry, material);
   lathe.applyMatrix4(transform);
   return lathe;
@@ -236,9 +264,10 @@ function makeGroup(data_group: any) {
   if (type == 'surfaces') {
     for (const surface of data) {
       // TODO: check that points are all Y > 0
-      const matrix = surface["matrix"];
-      const samples = surface["samples"];
-      const lathe = makeSurface(matrix, samples);
+      const matrix = surface.matrix;
+      const samples = surface.samples;
+      const side_length = surface.side_length ?? undefined;
+      const lathe = makeSurface(matrix, samples, side_length);
       group.add(lathe);
     }
   }
