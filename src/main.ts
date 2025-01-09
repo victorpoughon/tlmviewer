@@ -189,6 +189,8 @@ function makeSurface(matrix4: Array<Array<number>>, samples: Array<Array<number>
         );
 
   const material = new THREE.MeshNormalMaterial({ side: THREE.DoubleSide, clippingPlanes: clipPlanes });
+  material.transparent = true;
+  material.opacity = 0.8;
   const lathe = new THREE.Mesh(geometry, material);
   lathe.applyMatrix4(transform);
   return lathe;
