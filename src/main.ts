@@ -297,16 +297,22 @@ function makeGroup(data_group: any) {
 function makeScene(data: any) {
   const scene = new THREE.Scene();
 
-  for (const data_group of data) {
+  const data_data = data.data;
+
+  for (const data_group of data_data) {
     scene.add(makeGroup(data_group));
   }
 
   // Axes helper
-  const axesHelper = new THREE.AxesHelper(5);
-  scene.add(axesHelper);
+  if (data.show_axes ?? true) {
+    const axesHelper = new THREE.AxesHelper(5);
+    scene.add(axesHelper);
+  }
 
   // Optical Axis
-  scene.add(makeOpticalAxis(-500, 500));
+  if (data.show_optical_axis ?? true) {
+    scene.add(makeOpticalAxis(-500, 500));
+  }
 
   return scene;
 }

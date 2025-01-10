@@ -1,5 +1,7 @@
 [
-  [
+  {"show_optical_axis": false,
+  "show_axes": false,
+  "data": [
     {
       "type": "rays",
       "color": "red",
@@ -158,8 +160,8 @@
         ]
       ]
     }
-  ],
-  [
+  ]},
+  {"data": [
     {
       "type": "surfaces",
       "data": [
@@ -215,8 +217,8 @@
         }
       ]
     }
-  ],
-  [
+  ]},
+  {"data": [
     {
       "type": "points",
       "data": [
@@ -247,8 +249,8 @@
         ]
       ]
     }
-  ],
-  [
+  ]},
+  {"data": [
     {
       "type": "surfaces",
       "data": [
@@ -744,8 +746,8 @@
         }
       ]
     }
-  ],
-  [
+  ]},
+  {"data": [
     {
       "type": "arrows",
       "data": [
@@ -778,8 +780,8 @@
         ]
       ]
     }
-  ],
-  [
+  ]},
+  {"data": [
     {
       "type": "points",
       "data": [
@@ -1173,5 +1175,5 @@
       ],
       "color": "#00ffff"
     }
-  ]
+  ]}
 ]
