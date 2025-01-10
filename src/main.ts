@@ -111,10 +111,10 @@ class ThreeJSApp {
 }
 
 
-function makeLine(ray: number[]) {
+function makeLine(ray: number[], color: string) {
   console.assert(ray.length == 6);
 
-  const material = new THREE.LineBasicMaterial({ color: 0xffa724 });
+  const material = new THREE.LineBasicMaterial({ color: color });
 
   const points = [];
   points.push(new THREE.Vector3().fromArray(ray.slice(0, 3)));
@@ -258,12 +258,13 @@ function makeGroup(data_group: any) {
   if (type == "rays") {
     for (const ray of data) {
       console.assert(ray.length == 6);
-      const line = makeLine(ray);
+      const color = data_group.color ?? "#ffa724";
+      const line = makeLine(ray, color);
       group.add(line);
     }
   }
 
-  if (type == 'surfaces') {
+  else if (type == 'surfaces') {
     for (const surface of data) {
       // TODO: check that points are all Y > 0
       const matrix = surface.matrix;
@@ -275,15 +276,19 @@ function makeGroup(data_group: any) {
   }
 
   // Points
-  if (type == 'points') {
+  else if (type == 'points') {
     const color = data_group.color ?? "#ffffff";
     group.add(makePointsSpheres(data, color));
 
   }
 
   // Arrows
-  if (type == 'arrows') {
+  else if (type == 'arrows') {
     group.add(makeArrows(data));
+  }
+
+  else {
+    console.error("tlmviewer: unknown type: " + type);
   }
 
   return group;
