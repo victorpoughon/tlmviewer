@@ -5,6 +5,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { makeScene3D } from "./scene3D.ts";
 import { makeScene2D } from "./scene2D.ts";
 
+import { get_default } from "./utility.ts";
+
 class ThreeJSApp {
     private scene: THREE.Scene;
     private renderer: THREE.WebGLRenderer;
@@ -27,15 +29,14 @@ class ThreeJSApp {
 
         // Setup the default perspective camera
         if (camera === "orthographic") {
-            [this.camera, this.controls] = this.setupOrthographicCamera();            
+            [this.camera, this.controls] = this.setupOrthographicCamera();
         } else if (camera == "perspective") {
             [this.camera, this.controls] = this.setupPerspectiveCamera();
         } else if (camera === "XY") {
             [this.camera, this.controls] = this.setupXYCamera();
         } else {
-            throw new Error(`Uknown camera type '${camera}'`)
+            throw new Error(`Uknown camera type '${camera}'`);
         }
-
 
         // Handle window resizing
         //window.addEventListener("resize", this.onWindowResize.bind(this));
@@ -60,10 +61,7 @@ class ThreeJSApp {
     }
 
     // The 2D camera
-    private setupXYCamera(): [
-        THREE.OrthographicCamera,
-        OrbitControls
-    ] {
+    private setupXYCamera(): [THREE.OrthographicCamera, OrbitControls] {
         const rect = this.container.getBoundingClientRect();
         const aspect = rect.width / rect.height;
         const newCamera = new THREE.OrthographicCamera(
@@ -118,10 +116,7 @@ class ThreeJSApp {
         return [newCamera, newControls];
     }
 
-    private setupPerspectiveCamera(): [
-        THREE.PerspectiveCamera,
-        OrbitControls
-    ] {
+    private setupPerspectiveCamera(): [THREE.PerspectiveCamera, OrbitControls] {
         const rect = this.container.getBoundingClientRect();
         const aspect = rect.width / rect.height;
         const newCamera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
@@ -152,35 +147,25 @@ class ThreeJSApp {
     }
 }
 
-// Get the key of object with a default value and check that it's within the
-// list of allowed values. The default value is assumed to be the first element
-// of the options list.
-function get_default(obj: any, key: string, options: string[]): string {
-    const value = obj[key] ?? options[0];
-
-    if (options.indexOf(value) == -1) {
-        throw new Error(`${key} must be one of ${options}`);
-    }
-
-    return value;
-}
-
 function setupApp(container: HTMLElement, data: any) {
     const mode = get_default(data, "mode", ["3D", "2D"]);
-    const camera = get_default(data, "camera", ["orthographic", "perspective", "XY"]);
+    const camera = get_default(data, "camera", [
+        "orthographic",
+        "perspective",
+        "XY",
+    ]);
 
     var scene: THREE.Scene;
     if (mode === "3D") {
         scene = makeScene3D(data);
     } else if (mode === "2D") {
         scene = makeScene2D(data);
-    }
-    else {
+    } else {
         throw new Error("Uknown scene mode " + mode);
     }
 
     const app = new ThreeJSApp(container, scene, camera);
-    
+
     return app;
 }
 

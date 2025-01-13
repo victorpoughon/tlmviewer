@@ -1,8 +1,6 @@
 import * as THREE from "three";
 
-function raise_error(error: string) {
-    throw new Error(error);
-}
+import { get_required } from "./utility.ts";
 
 export function makeLine(start: number[], end: number[], color: string) {
     console.assert(start.length == 3);
@@ -45,6 +43,23 @@ const squareClipVectors = [
     new THREE.Vector3(0, 0, -1),
 ];
 
+function makeSurfaces(element: any, _dim: number): THREE.Group {
+    const data = get_required(element, "data");
+
+    const group = new THREE.Group();
+
+    for (const surface of data) {
+        // TODO: check that points are all Y > 0
+        const matrix = surface.matrix;
+        const samples = surface.samples;
+        const side_length = surface.side_length ?? undefined;
+        const lathe = makeSurface(matrix, samples, side_length);
+        group.add(lathe);
+    }
+
+    return group;
+}
+
 function makeSurface(
     matrix4: Array<Array<number>>,
     samples: Array<Array<number>>,
@@ -60,24 +75,9 @@ function makeSurface(
     // 4. Compose with the matrix4 in the data
 
     // Make the composed transform
-    const flip = new THREE.Matrix4(
-        0,
-        1,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        1
-    );
+    const flip = new THREE.Matrix4().fromArray([
+        0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+    ]);
     const userTransform = arrayToMatrix4(matrix4);
     const transform = new THREE.Matrix4();
     transform.multiplyMatrices(userTransform, flip);
@@ -114,28 +114,18 @@ function makeSurface(
     return lathe;
 }
 
-// @ts-ignore
-function makePoints(vertices: Array<number>) {
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute(
-        "position",
-        new THREE.Float32BufferAttribute(vertices.flat(), 3)
-    );
-    const material = new THREE.PointsMaterial({ color: 0xffffff, size: 1 });
-    const points = new THREE.Points(geometry, material);
-    return points;
-}
+function makePoints(element: any, _dim: number): THREE.Group {
+    const vertices = get_required(element, "data");
+    const color = element.color ?? "#ffffff";
 
-function makePointsSpheres(
-    vertices: Array<[number, number, number]>,
-    color: string
-) {
     const group = new THREE.Group();
     for (const point of vertices) {
         const geometry = new THREE.SphereGeometry(0.1, 8, 8);
         const material = new THREE.MeshBasicMaterial({ color: color });
         const sphere = new THREE.Mesh(geometry, material);
-        sphere.position.set(...point);
+
+        console.assert(point.length == 3);
+        sphere.position.set(point[0], point[1], point[2]);
 
         group.add(sphere);
     }
@@ -143,9 +133,9 @@ function makePointsSpheres(
     return group;
 }
 
-function makeArrows(
-    arrows: Array<[number, number, number, number, number, number, number]>
-) {
+function makeArrows(element: any, _dim: number): THREE.Group {
+    const arrows = get_required(element, "data");
+
     const group = new THREE.Group();
 
     for (const arrow of arrows) {
@@ -162,64 +152,49 @@ function makeArrows(
     return group;
 }
 
-function makeGroup(data_group: any) {
-    const type = data_group.type ?? raise_error("missing key type in group");
-    const data = data_group.data ?? raise_error("missing key data in group");
+function makeRays(element: any, _dim: number): THREE.Group {
+    const data = get_required(element, "data");
+    const color = element.color ?? "#ffa724";
 
     const group = new THREE.Group();
 
-    // Rays
-    if (type == "rays") {
-        for (const ray of data) {
-            console.assert(ray.length == 6);
-            const color = data_group.color ?? "#ffa724";
-            const line = makeLine(ray.slice(0, 3), ray.slice(3, 6), color);
-            group.add(line);
-        }
-    }
-
-    // Surfaces
-    else if (type == "surfaces") {
-        for (const surface of data) {
-            // TODO: check that points are all Y > 0
-            const matrix = surface.matrix;
-            const samples = surface.samples;
-            const side_length = surface.side_length ?? undefined;
-            const lathe = makeSurface(matrix, samples, side_length);
-            group.add(lathe);
-        }
-    }
-
-    // Points
-    else if (type == "points") {
-        const color = data_group.color ?? "#ffffff";
-        group.add(makePointsSpheres(data, color));
-    }
-
-    // Arrows
-    else if (type == "arrows") {
-        group.add(makeArrows(data));
-    }
-
-    // error case
-    else {
-        throw new Error("tlmviewer: unknown type: " + type);
+    for (const ray of data) {
+        console.assert(ray.length == 6);
+        const line = makeLine(ray.slice(0, 3), ray.slice(3, 6), color);
+        group.add(line);
     }
 
     return group;
 }
 
-export function makeScene3D(data: any) {
+function makeElement(element: any, _dim: number) : THREE.Group {
+    const type: string = get_required(element, "type");
+
+    type MakerFunction = (element: any, _dim: number) => THREE.Group;
+    const makers: { [key: string]: MakerFunction } = {
+        "rays": makeRays,
+        "surfaces": makeSurfaces,
+        "points": makePoints,
+        "arrows": makeArrows,
+    };
+
+    if (!makers.hasOwnProperty(type)) {
+        throw new Error("tlmviewer: unknown type: " + type);
+    }
+
+    // Call matching maker function
+    const maker = makers[type];
+
+    return maker(element, 3);
+}
+
+export function makeScene3D(root: any) {
     const scene = new THREE.Scene();
 
-    const data_data =
-        data.data ??
-        (() => {
-            throw new Error("missing key 'data' in scene");
-        })();
+    const data = get_required(root, "data");
 
-    for (const data_group of data_data) {
-        scene.add(makeGroup(data_group));
+    for (const element of data) {
+        scene.add(makeElement(element, 3));
     }
 
     // Axes helper

@@ -2,7 +2,6 @@ import * as THREE from "three";
 
 import { makeLine } from "./scene3D";
 
-// @ts-ignore
 export function makeScene2D(data: any) {
     const scene = new THREE.Scene();
 
