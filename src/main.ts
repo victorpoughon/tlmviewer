@@ -2,8 +2,7 @@ import * as THREE from "three";
 
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-import { makeScene3D } from "./scene3D.ts";
-import { makeScene2D } from "./scene2D.ts";
+import { makeScene } from "./scene.ts";
 
 import { get_default } from "./utility.ts";
 
@@ -157,9 +156,9 @@ function setupApp(container: HTMLElement, data: any) {
 
     var scene: THREE.Scene;
     if (mode === "3D") {
-        scene = makeScene3D(data);
+        scene = makeScene(data, 3);
     } else if (mode === "2D") {
-        scene = makeScene2D(data);
+        scene = makeScene(data, 2);
     } else {
         throw new Error("Uknown scene mode " + mode);
     }

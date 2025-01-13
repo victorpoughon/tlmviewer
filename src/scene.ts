@@ -152,7 +152,7 @@ function makeArrows(element: any, _dim: number): THREE.Group {
     return group;
 }
 
-function makeRays(element: any, _dim: number): THREE.Group {
+function makeRays(element: any, dim: number): THREE.Group {
     const data = get_required(element, "data");
     const color = element.color ?? "#ffa724";
 
@@ -160,22 +160,31 @@ function makeRays(element: any, _dim: number): THREE.Group {
 
     for (const ray of data) {
         console.assert(ray.length == 6);
-        const line = makeLine(ray.slice(0, 3), ray.slice(3, 6), color);
+        var start, end;
+
+        if (dim == 2) {
+            start = ray.slice(0, 2);
+            end = ray.slice(2, 4);
+        } else {
+            start = ray.slice(0, 3);
+            end = ray.slice(3, 6);
+        }
+        const line = makeLine(start, end, color);
         group.add(line);
     }
 
     return group;
 }
 
-function makeElement(element: any, _dim: number) : THREE.Group {
+function makeElement(element: any, dim: number): THREE.Group {
     const type: string = get_required(element, "type");
 
     type MakerFunction = (element: any, _dim: number) => THREE.Group;
     const makers: { [key: string]: MakerFunction } = {
-        "rays": makeRays,
-        "surfaces": makeSurfaces,
-        "points": makePoints,
-        "arrows": makeArrows,
+        rays: makeRays,
+        surfaces: makeSurfaces,
+        points: makePoints,
+        arrows: makeArrows,
     };
 
     if (!makers.hasOwnProperty(type)) {
@@ -185,22 +194,26 @@ function makeElement(element: any, _dim: number) : THREE.Group {
     // Call matching maker function
     const maker = makers[type];
 
-    return maker(element, 3);
+    return maker(element, dim);
 }
 
-export function makeScene3D(root: any) {
+export function makeScene(root: any, dim: number) {
     const scene = new THREE.Scene();
 
     const data = get_required(root, "data");
 
     for (const element of data) {
-        scene.add(makeElement(element, 3));
+        scene.add(makeElement(element, dim));
     }
 
     // Axes helper
     if (data.show_axes ?? true) {
-        const axesHelper = new THREE.AxesHelper(5);
-        scene.add(axesHelper);
+        if (dim == 2) {
+            scene.add(makeLine([0, -500, 0], [0, 500, 0], "white"));
+        } else if (dim == 3) {
+            const axesHelper = new THREE.AxesHelper(5);
+            scene.add(axesHelper);
+        }
     }
 
     // Optical Axis
