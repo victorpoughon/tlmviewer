@@ -297,7 +297,7 @@ function makeGroup(data_group: any) {
 function makeScene(data: any) {
   const scene = new THREE.Scene();
 
-  const data_data = data.data;
+  const data_data = data.data ?? (() => { throw new Error("missing key 'data' in scene") })();
 
   for (const data_group of data_data) {
     scene.add(makeGroup(data_group));
