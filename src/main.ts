@@ -75,7 +75,7 @@ class ThreeJSApp {
             10000
         );
 
-        newCamera.position.set(0, 0, 0);
+        newCamera.position.set(0, 0, 10);
         newCamera.lookAt(0, 0, 0);
 
         if (this.camera) {
@@ -152,27 +152,43 @@ class ThreeJSApp {
     }
 }
 
-function makeScene(data: any) {
-    const mode = data.mode ?? "3D";
+// Get the key of object with a default value and check that it's within the
+// list of allowed values. The default value is assumed to be the first element
+// of the options list.
+function get_default(obj: any, key: string, options: string[]): string {
+    const value = obj[key] ?? options[0];
 
-    if (mode === "3D") {
-        return makeScene3D(data);
-    } else if (mode === "2D") {
-        return makeScene2D(data);
-    } else {
-        throw new Error(`Unknown scene mode ${mode}`);
+    if (options.indexOf(value) == -1) {
+        throw new Error(`${key} must be one of ${options}`);
     }
+
+    return value;
+}
+
+function setupApp(container: HTMLElement, data: any) {
+    const mode = get_default(data, "mode", ["3D", "2D"]);
+    const camera = get_default(data, "camera", ["orthographic", "perspective", "XY"]);
+
+    var scene: THREE.Scene;
+    if (mode === "3D") {
+        scene = makeScene3D(data);
+    } else if (mode === "2D") {
+        scene = makeScene2D(data);
+    }
+    else {
+        throw new Error("Uknown scene mode " + mode);
+    }
+
+    const app = new ThreeJSApp(container, scene, camera);
+    
+    return app;
 }
 
 // tlmviewer entry point
 export function tlmviewer(container: HTMLElement, json_data: string) {
     try {
         const data = JSON.parse(json_data);
-        const scene: THREE.Scene = makeScene(data);
-
-        const camera: string = data.camera ?? "orthographic";
-
-        const app = new ThreeJSApp(container, scene, camera);
+        const app = setupApp(container, data);
         app.animate();
     } catch (error) {
         container.innerHTML = "tlmviewer error: " + error;

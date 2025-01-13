@@ -1,18 +1,19 @@
 import * as THREE from "three";
 
+import { makeLine } from "./scene3D";
+
 // @ts-ignore
 export function makeScene2D(data: any) {
     const scene = new THREE.Scene();
 
-    // Axes helper
+    // Meridional axis
     if (data.show_axes ?? true) {
-        //const axesHelper = new THREE.AxesHelper(5);
-        //scene.add(axesHelper);
+        scene.add(makeLine([0, -500, 0], [0, 500, 0], "white"));
     }
 
     // Optical Axis
     if (data.show_optical_axis ?? true) {
-        //scene.add(makeOpticalAxis(-500, 500));
+        scene.add(makeLine([-500, 0, 0], [500, 0, 0], "white"));
     }
 
     return scene;

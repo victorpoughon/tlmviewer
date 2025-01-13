@@ -4,14 +4,15 @@ function raise_error(error: string) {
     throw new Error(error);
 }
 
-function makeLine(ray: number[], color: string) {
-    console.assert(ray.length == 6);
+export function makeLine(start: number[], end: number[], color: string) {
+    console.assert(start.length == 3);
+    console.assert(end.length == 3);
 
     const material = new THREE.LineBasicMaterial({ color: color });
 
     const points = [];
-    points.push(new THREE.Vector3().fromArray(ray.slice(0, 3)));
-    points.push(new THREE.Vector3().fromArray(ray.slice(3, 6)));
+    points.push(new THREE.Vector3().fromArray(start));
+    points.push(new THREE.Vector3().fromArray(end));
 
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
     return new THREE.Line(geometry, material);
@@ -161,17 +162,6 @@ function makeArrows(
     return group;
 }
 
-function makeOpticalAxis(start: number, end: number) {
-    const material = new THREE.LineBasicMaterial({ color: 0xffffff });
-
-    const points = [];
-    points.push(new THREE.Vector3(start, 0, 0));
-    points.push(new THREE.Vector3(end, 0, 0));
-
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    return new THREE.Line(geometry, material);
-}
-
 function makeGroup(data_group: any) {
     const type = data_group.type ?? raise_error("missing key type in group");
     const data = data_group.data ?? raise_error("missing key data in group");
@@ -183,7 +173,7 @@ function makeGroup(data_group: any) {
         for (const ray of data) {
             console.assert(ray.length == 6);
             const color = data_group.color ?? "#ffa724";
-            const line = makeLine(ray, color);
+            const line = makeLine(ray.slice(0, 3), ray.slice(3, 6), color);
             group.add(line);
         }
     }
@@ -240,7 +230,7 @@ export function makeScene3D(data: any) {
 
     // Optical Axis
     if (data.show_optical_axis ?? true) {
-        scene.add(makeOpticalAxis(-500, 500));
+        scene.add(makeLine([-500, 0, 0], [500, 0, 0], "white"));
     }
 
     return scene;
