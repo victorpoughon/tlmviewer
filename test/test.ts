@@ -7,6 +7,7 @@ const all_tests = [
     "test4.json",
     "test5.json",
     "test6.json",
+    "dispersion.json",
 ];
 
 function runTest(json, test_file) {

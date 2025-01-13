@@ -2,6 +2,10 @@ import * as THREE from "three";
 
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
+function raise_error(error: string) {
+    throw new Error(error);
+}
+
 class ThreeJSApp {
     private scene: THREE.Scene;
     private renderer: THREE.WebGLRenderer;
@@ -283,11 +287,12 @@ function makeOpticalAxis(start: number, end: number) {
 }
 
 function makeGroup(data_group: any) {
-    const type = data_group["type"];
-    const data = data_group["data"];
+    const type = data_group.type ?? raise_error("missing key type in group");
+    const data = data_group.data ?? raise_error("missing key data in group");
 
     const group = new THREE.Group();
 
+    // Rays
     if (type == "rays") {
         for (const ray of data) {
             console.assert(ray.length == 6);
@@ -295,7 +300,10 @@ function makeGroup(data_group: any) {
             const line = makeLine(ray, color);
             group.add(line);
         }
-    } else if (type == "surfaces") {
+    }
+
+    // Surfaces
+    else if (type == "surfaces") {
         for (const surface of data) {
             // TODO: check that points are all Y > 0
             const matrix = surface.matrix;
@@ -315,8 +323,11 @@ function makeGroup(data_group: any) {
     // Arrows
     else if (type == "arrows") {
         group.add(makeArrows(data));
-    } else {
-        console.error("tlmviewer: unknown type: " + type);
+    }
+
+    // error case
+    else {
+        throw new Error("tlmviewer: unknown type: " + type);
     }
 
     return group;
