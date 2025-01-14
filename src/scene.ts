@@ -1,5 +1,9 @@
 import * as THREE from "three";
 
+import { Line2 } from "three/addons/lines/Line2.js";
+import { LineGeometry } from "three/addons/lines/LineGeometry.js";
+import { LineMaterial } from "three/addons/lines/LineMaterial.js";
+
 import { get_required } from "./utility.ts";
 
 export function makeLine(start: number[], end: number[], color: string) {
@@ -43,15 +47,72 @@ const squareClipVectors = [
     new THREE.Vector3(0, 0, -1),
 ];
 
-function makeSurfaces(element: any, _dim: number): THREE.Group {
+// Convert a 3x3 homogeneous matrix to a 4x4 homogeneous matrix,
+// by inserting identity transform to the new axis
+function homogeneousMatrix3to4(matrix: number[][]): number[][] {
+    // Check if the input matrix is 3x3
+    if (matrix.length !== 3 || matrix.some((row) => row.length !== 3)) {
+        throw new Error("Input matrix must be 3x3");
+    }
+
+    return [
+        [matrix[0][0], matrix[0][1], 0, matrix[0][2]],
+        [matrix[1][0], matrix[1][1], 0, matrix[1][2]],
+        [0, 0, 1, 0],
+        [matrix[2][0], matrix[2][1], 0, matrix[2][2]],
+    ];
+}
+
+function makeSurfaces(element: any, dim: number): THREE.Group {
+    if (dim == 2) {
+        return makeSurfaces2D(element);
+    } else {
+        return makeSurfaces3D(element);
+    }
+}
+
+function makeSurfaces2D(element: any): THREE.Group {
+    const group = new THREE.Group();
+
+    const data = get_required(element, "data");
+
+    for (const surface of data) {
+        const matrix4 = homogeneousMatrix3to4(get_required(surface, "matrix3"));
+        const samples = get_required(surface, "samples");
+
+        const material = new LineMaterial({
+            color: "cyan",
+            linewidth: 2,
+            worldUnits: false,
+            side: THREE.DoubleSide,
+        });
+
+        const points: number[] = [];
+        for (const p of samples) {
+            points.push(p[0], p[1], 1.0);
+        }
+
+        //const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const geometry = new LineGeometry();
+        geometry.setPositions(points);
+        const line_mesh = new Line2(geometry, material);
+        line_mesh.applyMatrix4(arrayToMatrix4(matrix4));
+        group.add(line_mesh);
+    }
+
+    return group;
+}
+
+function makeSurfaces3D(element: any): THREE.Group {
     const data = get_required(element, "data");
 
     const group = new THREE.Group();
 
     for (const surface of data) {
         // TODO: check that points are all Y > 0
-        const matrix = surface.matrix;
-        const samples = surface.samples;
+        const matrix = get_required(surface, "matrix");
+        const samples = get_required(surface, "samples");
+
         const side_length = surface.side_length ?? undefined;
         const lathe = makeSurface(matrix, samples, side_length);
         group.add(lathe);
@@ -159,12 +220,12 @@ function makeRays(element: any, dim: number): THREE.Group {
     const group = new THREE.Group();
 
     for (const ray of data) {
-        console.assert(ray.length == 6);
+        console.assert(ray.length == 6 || ray.length == 4);
         var start, end;
 
         if (dim == 2) {
-            start = ray.slice(0, 2);
-            end = ray.slice(2, 4);
+            start = ray.slice(0, 2).concat([0.]);
+            end = ray.slice(2, 4).concat([0.]);
         } else {
             start = ray.slice(0, 3);
             end = ray.slice(3, 6);

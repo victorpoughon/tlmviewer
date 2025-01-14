@@ -17,5 +17,5 @@ export function get_default(obj: any, key: string, options: string[]): string {
 
 // Get a required key
 export function get_required(obj: any, key: string): any {
-    return obj[key] ?? raise_error("missing key type in group");
+    return obj[key] ?? raise_error(`missing required key '${key}'`);
 }
