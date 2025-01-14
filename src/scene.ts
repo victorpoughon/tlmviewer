@@ -175,7 +175,7 @@ function makeSurface(
     return lathe;
 }
 
-function makePoints(element: any, _dim: number): THREE.Group {
+function makePoints(element: any, dim: number): THREE.Group {
     const vertices = get_required(element, "data");
     const color = element.color ?? "#ffffff";
 
@@ -185,8 +185,12 @@ function makePoints(element: any, _dim: number): THREE.Group {
         const material = new THREE.MeshBasicMaterial({ color: color });
         const sphere = new THREE.Mesh(geometry, material);
 
-        console.assert(point.length == 3);
-        sphere.position.set(point[0], point[1], point[2]);
+        console.assert(point.length == dim);
+        if (dim == 2) {
+            sphere.position.set(point[0], point[1], 2.0);
+        } else {
+            sphere.position.set(point[0], point[1], point[2]);
+        }
 
         group.add(sphere);
     }
@@ -224,8 +228,8 @@ function makeRays(element: any, dim: number): THREE.Group {
         var start, end;
 
         if (dim == 2) {
-            start = ray.slice(0, 2).concat([0.]);
-            end = ray.slice(2, 4).concat([0.]);
+            start = ray.slice(0, 2).concat([0]);
+            end = ray.slice(2, 4).concat([0]);
         } else {
             start = ray.slice(0, 3);
             end = ray.slice(3, 6);
