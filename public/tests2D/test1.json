@@ -28,7 +28,7 @@
             "type": "surfaces",
             "data": [
                 {
-                    "matrix3": [
+                    "matrix": [
                         [
                             -0.97,
                             0.26,

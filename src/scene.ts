@@ -77,7 +77,7 @@ function makeSurfaces2D(element: any): THREE.Group {
     const data = get_required(element, "data");
 
     for (const surface of data) {
-        const matrix4 = homogeneousMatrix3to4(get_required(surface, "matrix3"));
+        const matrix4 = homogeneousMatrix3to4(get_required(surface, "matrix"));
         const samples = get_required(surface, "samples");
 
         const material = new LineMaterial({
