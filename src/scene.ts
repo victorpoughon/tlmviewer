@@ -198,16 +198,28 @@ function makePoints(element: any, dim: number): THREE.Group {
     return group;
 }
 
-function makeArrows(element: any, _dim: number): THREE.Group {
+function makeArrows(element: any, dim: number): THREE.Group {
     const arrows = get_required(element, "data");
 
     const group = new THREE.Group();
 
     for (const arrow of arrows) {
-        const dir = new THREE.Vector3(...arrow.slice(0, 3));
+        var start, end, length;
+        if (dim == 2) {
+            console.assert(arrow.length == 5);
+            start = arrow.slice(0, 2);
+            end = arrow.slice(2, 4);
+            length = arrow[4];
+        } else {
+            console.assert(arrow.length == 7);
+            start = arrow.slice(0, 3);
+            end = arrow.slice(3, 6);
+            length = arrow[6]
+        }
+
+        const dir = new THREE.Vector3(...start);
         dir.normalize();
-        const origin = new THREE.Vector3(...arrow.slice(3, 6));
-        const length = arrow[6];
+        const origin = new THREE.Vector3(...end);
         const color = 0xffff00;
 
         const arrowHelper = new THREE.ArrowHelper(dir, origin, length, color);
