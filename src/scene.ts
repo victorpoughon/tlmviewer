@@ -38,15 +38,6 @@ function arrayToMatrix4(array: Array<Array<number>>): THREE.Matrix4 {
     return matrix;
 }
 
-// The four normal vectors for the four clipping planes
-// used to make squared outlines around the X axis
-const squareClipVectors = [
-    new THREE.Vector3(0, 1, 0),
-    new THREE.Vector3(0, -1, 0),
-    new THREE.Vector3(0, 0, 1),
-    new THREE.Vector3(0, 0, -1),
-];
-
 // Convert a 3x3 homogeneous matrix to a 4x4 homogeneous matrix,
 // by inserting identity transform to the new axis
 function homogeneousMatrix3to4(matrix: number[][]): number[][] {
@@ -112,9 +103,9 @@ function makeSurfaces3D(element: any): THREE.Group {
         // TODO: check that points are all Y > 0
         const matrix = get_required(surface, "matrix");
         const samples = get_required(surface, "samples");
+        const clip_planes = surface.clip_planes ?? [];
 
-        const side_length = surface.side_length ?? undefined;
-        const lathe = makeSurface(matrix, samples, side_length);
+        const lathe = makeSurface(matrix, samples, clip_planes);
         group.add(lathe);
     }
 
@@ -124,7 +115,7 @@ function makeSurfaces3D(element: any): THREE.Group {
 function makeSurface(
     matrix4: Array<Array<number>>,
     samples: Array<Array<number>>,
-    side_length: number | undefined
+    clip_planes: number[][]
 ) {
     const segments = 50;
     // threejs lathe surface makes a revolution around the Y axis
@@ -147,26 +138,23 @@ function makeSurface(
 
     const geometry = new THREE.LatheGeometry(tpoints, segments);
 
-    // If 'square' is in the data
-    // form a square of the given side length
-    // Side length of the clipping square
-    const clipPlanes: THREE.Plane[] =
-        side_length === undefined
-            ? []
-            : squareClipVectors.map(
-                  (v) =>
-                      new THREE.Plane(
-                          v,
-                          v
-                              .clone()
-                              .multiplyScalar(side_length / 2)
-                              .length()
-                      )
-              );
+    // Clip planes are encoded as [x, y, z, c], where:
+    //     [x, y, z] is the normal vector in surface local frame
+    //     c is the constant in surface local frame
+    const clipPlanes: THREE.Plane[] = [];
+    for (const plane of clip_planes) {
+        const v = new THREE.Vector3(plane[0], plane[1], plane[2]);
+
+        const c = plane[3];
+        const tplane = new THREE.Plane(v, c);
+        tplane.applyMatrix4(userTransform);
+        clipPlanes.push(tplane);
+    }
 
     const material = new THREE.MeshNormalMaterial({
         side: THREE.DoubleSide,
         clippingPlanes: clipPlanes,
+        clipIntersection: false,
     });
     material.transparent = true;
     material.opacity = 0.8;
@@ -214,7 +202,7 @@ function makeArrows(element: any, dim: number): THREE.Group {
             console.assert(arrow.length == 7);
             start = arrow.slice(0, 3);
             end = arrow.slice(3, 6);
-            length = arrow[6]
+            length = arrow[6];
         }
 
         const dir = new THREE.Vector3(...start);
