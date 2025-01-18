@@ -173,7 +173,9 @@ function makePoints(element: any, dim: number): THREE.Group {
         const material = new THREE.MeshBasicMaterial({ color: color });
         const sphere = new THREE.Mesh(geometry, material);
 
-        console.assert(point.length == dim);
+        if (point.length != dim) {
+            throw new Error(`point array length is ${point.length} (expected ${dim})`);
+        }
         if (dim == 2) {
             sphere.position.set(point[0], point[1], 2.0);
         } else {
@@ -227,6 +229,9 @@ function makeRays(element: any, dim: number): THREE.Group {
         console.assert(ray.length == 6 || ray.length == 4);
         var start, end;
 
+        if (ray.length != 2*dim) {
+            throw new Error(`ray array length is ${ray.length} (expected ${2*dim})`);
+        }
         if (dim == 2) {
             start = ray.slice(0, 2).concat([0]);
             end = ray.slice(2, 4).concat([0]);
