@@ -225,6 +225,10 @@ function makeRays(element: any, dim: number): THREE.Group {
 
     const group = new THREE.Group();
 
+    if (!(Symbol.iterator in Object(data))) {
+        throw new Error("data field of ray is not iterable");
+    }
+
     for (const ray of data) {
         console.assert(ray.length == 6 || ray.length == 4);
         var start, end;
