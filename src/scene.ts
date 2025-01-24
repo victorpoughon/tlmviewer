@@ -220,8 +220,21 @@ function makeArrows(element: any, dim: number): THREE.Group {
 }
 
 function makeRays(element: any, dim: number): THREE.Group {
+    // rays format:
+    /*
+    {
+        "type": "rays",
+        // default color for the group
+        "color": "red",
+        "data": [
+            // start_x, start_y, start_z, end_x, end_y, end_z, red, green, blue
+            [0, 0, 0, 10, 10, 10, 0, 255, 200],
+            ...
+        ]
+    }
+    */
     const data = get_required(element, "data");
-    const color = element.color ?? "#ffa724";
+    const default_color = element.color ?? "#ffa724";
 
     const group = new THREE.Group();
 
@@ -230,19 +243,30 @@ function makeRays(element: any, dim: number): THREE.Group {
     }
 
     for (const ray of data) {
-        console.assert(ray.length == 6 || ray.length == 4);
         var start, end;
-
-        if (ray.length != 2*dim) {
-            throw new Error(`ray array length is ${ray.length} (expected ${2*dim})`);
-        }
-        if (dim == 2) {
+        var color = default_color;
+        if (dim == 2 && ray.length == 4) {
             start = ray.slice(0, 2).concat([0]);
             end = ray.slice(2, 4).concat([0]);
-        } else {
+        } else if (dim == 2 && ray.length == 7) {
+            start = ray.slice(0, 2).concat([0]);
+            end = ray.slice(2, 4).concat([0]);
+            const [red, green, blue] = [ray[4], ray[5], ray[6]];
+            color = `rgb(${red}, ${green}, ${blue})`;
+            console.log(color);
+        } else if (dim == 3 && ray.length == 6) {
             start = ray.slice(0, 3);
             end = ray.slice(3, 6);
+        } else if (dim == 3 && ray.length == 9) {
+            start = ray.slice(0, 3);
+            end = ray.slice(3, 6);
+            const [red, green, blue] = [ray[6], ray[7], ray[8]];
+            color = `rgb(${red}, ${green}, ${blue})`;
+
+        } else {
+            throw new Error(`Invalid ray array length, got ${ray.length} for dim ${dim}`);
         }
+
         const line = makeLine(start, end, color);
         group.add(line);
     }
