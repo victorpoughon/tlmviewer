@@ -20,6 +20,25 @@ export function makeLine(start: number[], end: number[], color: string) {
     return new THREE.Line(geometry, material);
 }
 
+export function makeLine2(start: number[], end: number[], color: string) {
+    console.assert(start.length == 3);
+    console.assert(end.length == 3);
+
+    const material = new LineMaterial({
+        color: color,
+        linewidth: 1,
+        worldUnits: false,
+        side: THREE.DoubleSide,
+    });
+
+    const points = [];
+    points.push(new THREE.Vector3().fromArray(start));
+    points.push(new THREE.Vector3().fromArray(end));
+
+    const geometry = new LineGeometry().setFromPoints(points);
+    return new Line2(geometry, material);
+}
+
 function arrayToMatrix4(array: Array<Array<number>>): THREE.Matrix4 {
     if (array.length !== 4 || array.some((row) => row.length !== 4)) {
         throw new Error("Input must be a 4x4 array");
@@ -253,7 +272,6 @@ function makeRays(element: any, dim: number): THREE.Group {
             end = ray.slice(2, 4).concat([0]);
             const [red, green, blue] = [ray[4], ray[5], ray[6]];
             color = `rgb(${red}, ${green}, ${blue})`;
-            console.log(color);
         } else if (dim == 3 && ray.length == 6) {
             start = ray.slice(0, 3);
             end = ray.slice(3, 6);
@@ -267,7 +285,7 @@ function makeRays(element: any, dim: number): THREE.Group {
             throw new Error(`Invalid ray array length, got ${ray.length} for dim ${dim}`);
         }
 
-        const line = makeLine(start, end, color);
+        const line = makeLine2(start, end, color);
         group.add(line);
     }
 
