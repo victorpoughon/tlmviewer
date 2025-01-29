@@ -13,7 +13,12 @@ class ThreeJSApp {
     private controls: OrbitControls;
     private container: HTMLElement;
 
-    constructor(container: HTMLElement, sceneModel: THREE.Group, sceneHelpers: THREE.Group, camera: string) {
+    constructor(
+        container: HTMLElement,
+        sceneModel: THREE.Group,
+        sceneHelpers: THREE.Group,
+        camera: string
+    ) {
         this.container = container;
 
         // Set up the scene
@@ -66,7 +71,9 @@ class ThreeJSApp {
     }
 
     // The 2D camera
-    private setupXYCamera(bbox: THREE.Box3): [THREE.OrthographicCamera, OrbitControls] {
+    private setupXYCamera(
+        bbox: THREE.Box3
+    ): [THREE.OrthographicCamera, OrbitControls] {
         const rect = this.container.getBoundingClientRect();
         const aspect = rect.width / rect.height;
         const newCamera = new THREE.OrthographicCamera(
@@ -77,7 +84,6 @@ class ThreeJSApp {
             -10000,
             10000
         );
-
 
         if (this.camera) {
             this.controls.dispose();
@@ -92,24 +98,30 @@ class ThreeJSApp {
         bbox.getCenter(center);
         const size = new THREE.Vector3();
         bbox.getSize(size);
-        const frustumSize = 1.15*Math.max(size.x, size.y);
+        const marginFactor = 1.15;
 
         // Update camera position
-        newCamera.position.set(center.x, center.y, center.z + frustumSize);
+        newCamera.position.set(center.x, center.y, center.z + 100);
         // newCamera.lookAt(center);
-        
+
         // Update camera edges
-        newCamera.left = frustumSize * aspect / -2;
-        newCamera.right = frustumSize * aspect / 2;
-        newCamera.top = frustumSize / 2;
-        newCamera.bottom = frustumSize / -2;
-        
+        if (size.x > size.y) {
+            newCamera.left = marginFactor * size.x / -2;
+            newCamera.right = marginFactor * size.x / 2;
+            newCamera.top = marginFactor * ((1 / aspect) * size.x) / 2;
+            newCamera.bottom = marginFactor * ((1 / aspect) * size.x) / -2;
+        } else {
+            newCamera.left = marginFactor * (aspect * size.y) / -2;
+            newCamera.right = marginFactor * (aspect * size.y) / 2;
+            newCamera.top = marginFactor * size.y / 2;
+            newCamera.bottom = marginFactor * size.y / -2;
+        }
+
         newCamera.updateProjectionMatrix();
-        
+
         newControls.update();
 
         newControls.target = center;
-
 
         return [newCamera, newControls];
     }
