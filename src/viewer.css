@@ -1,0 +1,38 @@
+.tlmviewer-toolbar {
+    font-family: monospace;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border: 2px solid #cccccc;
+    height: 34px;
+    width: 600px;
+  }
+  
+  .group {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  
+  label.toggle {
+    background: #cccccc;
+    padding: 5px;
+    padding-right: 10px;
+    border-radius: 4px;
+    user-select: none;
+    margin: 2px;
+  }
+  
+  button {
+    width: 30px;
+    height: 30px;
+    margin: 0 2px;
+  }
+  
+  .divider {
+    height: 34px;
+    width: 2px;
+    background: #cccccc;
+    border-radius: 2px;
+    margin: 0 5px;
+  }

@@ -6,6 +6,10 @@ import { makeScene } from "./scene.ts";
 
 import { get_default } from "./utility.ts";
 
+import viewerTemplate from "./viewer.html?raw";
+
+import "./viewer.css";
+
 class ThreeJSApp {
     private scene: THREE.Scene;
     private renderer: THREE.WebGLRenderer;
@@ -17,7 +21,9 @@ class ThreeJSApp {
         container: HTMLElement,
         sceneModel: THREE.Group,
         sceneHelpers: THREE.Group,
-        camera: string
+        camera: string,
+        width: Number,
+        height: Number,
     ) {
         this.container = container;
 
@@ -29,8 +35,8 @@ class ThreeJSApp {
 
         // Set up the renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        const rect = container.getBoundingClientRect();
-        this.renderer.setSize(rect.width, rect.height);
+
+        this.renderer.setSize(width, height);
         this.renderer.localClippingEnabled = true;
         this.container.appendChild(this.renderer.domElement);
 
@@ -106,15 +112,15 @@ class ThreeJSApp {
 
         // Update camera edges
         if (size.x > size.y) {
-            newCamera.left = marginFactor * size.x / -2;
-            newCamera.right = marginFactor * size.x / 2;
-            newCamera.top = marginFactor * ((1 / aspect) * size.x) / 2;
-            newCamera.bottom = marginFactor * ((1 / aspect) * size.x) / -2;
+            newCamera.left = (marginFactor * size.x) / -2;
+            newCamera.right = (marginFactor * size.x) / 2;
+            newCamera.top = (marginFactor * ((1 / aspect) * size.x)) / 2;
+            newCamera.bottom = (marginFactor * ((1 / aspect) * size.x)) / -2;
         } else {
-            newCamera.left = marginFactor * (aspect * size.y) / -2;
-            newCamera.right = marginFactor * (aspect * size.y) / 2;
-            newCamera.top = marginFactor * size.y / 2;
-            newCamera.bottom = marginFactor * size.y / -2;
+            newCamera.left = (marginFactor * (aspect * size.y)) / -2;
+            newCamera.right = (marginFactor * (aspect * size.y)) / 2;
+            newCamera.top = (marginFactor * size.y) / 2;
+            newCamera.bottom = (marginFactor * size.y) / -2;
         }
 
         newCamera.updateProjectionMatrix();
@@ -186,7 +192,7 @@ class ThreeJSApp {
     }
 }
 
-function setupApp(container: HTMLElement, data: any) {
+function setupApp(container: HTMLElement, data: any, width: Number, height: Number) {
     const mode = get_default(data, "mode", ["3D", "2D"]);
     const camera = get_default(data, "camera", [
         "orthographic",
@@ -203,16 +209,33 @@ function setupApp(container: HTMLElement, data: any) {
         throw new Error("Uknown scene mode " + mode);
     }
 
-    const app = new ThreeJSApp(container, sceneModel, sceneHelpers, camera);
+
+    const app = new ThreeJSApp(container, sceneModel, sceneHelpers, camera, width, height);
 
     return app;
 }
 
 // tlmviewer entry point
 export function tlmviewer(container: HTMLElement, json_data: string) {
+
+    const jsonWidth = 1000;
+    const jsonHeight = 650;
+
     try {
+        const viewerElement = document.createElement("div");
+        viewerElement.classList.add("tlmviewer");
+        container.appendChild(viewerElement);
+
+        viewerElement.innerHTML = viewerTemplate;
+        
+        const viewport =
+            container.getElementsByClassName("tlmviewer-viewport")[0];
+
+        if (!(viewport instanceof HTMLElement))
+            throw new Error(`Expected viewport to be an HTMLElement`);
+
         const data = JSON.parse(json_data);
-        const app = setupApp(container, data);
+        const app = setupApp(viewport, data, jsonWidth, jsonHeight);
         app.animate();
     } catch (error) {
         container.innerHTML = "tlmviewer error: " + error;
