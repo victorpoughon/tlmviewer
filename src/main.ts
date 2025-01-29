@@ -13,10 +13,13 @@ class ThreeJSApp {
     private controls: OrbitControls;
     private container: HTMLElement;
 
-    constructor(container: HTMLElement, scene: THREE.Scene, camera: string) {
+    constructor(container: HTMLElement, sceneModel: THREE.Group, sceneHelpers: THREE.Group, camera: string) {
         this.container = container;
 
         // Set up the scene
+        const scene = new THREE.Scene();
+        scene.add(sceneModel);
+        scene.add(sceneHelpers);
         this.scene = scene;
 
         // Set up the renderer
@@ -26,13 +29,16 @@ class ThreeJSApp {
         this.renderer.localClippingEnabled = true;
         this.container.appendChild(this.renderer.domElement);
 
+        // note: precise=true seems broken for Line2
+        const sceneBoundingBox = new THREE.Box3().setFromObject(sceneModel);
+
         // Setup the default perspective camera
         if (camera === "orthographic") {
             [this.camera, this.controls] = this.setupOrthographicCamera();
         } else if (camera == "perspective") {
             [this.camera, this.controls] = this.setupPerspectiveCamera();
         } else if (camera === "XY") {
-            [this.camera, this.controls] = this.setupXYCamera();
+            [this.camera, this.controls] = this.setupXYCamera(sceneBoundingBox);
         } else {
             throw new Error(`Uknown camera type '${camera}'`);
         }
@@ -60,7 +66,7 @@ class ThreeJSApp {
     }
 
     // The 2D camera
-    private setupXYCamera(): [THREE.OrthographicCamera, OrbitControls] {
+    private setupXYCamera(bbox: THREE.Box3): [THREE.OrthographicCamera, OrbitControls] {
         const rect = this.container.getBoundingClientRect();
         const aspect = rect.width / rect.height;
         const newCamera = new THREE.OrthographicCamera(
@@ -72,8 +78,6 @@ class ThreeJSApp {
             10000
         );
 
-        newCamera.position.set(0, 0, 10);
-        newCamera.lookAt(0, 0, 0);
 
         if (this.camera) {
             this.controls.dispose();
@@ -83,6 +87,30 @@ class ThreeJSApp {
             newCamera,
             this.renderer.domElement
         );
+
+        const center = new THREE.Vector3();
+        bbox.getCenter(center);
+        const size = new THREE.Vector3();
+        bbox.getSize(size);
+        const frustumSize = 1.15*Math.max(size.x, size.y);
+
+        // Update camera position
+        newCamera.position.set(center.x, center.y, center.z + frustumSize);
+        // newCamera.lookAt(center);
+        
+        // Update camera edges
+        newCamera.left = frustumSize * aspect / -2;
+        newCamera.right = frustumSize * aspect / 2;
+        newCamera.top = frustumSize / 2;
+        newCamera.bottom = frustumSize / -2;
+        
+        newCamera.updateProjectionMatrix();
+        
+        newControls.update();
+
+        newControls.target = center;
+
+
         return [newCamera, newControls];
     }
 
@@ -154,16 +182,16 @@ function setupApp(container: HTMLElement, data: any) {
         "XY",
     ]);
 
-    var scene: THREE.Scene;
+    var sceneModel, sceneHelpers: THREE.Group;
     if (mode === "3D") {
-        scene = makeScene(data, 3);
+        [sceneModel, sceneHelpers] = makeScene(data, 3);
     } else if (mode === "2D") {
-        scene = makeScene(data, 2);
+        [sceneModel, sceneHelpers] = makeScene(data, 2);
     } else {
         throw new Error("Uknown scene mode " + mode);
     }
 
-    const app = new ThreeJSApp(container, scene, camera);
+    const app = new ThreeJSApp(container, sceneModel, sceneHelpers, camera);
 
     return app;
 }

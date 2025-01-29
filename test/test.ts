@@ -1,6 +1,7 @@
 import { tlmviewer } from "../src/main.ts";
 
 const all_tests = [
+    "/tests2D/bbtest.json",
     "/tests2D/plasma.json",
     "/tests2D/inverted_plasma.json",
     "/tests2D/rainbow.json",

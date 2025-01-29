@@ -34,9 +34,12 @@ export function makeLine2(start: number[], end: number[], color: string) {
     const points = [];
     points.push(new THREE.Vector3().fromArray(start));
     points.push(new THREE.Vector3().fromArray(end));
-
+    
     const geometry = new LineGeometry().setFromPoints(points);
-    return new Line2(geometry, material);
+    const ret = new Line2(geometry, material);
+
+    return ret;
+
 }
 
 function arrayToMatrix4(array: Array<Array<number>>): THREE.Matrix4 {
@@ -314,28 +317,34 @@ function makeElement(element: any, dim: number): THREE.Group {
 }
 
 export function makeScene(root: any, dim: number) {
-    const scene = new THREE.Scene();
+    
+    // Group for objects comming from the json data
+    const sceneModel = new THREE.Group();
+
+    // Group for helper objects
+    const sceneHelpers = new THREE.Group();
 
     const data = get_required(root, "data");
 
     for (const element of data) {
-        scene.add(makeElement(element, dim));
+        const sceneElement = makeElement(element, dim);
+        sceneModel.add(sceneElement);
     }
 
     // Axes helper
     if (data.show_axes ?? true) {
         if (dim == 2) {
-            scene.add(makeLine([0, -500, 0], [0, 500, 0], "white"));
+            sceneHelpers.add(makeLine([0, -500, 0], [0, 500, 0], "white"));
         } else if (dim == 3) {
             const axesHelper = new THREE.AxesHelper(5);
-            scene.add(axesHelper);
+            sceneHelpers.add(axesHelper);
         }
     }
 
     // Optical Axis
     if (data.show_optical_axis ?? true) {
-        scene.add(makeLine([-500, 0, 0], [500, 0, 0], "white"));
+        sceneHelpers.add(makeLine([-500, 0, 0], [500, 0, 0], "white"));
     }
 
-    return scene;
+    return [sceneModel, sceneHelpers];
 }
