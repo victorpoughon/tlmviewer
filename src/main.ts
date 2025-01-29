@@ -7,11 +7,11 @@ import { makeScene } from "./scene.ts";
 import { get_default } from "./utility.ts";
 
 import viewerTemplate from "./viewer.html?raw";
-
 import "./viewer.css";
 
 class ThreeJSApp {
     private scene: THREE.Scene;
+    private sceneModel: THREE.Group;
     private renderer: THREE.WebGLRenderer;
     private camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
     private controls: OrbitControls;
@@ -22,8 +22,8 @@ class ThreeJSApp {
         sceneModel: THREE.Group,
         sceneHelpers: THREE.Group,
         camera: string,
-        width: Number,
-        height: Number,
+        width: number,
+        height: number
     ) {
         this.container = container;
 
@@ -31,6 +31,7 @@ class ThreeJSApp {
         const scene = new THREE.Scene();
         scene.add(sceneModel);
         scene.add(sceneHelpers);
+        this.sceneModel = sceneModel;
         this.scene = scene;
 
         // Set up the renderer
@@ -40,16 +41,13 @@ class ThreeJSApp {
         this.renderer.localClippingEnabled = true;
         this.container.appendChild(this.renderer.domElement);
 
-        // note: precise=true seems broken for Line2
-        const sceneBoundingBox = new THREE.Box3().setFromObject(sceneModel);
-
         // Setup the default perspective camera
         if (camera === "orthographic") {
             [this.camera, this.controls] = this.setupOrthographicCamera();
         } else if (camera == "perspective") {
             [this.camera, this.controls] = this.setupPerspectiveCamera();
         } else if (camera === "XY") {
-            [this.camera, this.controls] = this.setupXYCamera(sceneBoundingBox);
+            [this.camera, this.controls] = this.setupXYCamera();
         } else {
             throw new Error(`Uknown camera type '${camera}'`);
         }
@@ -76,10 +74,49 @@ class ThreeJSApp {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
+    private resetView() {
+        // note: precise=true seems broken for Line2
+        const sceneBoundingBox = new THREE.Box3().setFromObject(
+            this.sceneModel
+        );
+
+        const rect = this.container.getBoundingClientRect();
+        const aspect = rect.width / rect.height;
+
+        if (!(this.camera instanceof THREE.OrthographicCamera)) return;
+
+        const center = new THREE.Vector3();
+        sceneBoundingBox.getCenter(center);
+        const size = new THREE.Vector3();
+        sceneBoundingBox.getSize(size);
+        const marginFactor = 1.15;
+
+        this.camera.zoom = 1;
+        // Update camera position
+        this.camera.position.set(center.x, center.y, center.z + 100);
+        // this.camera.lookAt(center);
+
+        // Update camera edges
+        if (size.x > size.y) {
+            this.camera.left = (marginFactor * size.x) / -2;
+            this.camera.right = (marginFactor * size.x) / 2;
+            this.camera.top = (marginFactor * ((1 / aspect) * size.x)) / 2;
+            this.camera.bottom = (marginFactor * ((1 / aspect) * size.x)) / -2;
+        } else {
+            this.camera.left = (marginFactor * (aspect * size.y)) / -2;
+            this.camera.right = (marginFactor * (aspect * size.y)) / 2;
+            this.camera.top = (marginFactor * size.y) / 2;
+            this.camera.bottom = (marginFactor * size.y) / -2;
+        }
+
+        this.camera.updateProjectionMatrix();
+        this.controls.update();
+
+        this.controls.target = center;
+    }
+
     // The 2D camera
-    private setupXYCamera(
-        bbox: THREE.Box3
-    ): [THREE.OrthographicCamera, OrbitControls] {
+    private setupXYCamera(): [THREE.OrthographicCamera, OrbitControls] {
         const rect = this.container.getBoundingClientRect();
         const aspect = rect.width / rect.height;
         const newCamera = new THREE.OrthographicCamera(
@@ -100,34 +137,10 @@ class ThreeJSApp {
             this.renderer.domElement
         );
 
-        const center = new THREE.Vector3();
-        bbox.getCenter(center);
-        const size = new THREE.Vector3();
-        bbox.getSize(size);
-        const marginFactor = 1.15;
+        this.camera = newCamera;
+        this.controls = newControls;
 
-        // Update camera position
-        newCamera.position.set(center.x, center.y, center.z + 100);
-        // newCamera.lookAt(center);
-
-        // Update camera edges
-        if (size.x > size.y) {
-            newCamera.left = (marginFactor * size.x) / -2;
-            newCamera.right = (marginFactor * size.x) / 2;
-            newCamera.top = (marginFactor * ((1 / aspect) * size.x)) / 2;
-            newCamera.bottom = (marginFactor * ((1 / aspect) * size.x)) / -2;
-        } else {
-            newCamera.left = (marginFactor * (aspect * size.y)) / -2;
-            newCamera.right = (marginFactor * (aspect * size.y)) / 2;
-            newCamera.top = (marginFactor * size.y) / 2;
-            newCamera.bottom = (marginFactor * size.y) / -2;
-        }
-
-        newCamera.updateProjectionMatrix();
-
-        newControls.update();
-
-        newControls.target = center;
+        this.resetView();
 
         return [newCamera, newControls];
     }
@@ -158,6 +171,7 @@ class ThreeJSApp {
             newCamera,
             this.renderer.domElement
         );
+
         return [newCamera, newControls];
     }
 
@@ -177,7 +191,15 @@ class ThreeJSApp {
             newCamera,
             this.renderer.domElement
         );
+
         return [newCamera, newControls];
+    }
+
+    public registerEventHandlers(container: HTMLElement): void {
+        const resetViewButton = container.querySelector("button.reset-view");
+        resetViewButton?.addEventListener("click", () => {
+            this.resetView();
+        });
     }
 
     // Start the animation loop
@@ -192,7 +214,12 @@ class ThreeJSApp {
     }
 }
 
-function setupApp(container: HTMLElement, data: any, width: Number, height: Number) {
+function setupApp(
+    container: HTMLElement,
+    data: any,
+    width: number,
+    height: number
+) {
     const mode = get_default(data, "mode", ["3D", "2D"]);
     const camera = get_default(data, "camera", [
         "orthographic",
@@ -209,15 +236,21 @@ function setupApp(container: HTMLElement, data: any, width: Number, height: Numb
         throw new Error("Uknown scene mode " + mode);
     }
 
-
-    const app = new ThreeJSApp(container, sceneModel, sceneHelpers, camera, width, height);
+    const app = new ThreeJSApp(
+        container,
+        sceneModel,
+        sceneHelpers,
+        camera,
+        width,
+        height
+    );
 
     return app;
 }
 
 // tlmviewer entry point
 export function tlmviewer(container: HTMLElement, json_data: string) {
-
+    // TODO get this from json
     const jsonWidth = 1000;
     const jsonHeight = 650;
 
@@ -227,7 +260,7 @@ export function tlmviewer(container: HTMLElement, json_data: string) {
         container.appendChild(viewerElement);
 
         viewerElement.innerHTML = viewerTemplate;
-        
+
         const viewport =
             container.getElementsByClassName("tlmviewer-viewport")[0];
 
@@ -236,6 +269,10 @@ export function tlmviewer(container: HTMLElement, json_data: string) {
 
         const data = JSON.parse(json_data);
         const app = setupApp(viewport, data, jsonWidth, jsonHeight);
+
+        // Register event handlers
+        app.registerEventHandlers(container);
+
         app.animate();
     } catch (error) {
         container.innerHTML = "tlmviewer error: " + error;
