@@ -4,6 +4,8 @@ const all_tests = [
     "/tests2D/bbtest1.json",
     "/tests2D/bbtest2.json",
     "/tests2D/bbtest3.json",
+    "/tests2D/bbtest4.json",
+    "/tests2D/bbtest5.json",
     "/tests2D/plasma.json",
     "/tests2D/inverted_plasma.json",
     "/tests2D/rainbow.json",

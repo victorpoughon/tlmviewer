@@ -97,7 +97,7 @@ class ThreeJSApp {
         // this.camera.lookAt(center);
 
         // Update camera edges
-        if (size.x > size.y) {
+        if (size.x > aspect*size.y) {
             this.camera.left = (marginFactor * size.x) / -2;
             this.camera.right = (marginFactor * size.x) / 2;
             this.camera.top = (marginFactor * ((1 / aspect) * size.x)) / 2;
@@ -251,8 +251,8 @@ function setupApp(
 // tlmviewer entry point
 export function tlmviewer(container: HTMLElement, json_data: string) {
     // TODO get this from json
-    const jsonWidth = 1000;
-    const jsonHeight = 650;
+    const jsonWidth = 800;
+    const jsonHeight = 500;
 
     try {
         const viewerElement = document.createElement("div");
