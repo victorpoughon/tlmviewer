@@ -1,3 +1,5 @@
+import GUI from 'lil-gui';
+
 import * as THREE from "three";
 
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -15,7 +17,7 @@ class ThreeJSApp {
     private renderer: THREE.WebGLRenderer;
     private camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
     private controls: OrbitControls;
-    private container: HTMLElement;
+    private viewport: HTMLElement;
 
     constructor(
         container: HTMLElement,
@@ -25,7 +27,18 @@ class ThreeJSApp {
         width: number,
         height: number
     ) {
-        this.container = container;
+        const viewport =
+            container.getElementsByClassName("tlmviewer-viewport")[0];
+
+        if (!(viewport instanceof HTMLElement))
+            throw new Error(`Expected viewport to be an HTMLElement`);
+
+        this.viewport = viewport;
+
+        // LIL GUI
+        const gui = new GUI({ container: container, autoPlace: false });
+        gui.add( document, 'title' );
+        gui.open(false);
 
         // Set up the scene
         const scene = new THREE.Scene();
@@ -39,7 +52,7 @@ class ThreeJSApp {
 
         this.renderer.setSize(width, height);
         this.renderer.localClippingEnabled = true;
-        this.container.appendChild(this.renderer.domElement);
+        this.viewport.appendChild(this.renderer.domElement);
 
         // Setup the default perspective camera
         if (camera === "orthographic") {
@@ -80,7 +93,7 @@ class ThreeJSApp {
             this.sceneModel
         );
 
-        const rect = this.container.getBoundingClientRect();
+        const rect = this.viewport.getBoundingClientRect();
         const aspect = rect.width / rect.height;
 
         if (!(this.camera instanceof THREE.OrthographicCamera)) return;
@@ -117,7 +130,7 @@ class ThreeJSApp {
 
     // The 2D camera
     private setupXYCamera(): [THREE.OrthographicCamera, OrbitControls] {
-        const rect = this.container.getBoundingClientRect();
+        const rect = this.viewport.getBoundingClientRect();
         const aspect = rect.width / rect.height;
         const newCamera = new THREE.OrthographicCamera(
             -aspect * 10,
@@ -137,6 +150,8 @@ class ThreeJSApp {
             this.renderer.domElement
         );
 
+        newControls.enableRotate = false;
+
         this.camera = newCamera;
         this.controls = newControls;
 
@@ -149,7 +164,7 @@ class ThreeJSApp {
         THREE.OrthographicCamera,
         OrbitControls
     ] {
-        const rect = this.container.getBoundingClientRect();
+        const rect = this.viewport.getBoundingClientRect();
         const aspect = rect.width / rect.height;
         const newCamera = new THREE.OrthographicCamera(
             -aspect * 10,
@@ -176,7 +191,7 @@ class ThreeJSApp {
     }
 
     private setupPerspectiveCamera(): [THREE.PerspectiveCamera, OrbitControls] {
-        const rect = this.container.getBoundingClientRect();
+        const rect = this.viewport.getBoundingClientRect();
         const aspect = rect.width / rect.height;
         const newCamera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
 
@@ -251,24 +266,20 @@ function setupApp(
 // tlmviewer entry point
 export function tlmviewer(container: HTMLElement, json_data: string) {
     // TODO get this from json
-    const jsonWidth = 800;
-    const jsonHeight = 500;
+    const jsonWidth = 900;
+    const jsonHeight = 600;
 
     try {
         const viewerElement = document.createElement("div");
         viewerElement.classList.add("tlmviewer");
+        viewerElement.style.width = `{jsonWidth}px`;
+        viewerElement.style.height = `{jsonHeight}px`;
         container.appendChild(viewerElement);
 
         viewerElement.innerHTML = viewerTemplate;
 
-        const viewport =
-            container.getElementsByClassName("tlmviewer-viewport")[0];
-
-        if (!(viewport instanceof HTMLElement))
-            throw new Error(`Expected viewport to be an HTMLElement`);
-
         const data = JSON.parse(json_data);
-        const app = setupApp(viewport, data, jsonWidth, jsonHeight);
+        const app = setupApp(viewerElement, data, jsonWidth, jsonHeight);
 
         // Register event handlers
         app.registerEventHandlers(container);

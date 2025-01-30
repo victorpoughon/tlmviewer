@@ -1,38 +1,82 @@
+.tlmviewer {
+    display: inline-block;
+    position: relative;
+
+    /* box-shadow: 10px 10px 30px 3px rgba(0, 0, 0, 0.45); */
+}
+
 .tlmviewer-toolbar {
+    box-sizing: border-box;
     font-family: monospace;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
-    border: 2px solid #cccccc;
-    height: 34px;
-    width: 600px;
-  }
-  
-  .group {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-  }
-  
-  label.toggle {
-    background: #cccccc;
-    padding: 5px;
-    padding-right: 10px;
-    border-radius: 4px;
+    /* border: 2px solid #cccccc; */
+    height: 40px;
+    /* width: 50px; */
+    position: absolute;
+
+    padding: 6px 6px;
+    gap: 6px;
+
+    background: rgb(59, 59, 59);
+
+    border-bottom: 2px solid grey;
+    border-right: 2px solid grey;
+    border-bottom-right-radius: 3px;
+
+    top: 0;
+    left: 0;
+
+    /* box-shadow: 10px 10px 30px 3px rgba(255,255,255,0.45); */
+}
+
+.tlmviewer .tlmviewer-legend {
+    position: absolute;
+    color: white;
+    /* background: black; */
     user-select: none;
-    margin: 2px;
-  }
-  
-  button {
-    width: 30px;
-    height: 30px;
-    margin: 0 2px;
-  }
-  
-  .divider {
-    height: 34px;
-    width: 2px;
-    background: #cccccc;
-    border-radius: 2px;
-    margin: 0 5px;
-  }
+    padding-left: 5px;
+
+    background-color: rgb(0, 0, 0);
+
+    left: 0;
+    bottom: 0;
+    text-align: right;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.tlmviewer .tlmviewer-toolbar button,
+.tlmviewer .tlmviewer-toolbar button:hover {
+    height: 100%;
+    aspect-ratio: 1;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+}
+
+.tlmviewer .tlmviewer-toolbar button:hover {
+    background-color: rgb(117, 117, 117);
+}
+
+.fluent-mdl2--zoom-to-fit {
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2048 2048'%3E%3Cpath fill='%23fff' d='m749 456l-90-91L1024 0l365 365l-90 91l-275-275zm550 1136l90 91l-365 365l-365-365l90-91l275 275zM456 749l-275 275l275 275l-91 90L0 1024l365-365zm1592 275l-365 365l-91-90l275-275l-275-275l91-90zM640 640h768v768H640zm128 640h512V768H768z'/%3E%3C/svg%3E");
+}
+
+.zondicons--view-show {
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%23fff' d='M.2 10a11 11 0 0 1 19.6 0A11 11 0 0 1 .2 10m9.8 4a4 4 0 1 0 0-8a4 4 0 0 0 0 8m0-2a2 2 0 1 1 0-4a2 2 0 0 1 0 4'/%3E%3C/svg%3E");
+}
+
+.tlmviewer .lil-gui.root {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
