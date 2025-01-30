@@ -34,12 +34,11 @@ export function makeLine2(start: number[], end: number[], color: string) {
     const points = [];
     points.push(new THREE.Vector3().fromArray(start));
     points.push(new THREE.Vector3().fromArray(end));
-    
+
     const geometry = new LineGeometry().setFromPoints(points);
     const ret = new Line2(geometry, material);
 
     return ret;
-
 }
 
 function arrayToMatrix4(array: Array<Array<number>>): THREE.Matrix4 {
@@ -196,7 +195,9 @@ function makePoints(element: any, dim: number): THREE.Group {
         const sphere = new THREE.Mesh(geometry, material);
 
         if (point.length != dim) {
-            throw new Error(`point array length is ${point.length} (expected ${dim})`);
+            throw new Error(
+                `point array length is ${point.length} (expected ${dim})`
+            );
         }
         if (dim == 2) {
             sphere.position.set(point[0], point[1], 2.0);
@@ -283,12 +284,13 @@ function makeRays(element: any, dim: number): THREE.Group {
             end = ray.slice(3, 6);
             const [red, green, blue] = [ray[6], ray[7], ray[8]];
             color = `rgb(${red}, ${green}, ${blue})`;
-
         } else {
-            throw new Error(`Invalid ray array length, got ${ray.length} for dim ${dim}`);
+            throw new Error(
+                `Invalid ray array length, got ${ray.length} for dim ${dim}`
+            );
         }
 
-        const line = makeLine2(start, end, color);
+        const line = makeLine(start, end, color);
         group.add(line);
     }
 
@@ -316,35 +318,44 @@ function makeElement(element: any, dim: number): THREE.Group {
     return maker(element, dim);
 }
 
-export function makeScene(root: any, dim: number) {
-    
-    // Group for objects comming from the json data
-    const sceneModel = new THREE.Group();
+export class TLMScene {
+    public model: THREE.Group;
+    public opticalAxis: THREE.Group;
+    public otherAxes: THREE.Group;
+    public scene: THREE.Scene;
 
-    // Group for helper objects
-    const sceneHelpers = new THREE.Group();
-
-    const data = get_required(root, "data");
-
-    for (const element of data) {
-        const sceneElement = makeElement(element, dim);
-        sceneModel.add(sceneElement);
-    }
-
-    // Axes helper
-    if (data.show_axes ?? true) {
-        if (dim == 2) {
-            sceneHelpers.add(makeLine([0, -500, 0], [0, 500, 0], "white"));
-        } else if (dim == 3) {
-            const axesHelper = new THREE.AxesHelper(5);
-            sceneHelpers.add(axesHelper);
+    constructor(root: any, dim: number) {
+        const data = get_required(root, "data");
+        
+        // 'Model' is the group for all the json data
+        this.model = new THREE.Group();
+        for (const element of data) {
+            const sceneElement = makeElement(element, dim);
+            this.model.add(sceneElement);
         }
-    }
 
-    // Optical Axis
-    if (data.show_optical_axis ?? true) {
-        sceneHelpers.add(makeLine([-500, 0, 0], [500, 0, 0], "white"));
-    }
+        // Axes helper
+        this.otherAxes = new THREE.Group();
+        if (data.show_axes ?? true) {
+            if (dim == 2) {
+                this.otherAxes.add(makeLine([0, -500, 0], [0, 500, 0], "white"));
+            } else if (dim == 3) {
+                const axesHelper = new THREE.AxesHelper(5);
+                this.otherAxes.add(axesHelper);
+            }
+        }
 
-    return [sceneModel, sceneHelpers];
+        // Optical Axis
+        this.opticalAxis = new THREE.Group();
+        if (data.show_optical_axis ?? true) {
+            this.opticalAxis.add(makeLine([-500, 0, 0], [500, 0, 0], "white"));
+        }
+
+        // The actual THREE scene
+        // Set up the scene
+        this.scene = new THREE.Scene();
+        this.scene.add(this.model);
+        this.scene.add(this.otherAxes);
+        this.scene.add(this.opticalAxis);
+    }
 }

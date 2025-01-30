@@ -1,10 +1,10 @@
-import GUI from 'lil-gui';
+import GUI from "lil-gui";
 
 import * as THREE from "three";
 
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-import { makeScene } from "./scene.ts";
+import { TLMScene } from "./scene.ts";
 
 import { get_default } from "./utility.ts";
 
@@ -12,17 +12,17 @@ import viewerTemplate from "./viewer.html?raw";
 import "./viewer.css";
 
 class ThreeJSApp {
-    private scene: THREE.Scene;
-    private sceneModel: THREE.Group;
+    private scene: TLMScene;
+
     private renderer: THREE.WebGLRenderer;
     private camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
     private controls: OrbitControls;
     private viewport: HTMLElement;
+    private controller: any;
 
     constructor(
         container: HTMLElement,
-        sceneModel: THREE.Group,
-        sceneHelpers: THREE.Group,
+        scene: TLMScene,
         camera: string,
         width: number,
         height: number
@@ -34,27 +34,15 @@ class ThreeJSApp {
             throw new Error(`Expected viewport to be an HTMLElement`);
 
         this.viewport = viewport;
-
-        // LIL GUI
-        const gui = new GUI({ container: container, autoPlace: false });
-        gui.add( document, 'title' );
-        gui.open(false);
-
-        // Set up the scene
-        const scene = new THREE.Scene();
-        scene.add(sceneModel);
-        scene.add(sceneHelpers);
-        this.sceneModel = sceneModel;
         this.scene = scene;
 
         // Set up the renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
-
         this.renderer.setSize(width, height);
         this.renderer.localClippingEnabled = true;
         this.viewport.appendChild(this.renderer.domElement);
 
-        // Setup the default perspective camera
+        // Setup the default camera
         if (camera === "orthographic") {
             [this.camera, this.controls] = this.setupOrthographicCamera();
         } else if (camera == "perspective") {
@@ -65,8 +53,19 @@ class ThreeJSApp {
             throw new Error(`Uknown camera type '${camera}'`);
         }
 
-        // Handle window resizing
-        //window.addEventListener("resize", this.onWindowResize.bind(this));
+        // LIL GUI
+        const app = this;
+        this.controller = {
+            resetView() {
+                app.resetView();
+            },
+        };
+        const gui = new GUI({ container: container, autoPlace: false, width: 200 });
+        gui.add(this.scene.opticalAxis, "visible").name("Show optical axis");
+        gui.add(this.scene.otherAxes, "visible").name("Show other axes");
+        gui.add(this.controller, "resetView").name("Reset View");
+        // gui.open(false);
+
     }
 
     // Handle window resize events
@@ -90,7 +89,7 @@ class ThreeJSApp {
     private resetView() {
         // note: precise=true seems broken for Line2
         const sceneBoundingBox = new THREE.Box3().setFromObject(
-            this.sceneModel
+            this.scene.model
         );
 
         const rect = this.viewport.getBoundingClientRect();
@@ -110,7 +109,7 @@ class ThreeJSApp {
         // this.camera.lookAt(center);
 
         // Update camera edges
-        if (size.x > aspect*size.y) {
+        if (size.x > aspect * size.y) {
             this.camera.left = (marginFactor * size.x) / -2;
             this.camera.right = (marginFactor * size.x) / 2;
             this.camera.top = (marginFactor * ((1 / aspect) * size.x)) / 2;
@@ -221,7 +220,7 @@ class ThreeJSApp {
     public animate(): void {
         const loop = () => {
             this.controls.update(); // Update the controls for damping
-            this.renderer.render(this.scene, this.camera); // Render the scene
+            this.renderer.render(this.scene.scene, this.camera); // Render the scene
             requestAnimationFrame(loop); // Call the next frame
         };
 
@@ -242,19 +241,11 @@ function setupApp(
         "XY",
     ]);
 
-    var sceneModel, sceneHelpers: THREE.Group;
-    if (mode === "3D") {
-        [sceneModel, sceneHelpers] = makeScene(data, 3);
-    } else if (mode === "2D") {
-        [sceneModel, sceneHelpers] = makeScene(data, 2);
-    } else {
-        throw new Error("Uknown scene mode " + mode);
-    }
+    const scene = new TLMScene(data, mode === "3D" ? 3 : 2);
 
     const app = new ThreeJSApp(
         container,
-        sceneModel,
-        sceneHelpers,
+        scene,
         camera,
         width,
         height

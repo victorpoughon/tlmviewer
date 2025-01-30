@@ -19,11 +19,11 @@
     padding: 6px 6px;
     gap: 6px;
 
-    background: rgb(59, 59, 59);
+    background: rgb(30, 30, 30);
 
-    border-bottom: 2px solid grey;
-    border-right: 2px solid grey;
-    border-bottom-right-radius: 3px;
+    border-bottom: 1px solid grey;
+    border-right: 1px solid grey;
+    border-bottom-right-radius: 2px;
 
     top: 0;
     left: 0;
