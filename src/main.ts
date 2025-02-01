@@ -59,11 +59,16 @@ class ThreeJSApp {
             resetView() {
                 app.resetView();
             },
+            backgroundColor: { r: 0, g: 0, b: 0 },
         };
-        const gui = new GUI({ container: container, autoPlace: false, width: 200 });
+        const gui = new GUI({ container: container, autoPlace: false});
         gui.add(this.scene.opticalAxis, "visible").name("Show optical axis");
         gui.add(this.scene.otherAxes, "visible").name("Show other axes");
         gui.add(this.controller, "resetView").name("Reset View");
+        gui.addColor(this.controller, 'backgroundColor' ).name('Background color').onChange( (value: object) => {
+            // @ts-ignore
+            app.scene.scene.background = new THREE.Color(value.r, value.g, value.b);
+        } );
         // gui.open(false);
 
     }

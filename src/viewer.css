@@ -5,6 +5,11 @@
     /* box-shadow: 10px 10px 30px 3px rgba(0, 0, 0, 0.45); */
 }
 
+.lil-gui {
+    --width: 200px;
+	--name-width: 50%;
+}
+
 .tlmviewer-toolbar {
     box-sizing: border-box;
     font-family: monospace;
