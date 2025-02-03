@@ -63,6 +63,7 @@ class ThreeJSApp {
             showValidRays: true,
             showBlockedRays: false,
             showOutputRays: true,
+            showKinematicJoints: false,
         };
         const gui = new GUI({ container: container, autoPlace: false});
 
@@ -75,13 +76,12 @@ class ThreeJSApp {
         const folderShow = gui.addFolder('Visible');
         folderShow.add(this.scene.opticalAxis, "visible").name("Optical axis");
         folderShow.add(this.scene.otherAxes, "visible").name("Other axes");
-        folderShow.add(this.controller, 'showValidRays').name("Valid rays").onChange((_: Object) => {
-            app.updateCameraLayers();
-        });
-        folderShow.add(this.controller, 'showBlockedRays').name("Blocked rays").onChange((_: Object) => {
-            app.updateCameraLayers();
-        });
-        folderShow.add(this.controller, 'showOutputRays').name("Output rays").onChange((_: Object) => {
+        folderShow.add(this.controller, 'showValidRays').name("Valid rays");
+        folderShow.add(this.controller, 'showBlockedRays').name("Blocked rays");
+        folderShow.add(this.controller, 'showOutputRays').name("Output rays");
+        folderShow.add(this.controller, 'showKinematicJoints').name("Kinematic joints");
+        
+        folderShow.onChange((_: Object) => {
             app.updateCameraLayers();
         });
         gui.open(false);
@@ -102,9 +102,7 @@ class ThreeJSApp {
         setCameraLayer(this.controller.showValidRays, 1);
         setCameraLayer(this.controller.showBlockedRays, 2);
         setCameraLayer(this.controller.showOutputRays, 3);
-        
-        console.log(this.camera.layers);
-        console.log(this.controller);
+        setCameraLayer(this.controller.showKinematicJoints, 4);
     }
 
     // Handle window resize events

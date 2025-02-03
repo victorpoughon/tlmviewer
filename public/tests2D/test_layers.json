@@ -22,7 +22,8 @@
                     254
                 ]
             ],
-            "color": "#ffa724"
+            "color": "#ffa724",
+            "layers": [2]
         },
         {
             "type": "rays",

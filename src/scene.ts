@@ -184,6 +184,17 @@ function makeSurface(
     return lathe;
 }
 
+function applyLayerGroup(obj: THREE.Object3D, layers: Array<number>) {
+    obj.traverse((child) => {
+        child.layers.disableAll();
+    });
+    obj.traverse((child) => {
+        for (const layer of layers) {
+            child.layers.enable(layer);
+        }
+    });
+}
+
 function makePoints(element: any, dim: number): THREE.Group {
     const vertices = get_required(element, "data");
     const color = element.color ?? "#ffffff";
@@ -207,6 +218,9 @@ function makePoints(element: any, dim: number): THREE.Group {
 
         group.add(sphere);
     }
+
+    // Add layers
+    applyLayerGroup(group, element["layers"] ?? [0]);
 
     return group;
 }
@@ -296,16 +310,7 @@ function makeRays(element: any, dim: number): THREE.Group {
     }
 
     // Add layers
-    const layers = element["layers"] ?? [0];
-
-    group.traverse((child) => {
-        child.layers.disableAll();
-    });
-    group.traverse((child) => {
-        for (const layer of layers) {
-            child.layers.enable(layer);
-        }
-    });
+    applyLayerGroup(group, element["layers"] ?? [0]);
 
     return group;
 }
