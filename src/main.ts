@@ -60,17 +60,51 @@ class ThreeJSApp {
                 app.resetView();
             },
             backgroundColor: { r: 0, g: 0, b: 0 },
+            showValidRays: true,
+            showBlockedRays: false,
+            showOutputRays: true,
         };
         const gui = new GUI({ container: container, autoPlace: false});
-        gui.add(this.scene.opticalAxis, "visible").name("Show optical axis");
-        gui.add(this.scene.otherAxes, "visible").name("Show other axes");
-        gui.add(this.controller, "resetView").name("Reset View");
+
+        gui.add(this.controller, "resetView").name("Reset Camera");
         gui.addColor(this.controller, 'backgroundColor' ).name('Background color').onChange( (value: object) => {
             // @ts-ignore
             app.scene.scene.background = new THREE.Color(value.r, value.g, value.b);
         } );
-        // gui.open(false);
 
+        const folderShow = gui.addFolder('Visible');
+        folderShow.add(this.scene.opticalAxis, "visible").name("Optical axis");
+        folderShow.add(this.scene.otherAxes, "visible").name("Other axes");
+        folderShow.add(this.controller, 'showValidRays').name("Valid rays").onChange((_: Object) => {
+            app.updateCameraLayers();
+        });
+        folderShow.add(this.controller, 'showBlockedRays').name("Blocked rays").onChange((_: Object) => {
+            app.updateCameraLayers();
+        });
+        folderShow.add(this.controller, 'showOutputRays').name("Output rays").onChange((_: Object) => {
+            app.updateCameraLayers();
+        });
+        gui.open(false);
+
+        app.updateCameraLayers();
+    }
+
+    private updateCameraLayers() {
+        const app = this;
+        const setCameraLayer = function(flag: boolean, id: number) {
+            if (flag) {
+                app.camera.layers.enable(id);
+            } else {
+                app.camera.layers.disable(id);
+            }
+        }
+        
+        setCameraLayer(this.controller.showValidRays, 1);
+        setCameraLayer(this.controller.showBlockedRays, 2);
+        setCameraLayer(this.controller.showOutputRays, 3);
+        
+        console.log(this.camera.layers);
+        console.log(this.controller);
     }
 
     // Handle window resize events

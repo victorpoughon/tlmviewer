@@ -249,6 +249,7 @@ function makeRays(element: any, dim: number): THREE.Group {
         "type": "rays",
         // default color for the group
         "color": "red",
+        "layers": [1, 2],
         "data": [
             // start_x, start_y, start_z, end_x, end_y, end_z, red, green, blue
             [0, 0, 0, 10, 10, 10, 0, 255, 200],
@@ -294,6 +295,18 @@ function makeRays(element: any, dim: number): THREE.Group {
         group.add(line);
     }
 
+    // Add layers
+    const layers = element["layers"] ?? [0];
+
+    group.traverse((child) => {
+        child.layers.disableAll();
+    });
+    group.traverse((child) => {
+        for (const layer of layers) {
+            child.layers.enable(layer);
+        }
+    });
+
     return group;
 }
 
@@ -326,7 +339,7 @@ export class TLMScene {
 
     constructor(root: any, dim: number) {
         const data = get_required(root, "data");
-        
+
         // 'Model' is the group for all the json data
         this.model = new THREE.Group();
         for (const element of data) {
@@ -338,7 +351,9 @@ export class TLMScene {
         this.otherAxes = new THREE.Group();
         if (data.show_axes ?? true) {
             if (dim == 2) {
-                this.otherAxes.add(makeLine([0, -500, 0], [0, 500, 0], "white"));
+                this.otherAxes.add(
+                    makeLine([0, -500, 0], [0, 500, 0], "white")
+                );
             } else if (dim == 3) {
                 const axesHelper = new THREE.AxesHelper(5);
                 this.otherAxes.add(axesHelper);
