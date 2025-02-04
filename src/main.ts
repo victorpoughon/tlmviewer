@@ -56,6 +56,7 @@ class ThreeJSApp {
         // LIL GUI
         const app = this;
         this.controller = {
+            colorDim: "default",
             resetView() {
                 app.resetView();
             },
@@ -67,6 +68,9 @@ class ThreeJSApp {
         };
         const gui = new GUI({ container: container, autoPlace: false});
 
+        gui.add(this.controller, "colorDim", this.scene.variables).name("Rays Color").onChange( (value: string) => {
+            app.scene.setupRays(value);
+        });
         gui.add(this.controller, "resetView").name("Reset Camera");
         gui.addColor(this.controller, 'backgroundColor' ).name('Background color').onChange( (value: object) => {
             // @ts-ignore
@@ -99,6 +103,7 @@ class ThreeJSApp {
             }
         }
         
+        app.camera.layers.enable(0);
         setCameraLayer(this.controller.showValidRays, 1);
         setCameraLayer(this.controller.showBlockedRays, 2);
         setCameraLayer(this.controller.showOutputRays, 3);
@@ -128,6 +133,12 @@ class ThreeJSApp {
         const sceneBoundingBox = new THREE.Box3().setFromObject(
             this.scene.model
         );
+
+        if (sceneBoundingBox.isEmpty()) {
+            // make sure axes are visible in default empty view
+            sceneBoundingBox.min = new THREE.Vector3(-10, -10, -10);
+            sceneBoundingBox.max = new THREE.Vector3(10, 10, 10);
+        }
 
         const rect = this.viewport.getBoundingClientRect();
         const aspect = rect.width / rect.height;

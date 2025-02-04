@@ -26,7 +26,7 @@ export function makeLine2(start: number[], end: number[], color: string) {
 
     const material = new LineMaterial({
         color: color,
-        linewidth: 1,
+        linewidth: 1.1,
         worldUnits: false,
         side: THREE.DoubleSide,
     });
@@ -256,23 +256,29 @@ function makeArrows(element: any, dim: number): THREE.Group {
     return group;
 }
 
-function makeRays(element: any, dim: number): THREE.Group {
-    // rays format:
-    /*
-    {
-        "type": "rays",
-        // default color for the group
-        "color": "red",
-        "layers": [1, 2],
-        "data": [
-            // start_x, start_y, start_z, end_x, end_y, end_z, red, green, blue
-            [0, 0, 0, 10, 10, 10, 0, 255, 200],
-            ...
-        ]
-    }
-    */
+function floatRGBToHex(r: number, g: number, b: number): string {
+    const toHex = (float: number): string => {
+        const int: number = Math.round(float * 255);
+        const hex: string = int.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+    };
+
+    return "#" + toHex(r) + toHex(g) + toHex(b);
+}
+
+function colormap(x: number, min: number, max: number): string {
+    const r = (x - min) / (max - min);
+    const g = 1;
+    const b = 1;
+    return floatRGBToHex(r, g, b);
+}
+
+function makeRays(element: any, dim: number, color_dim: string): THREE.Group {
     const data = get_required(element, "data");
-    const default_color = element.color ?? "#ffa724";
+    const default_color = element.color ?? "#ffa724"; // TODO
+    const variables: string[] = element.variables ?? [];
+    const domain = element.domain ?? {};
+    const expectedLength = 2 * dim + variables.length;
 
     const group = new THREE.Group();
 
@@ -281,31 +287,39 @@ function makeRays(element: any, dim: number): THREE.Group {
     }
 
     for (const ray of data) {
-        var start, end;
-        var color = default_color;
-        if (dim == 2 && ray.length == 4) {
-            start = ray.slice(0, 2).concat([0]);
-            end = ray.slice(2, 4).concat([0]);
-        } else if (dim == 2 && ray.length == 7) {
-            start = ray.slice(0, 2).concat([0]);
-            end = ray.slice(2, 4).concat([0]);
-            const [red, green, blue] = [ray[4], ray[5], ray[6]];
-            color = `rgb(${red}, ${green}, ${blue})`;
-        } else if (dim == 3 && ray.length == 6) {
-            start = ray.slice(0, 3);
-            end = ray.slice(3, 6);
-        } else if (dim == 3 && ray.length == 9) {
-            start = ray.slice(0, 3);
-            end = ray.slice(3, 6);
-            const [red, green, blue] = [ray[6], ray[7], ray[8]];
-            color = `rgb(${red}, ${green}, ${blue})`;
-        } else {
+        if (ray.length != expectedLength) {
             throw new Error(
-                `Invalid ray array length, got ${ray.length} for dim ${dim}`
+                `Invalid ray array length, got ${ray.length} for dim ${dim} and ${variables.length} variables`
             );
         }
 
-        const line = makeLine(start, end, color);
+        var start, end;
+        if (dim == 2) {
+            start = ray.slice(0, 2).concat([0]);
+            end = ray.slice(2, 4).concat([0]);
+        } else {
+            start = ray.slice(0, 3);
+            end = ray.slice(3, 6);
+        }
+
+        const color_index = variables.indexOf(color_dim);
+        var color;
+        if (color_index == -1) {
+            color = default_color;
+        } else {
+            if (!domain.hasOwnProperty(color_dim)) {
+                throw new Error(`${color_dim} missing from ray domain object`);
+            }
+            color = colormap(
+                ray[2*dim + color_index],
+                domain[color_dim][0],
+                domain[color_dim][1]
+            );
+        }
+
+        console.log("color", color);
+
+        const line = makeLine2(start, end, color);
         group.add(line);
     }
 
@@ -320,7 +334,6 @@ function makeElement(element: any, dim: number): THREE.Group {
 
     type MakerFunction = (element: any, _dim: number) => THREE.Group;
     const makers: { [key: string]: MakerFunction } = {
-        rays: makeRays,
         surfaces: makeSurfaces,
         points: makePoints,
         arrows: makeArrows,
@@ -336,28 +349,62 @@ function makeElement(element: any, dim: number): THREE.Group {
     return maker(element, dim);
 }
 
+// Extract available variables from the scene
+// includes "default" to mean "use default color"
+function extractVariables(root: any): string[] {
+    const variables = new Set(["default"]);
+
+    const data = get_required(root, "data");
+    for (const element of data) {
+        if (get_required(element, "type") == "rays") {
+            const thisVars = element.variables ?? [];
+            console.log(thisVars);
+            thisVars.forEach((v: string) => variables.add(v));
+        }
+    }
+
+    return Array.from(variables);
+}
+
 export class TLMScene {
+    private root: any;
+    private dim: number;
+
     public model: THREE.Group;
+    public rays: THREE.Group;
     public opticalAxis: THREE.Group;
     public otherAxes: THREE.Group;
     public scene: THREE.Scene;
 
+    public variables: string[];
+
     constructor(root: any, dim: number) {
+        this.root = root;
+        this.dim = dim;
+        this.scene = new THREE.Scene();
         const data = get_required(root, "data");
 
-        // 'Model' is the group for all the json data
+        // Setup all nodes except for rays
         this.model = new THREE.Group();
         for (const element of data) {
-            const sceneElement = makeElement(element, dim);
-            this.model.add(sceneElement);
+            if (get_required(element, "type") != "rays") {
+                const sceneElement = makeElement(element, dim);
+                this.model.add(sceneElement);
+            }
         }
+
+        this.variables = extractVariables(root);
+
+        // Setup all ray nodes
+        this.rays = new THREE.Group();
+        this.setupRays("default");
 
         // Axes helper
         this.otherAxes = new THREE.Group();
         if (data.show_axes ?? true) {
             if (dim == 2) {
                 this.otherAxes.add(
-                    makeLine([0, -500, 0], [0, 500, 0], "white")
+                    makeLine2([0, -500, 0], [0, 500, 0], "#e3e3e3")
                 );
             } else if (dim == 3) {
                 const axesHelper = new THREE.AxesHelper(5);
@@ -368,14 +415,29 @@ export class TLMScene {
         // Optical Axis
         this.opticalAxis = new THREE.Group();
         if (data.show_optical_axis ?? true) {
-            this.opticalAxis.add(makeLine([-500, 0, 0], [500, 0, 0], "white"));
+            this.opticalAxis.add(makeLine2([-500, 0, 0], [500, 0, 0], "#e3e3e3"));
         }
 
-        // The actual THREE scene
-        // Set up the scene
-        this.scene = new THREE.Scene();
+        // Setup the actual THREE scene
         this.scene.add(this.model);
+        this.scene.add(this.rays);
         this.scene.add(this.otherAxes);
         this.scene.add(this.opticalAxis);
+    }
+
+    // Setup rays with selected color dim
+    public setupRays(color_dim: string) {
+        this.rays.removeFromParent();
+        this.rays = new THREE.Group();
+
+        const data = get_required(this.root, "data");
+
+        for (const element of data) {
+            if (get_required(element, "type") == "rays") {
+                const elem = makeRays(element, this.dim, color_dim);
+                this.rays.add(elem);
+            }
+        }
+        this.scene.add(this.rays);
     }
 }
