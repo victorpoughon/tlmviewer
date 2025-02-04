@@ -66,25 +66,31 @@ class ThreeJSApp {
             showOutputRays: true,
             showKinematicJoints: false,
         };
-        const gui = new GUI({ container: container, autoPlace: false});
+        const gui = new GUI({ container: container, autoPlace: false });
 
-        gui.add(this.controller, "colorDim", this.scene.variables).name("Rays Color").onChange( (value: string) => {
-            app.scene.setupRays(value);
-        });
+        gui.add(this.controller, "colorDim", this.scene.variables)
+            .name("Rays Color")
+            .onChange((value: string) => {
+                app.scene.setupRays(value);
+            });
         gui.add(this.controller, "resetView").name("Reset Camera");
-        gui.addColor(this.controller, 'backgroundColor' ).name('Background color').onChange( (value: object) => {
-            // @ts-ignore
-            app.scene.scene.background = new THREE.Color(value.r, value.g, value.b);
-        } );
+        gui.addColor(this.controller, "backgroundColor")
+            .name("Background color")
+            .onChange((value: object) => {
+                // @ts-ignore
+                app.scene.scene.background = new THREE.Color(value.r, value.g, value.b);
+            });
 
-        const folderShow = gui.addFolder('Visible');
+        const folderShow = gui.addFolder("Visible");
         folderShow.add(this.scene.opticalAxis, "visible").name("Optical axis");
         folderShow.add(this.scene.otherAxes, "visible").name("Other axes");
-        folderShow.add(this.controller, 'showValidRays').name("Valid rays");
-        folderShow.add(this.controller, 'showBlockedRays').name("Blocked rays");
-        folderShow.add(this.controller, 'showOutputRays').name("Output rays");
-        folderShow.add(this.controller, 'showKinematicJoints').name("Kinematic joints");
-        
+        folderShow.add(this.controller, "showValidRays").name("Valid rays");
+        folderShow.add(this.controller, "showBlockedRays").name("Blocked rays");
+        folderShow.add(this.controller, "showOutputRays").name("Output rays");
+        folderShow
+            .add(this.controller, "showKinematicJoints")
+            .name("Kinematic joints");
+
         folderShow.onChange((_: Object) => {
             app.updateCameraLayers();
         });
@@ -95,14 +101,14 @@ class ThreeJSApp {
 
     private updateCameraLayers() {
         const app = this;
-        const setCameraLayer = function(flag: boolean, id: number) {
+        const setCameraLayer = function (flag: boolean, id: number) {
             if (flag) {
                 app.camera.layers.enable(id);
             } else {
                 app.camera.layers.disable(id);
             }
-        }
-        
+        };
+
         app.camera.layers.enable(0);
         setCameraLayer(this.controller.showValidRays, 1);
         setCameraLayer(this.controller.showBlockedRays, 2);
@@ -284,13 +290,7 @@ function setupApp(
 
     const scene = new TLMScene(data, mode === "3D" ? 3 : 2);
 
-    const app = new ThreeJSApp(
-        container,
-        scene,
-        camera,
-        width,
-        height
-    );
+    const app = new ThreeJSApp(container, scene, camera, width, height);
 
     return app;
 }

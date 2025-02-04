@@ -5,6 +5,8 @@ import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
 import { get_required } from "./utility.ts";
+import { colormap } from "./color.ts";
+import {CET_I2} from "./colormaps.ts";
 
 export function makeLine(start: number[], end: number[], color: string) {
     console.assert(start.length == 3);
@@ -256,23 +258,6 @@ function makeArrows(element: any, dim: number): THREE.Group {
     return group;
 }
 
-function floatRGBToHex(r: number, g: number, b: number): string {
-    const toHex = (float: number): string => {
-        const int: number = Math.round(float * 255);
-        const hex: string = int.toString(16);
-        return hex.length === 1 ? "0" + hex : hex;
-    };
-
-    return "#" + toHex(r) + toHex(g) + toHex(b);
-}
-
-function colormap(x: number, min: number, max: number): string {
-    const r = (x - min) / (max - min);
-    const g = 1;
-    const b = 1;
-    return floatRGBToHex(r, g, b);
-}
-
 function makeRays(element: any, dim: number, color_dim: string): THREE.Group {
     const points = get_required(element, "points");
     const default_color = element.color ?? "#ffa724";
@@ -308,11 +293,9 @@ function makeRays(element: any, dim: number, color_dim: string): THREE.Group {
             if (!domain.hasOwnProperty(color_dim)) {
                 throw new Error(`${color_dim} missing from ray domain object`);
             }
-            color = colormap(
-                variables[color_dim][index],
-                domain[color_dim][0],
-                domain[color_dim][1]
-            );
+            const [min, max] = domain[color_dim];
+            const normalizedX = (variables[color_dim][index] - min) / (max - min);
+            color = colormap(normalizedX, CET_I2);
         }
 
         const line = makeLine2(start, end, color);
