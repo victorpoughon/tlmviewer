@@ -274,23 +274,21 @@ function colormap(x: number, min: number, max: number): string {
 }
 
 function makeRays(element: any, dim: number, color_dim: string): THREE.Group {
-    const data = get_required(element, "data");
-    const default_color = element.color ?? "#ffa724"; // TODO
-    const variables: string[] = element.variables ?? [];
+    const points = get_required(element, "points");
+    const default_color = element.color ?? "#ffa724";
+    const variables = element.variables ?? {};
     const domain = element.domain ?? {};
-    const expectedLength = 2 * dim + variables.length;
+    const expectedLength = 2 * dim;
 
     const group = new THREE.Group();
 
-    if (!(Symbol.iterator in Object(data))) {
-        throw new Error("data field of ray is not iterable");
+    if (!(Symbol.iterator in Object(points))) {
+        throw new Error("points field of ray is not iterable");
     }
 
-    for (const ray of data) {
+    for (const [index, ray] of points.entries()) {
         if (ray.length != expectedLength) {
-            throw new Error(
-                `Invalid ray array length, got ${ray.length} for dim ${dim} and ${variables.length} variables`
-            );
+            throw new Error(`Invalid ray array length, got ${ray.length} for dim ${dim}`);
         }
 
         var start, end;
@@ -302,22 +300,20 @@ function makeRays(element: any, dim: number, color_dim: string): THREE.Group {
             end = ray.slice(3, 6);
         }
 
-        const color_index = variables.indexOf(color_dim);
         var color;
-        if (color_index == -1) {
+
+        if (!(variables.hasOwnProperty(color_dim))) {
             color = default_color;
         } else {
             if (!domain.hasOwnProperty(color_dim)) {
                 throw new Error(`${color_dim} missing from ray domain object`);
             }
             color = colormap(
-                ray[2*dim + color_index],
+                variables[color_dim][index],
                 domain[color_dim][0],
                 domain[color_dim][1]
             );
         }
-
-        console.log("color", color);
 
         const line = makeLine2(start, end, color);
         group.add(line);
@@ -357,9 +353,8 @@ function extractVariables(root: any): string[] {
     const data = get_required(root, "data");
     for (const element of data) {
         if (get_required(element, "type") == "rays") {
-            const thisVars = element.variables ?? [];
-            console.log(thisVars);
-            thisVars.forEach((v: string) => variables.add(v));
+            const thisVars = element.variables ?? {};
+            Object.keys(thisVars).forEach((v: string) => variables.add(v));
         }
     }
 
@@ -439,5 +434,19 @@ export class TLMScene {
             }
         }
         this.scene.add(this.rays);
+    }
+
+    public getBB() : THREE.Box3 {
+        const bbox = new THREE.Box3();
+        bbox.union(new THREE.Box3().setFromObject(this.model));
+        bbox.union(new THREE.Box3().setFromObject(this.rays))
+
+        if (bbox.isEmpty()) {
+            // make sure axes are visible in default empty view
+            bbox.min = new THREE.Vector3(-10, -10, -10);
+            bbox.max = new THREE.Vector3(10, 10, 10);
+        }
+
+        return bbox;
     }
 }

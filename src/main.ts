@@ -129,16 +129,9 @@ class ThreeJSApp {
     }
 
     private resetView() {
-        // note: precise=true seems broken for Line2
-        const sceneBoundingBox = new THREE.Box3().setFromObject(
-            this.scene.model
-        );
-
-        if (sceneBoundingBox.isEmpty()) {
-            // make sure axes are visible in default empty view
-            sceneBoundingBox.min = new THREE.Vector3(-10, -10, -10);
-            sceneBoundingBox.max = new THREE.Vector3(10, 10, 10);
-        }
+        // Compute bounding box of scene (excluding axes and axes helpers)
+        // note: precise=true seems broken for Line2, don't use precise
+        const sceneBoundingBox = this.scene.getBB();
 
         const rect = this.viewport.getBoundingClientRect();
         const aspect = rect.width / rect.height;
