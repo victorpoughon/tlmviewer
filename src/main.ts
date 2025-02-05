@@ -79,11 +79,11 @@ class ThreeJSApp {
         gui.addColor(this.controller, "backgroundColor")
             .name("Background color")
             .onChange((value: object) => {
-                // @ts-ignore
-                app.scene.scene.background = new THREE.Color(
-                    value.r,
-                    value.g,
-                    value.b
+                
+                app.scene.scene.background = new THREE.Color( // @ts-ignore
+                    value.r, // @ts-ignore
+                    value.g, // @ts-ignore
+                    value.b  // @ts-ignore
                 );
             });
 
@@ -318,15 +318,12 @@ function tlmviewerRun(container: HTMLElement, data: object) {
     const jsonHeight = 600;
     
     try {
-        const viewerElement = document.createElement("div");
-        viewerElement.classList.add("tlmviewer");
-        viewerElement.style.width = `{jsonWidth}px`;
-        viewerElement.style.height = `{jsonHeight}px`;
-        container.appendChild(viewerElement);
+        container.style.width = `{jsonWidth}px`;
+        container.style.height = `{jsonHeight}px`;
 
-        viewerElement.innerHTML = viewerTemplate;
+        container.innerHTML = viewerTemplate;
 
-        const app = setupApp(viewerElement, data, jsonWidth, jsonHeight);
+        const app = setupApp(container, data, jsonWidth, jsonHeight);
 
         // Register event handlers
         app.registerEventHandlers(container);
@@ -346,16 +343,29 @@ function embed(container: HTMLElement, json_data: string) {
     }
 }
 
-function load(container: HTMLElement, url: string) {
-    fetch(url)
+async function load(container: HTMLElement, url: string): Promise<void> {
+    return fetch(url)
         .then((response) => response.json())
         .then((data) => tlmviewerRun(container, data));
 }
 
-function loadAll() {
-    // find all elements with class "tlmviewer"
-    // get url from html data attribute
-    // load
+// For each element with class "tlmviewer" in the document
+// If it has a data-url attribute, use it to load tlmviewer
+async function loadAll(): Promise<Promise<void>[]> {
+    const elements = document.querySelectorAll('.tlmviewer');
+    const promises: Promise<void>[] = [];
+
+    // For each ".tlmviewer" element, load tlmviewer with the data-url attribute
+    elements.forEach((element) => {
+        const url = element.getAttribute('data-url');
+        
+        // Call the async load function and add the promise to the array
+        if (url) {
+            promises.push(load(element as HTMLElement, url));
+        }
+    });
+
+    return promises;
 }
 
 export const tlmviewer = {
