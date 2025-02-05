@@ -37,7 +37,6 @@ class ThreeJSApp {
         // Set up the renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         const rect = container.getBoundingClientRect();
-        console.log(rect);
         this.renderer.setSize(rect.width, rect.height);
         this.renderer.localClippingEnabled = true;
         this.viewport.appendChild(this.renderer.domElement);
