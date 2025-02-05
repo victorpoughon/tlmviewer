@@ -14,6 +14,8 @@ function runTest(json, test_file, testContainer) {
     source.innerHTML = test_file;
 
     const viewerElement = document.createElement("div");
+    viewerElement.style.height = "450px";
+    viewerElement.style.width = "800px";
     viewerElement.classList.add("tlmviewer");
     testContainer.appendChild(viewerElement);
 
@@ -44,6 +46,8 @@ window.onload = () => {
     // test tlmviewer.load
     for (const test_file of load_tests) {
         const viewerElement = document.createElement("div");
+        viewerElement.style.height = "450px";
+        viewerElement.style.width = "800px";
         viewerElement.classList.add("tlmviewer");
         mainLoad.appendChild(viewerElement);
 

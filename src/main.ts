@@ -23,9 +23,7 @@ class ThreeJSApp {
     constructor(
         container: HTMLElement,
         scene: TLMScene,
-        camera: string,
-        width: number,
-        height: number
+        camera: string
     ) {
         const viewport =
             container.getElementsByClassName("tlmviewer-viewport")[0];
@@ -38,7 +36,9 @@ class ThreeJSApp {
 
         // Set up the renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        this.renderer.setSize(width, height);
+        const rect = container.getBoundingClientRect();
+        console.log(rect);
+        this.renderer.setSize(rect.width, rect.height);
         this.renderer.localClippingEnabled = true;
         this.viewport.appendChild(this.renderer.domElement);
 
@@ -295,8 +295,6 @@ class ThreeJSApp {
 function setupApp(
     container: HTMLElement,
     data: any,
-    width: number,
-    height: number
 ): ThreeJSApp {
     const mode = get_default(data, "mode", ["3D", "2D"]);
     const camera = get_default(data, "camera", [
@@ -307,23 +305,17 @@ function setupApp(
 
     const scene = new TLMScene(data, mode === "3D" ? 3 : 2);
 
-    const app = new ThreeJSApp(container, scene, camera, width, height);
+    const app = new ThreeJSApp(container, scene, camera);
 
     return app;
 }
 
-function tlmviewerRun(container: HTMLElement, data: object) {
-    // TODO get this from json
-    const jsonWidth = 900;
-    const jsonHeight = 600;
+function tlmviewerRun(container: HTMLElement, data: any) {
     
     try {
-        container.style.width = `{jsonWidth}px`;
-        container.style.height = `{jsonHeight}px`;
-
         container.innerHTML = viewerTemplate;
 
-        const app = setupApp(container, data, jsonWidth, jsonHeight);
+        const app = setupApp(container, data);
 
         // Register event handlers
         app.registerEventHandlers(container);
