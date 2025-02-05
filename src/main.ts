@@ -80,7 +80,11 @@ class ThreeJSApp {
             .name("Background color")
             .onChange((value: object) => {
                 // @ts-ignore
-                app.scene.scene.background = new THREE.Color(value.r, value.g, value.b);
+                app.scene.scene.background = new THREE.Color(
+                    value.r,
+                    value.g,
+                    value.b
+                );
             });
 
         const folderShow = gui.addFolder("Visible");
@@ -293,7 +297,7 @@ function setupApp(
     data: any,
     width: number,
     height: number
-) {
+): ThreeJSApp {
     const mode = get_default(data, "mode", ["3D", "2D"]);
     const camera = get_default(data, "camera", [
         "orthographic",
@@ -308,12 +312,11 @@ function setupApp(
     return app;
 }
 
-// tlmviewer entry point
-export function tlmviewer(container: HTMLElement, json_data: string) {
+function tlmviewerRun(container: HTMLElement, data: object) {
     // TODO get this from json
     const jsonWidth = 900;
     const jsonHeight = 600;
-
+    
     try {
         const viewerElement = document.createElement("div");
         viewerElement.classList.add("tlmviewer");
@@ -323,7 +326,6 @@ export function tlmviewer(container: HTMLElement, json_data: string) {
 
         viewerElement.innerHTML = viewerTemplate;
 
-        const data = JSON.parse(json_data);
         const app = setupApp(viewerElement, data, jsonWidth, jsonHeight);
 
         // Register event handlers
@@ -334,5 +336,32 @@ export function tlmviewer(container: HTMLElement, json_data: string) {
         container.innerHTML = "tlmviewer error: " + error;
     }
 }
+
+function embed(container: HTMLElement, json_data: string) {
+    try {
+        const data = JSON.parse(json_data);
+        tlmviewerRun(container, data);
+    } catch (error) {
+        container.innerHTML = "tlmviewer error: " + error;
+    }
+}
+
+function load(container: HTMLElement, url: string) {
+    fetch(url)
+        .then((response) => response.json())
+        .then((data) => tlmviewerRun(container, data));
+}
+
+function loadAll() {
+    // find all elements with class "tlmviewer"
+    // get url from html data attribute
+    // load
+}
+
+export const tlmviewer = {
+    embed: embed,
+    load: load,
+    loadAll: loadAll,
+};
 
 console.log("tlmviewer loaded");

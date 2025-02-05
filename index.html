@@ -12,22 +12,28 @@
   body {
     margin: 0 auto;
     max-width: 1200px;
+    margin-bottom: 100px;
   }
 
   main .tlmviewer {
     /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   }
-  h2 {
-    font-family: monospace;
+  h1, h2, h3 {
+    font-family: monospace; 
     margin-top: 2rem;
   }
 </style>
 
 <body>
-  <main>
-    <h1>tlmviewer examples</h1>
-  </main>
+  <h1>tlmviewer tests</h1>
+  <div id="embed-tests">
+    <h2>embed</h2>
+  </div>
+
+  <div id="load-tests">
+    <h2>external link</h2>
+  </div>
   <script type="module" src="./test/test.ts"></script>
 
 </body>
