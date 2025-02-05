@@ -355,6 +355,7 @@ export class TLMScene {
     public scene: THREE.Scene;
 
     public variables: string[];
+    public colorDim: string;
 
     constructor(root: any, dim: number) {
         this.root = root;
@@ -375,7 +376,8 @@ export class TLMScene {
 
         // Setup all ray nodes
         this.rays = new THREE.Group();
-        this.setupRays("default");
+        this.colorDim = "default";
+        this.setupRays(this.colorDim);
 
         // Axes helper
         this.otherAxes = new THREE.Group();
@@ -405,6 +407,7 @@ export class TLMScene {
 
     // Setup rays with selected color dim
     public setupRays(color_dim: string) {
+        this.colorDim = color_dim;
         this.rays.removeFromParent();
         this.rays = new THREE.Group();
 

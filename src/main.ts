@@ -53,10 +53,12 @@ class ThreeJSApp {
             throw new Error(`Uknown camera type '${camera}'`);
         }
 
+        this.guiDefaults();
+
         // LIL GUI
         const app = this;
         this.controller = {
-            colorDim: "default",
+            colorDim: app.scene.colorDim,
             resetView() {
                 app.resetView();
             },
@@ -96,7 +98,7 @@ class ThreeJSApp {
         });
         gui.open(false);
 
-        app.updateCameraLayers();
+        this.updateCameraLayers();
     }
 
     private updateCameraLayers() {
@@ -172,6 +174,17 @@ class ThreeJSApp {
         this.controls.update();
 
         this.controls.target = center;
+    }
+
+    private guiDefaults() {
+        // Color dim
+        if (this.scene.variables.includes("object")) {
+            this.scene.setupRays("object");
+        }
+
+        // Visibility
+        this.scene.opticalAxis.visible = false;
+        this.scene.otherAxes.visible = false;
     }
 
     // The 2D camera
