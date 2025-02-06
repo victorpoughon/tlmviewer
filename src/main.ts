@@ -52,6 +52,10 @@ class ThreeJSApp {
             throw new Error(`Uknown camera type '${camera}'`);
         }
 
+        // Title
+        const titleDiv = container.getElementsByClassName("tlmviewer-title")[0];
+        titleDiv.innerHTML = scene.title;
+
         this.guiDefaults();
 
         // LIL GUI

@@ -36,12 +36,12 @@
     /* box-shadow: 10px 10px 30px 3px rgba(255,255,255,0.45); */
 }
 
-.tlmviewer .tlmviewer-legend {
+.tlmviewer .tlmviewer-title {
     position: absolute;
     color: white;
     /* background: black; */
     user-select: none;
-    padding-left: 5px;
+    padding: 5px;
 
     background-color: rgb(0, 0, 0);
 

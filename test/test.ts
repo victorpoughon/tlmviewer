@@ -52,8 +52,9 @@ window.onload = () => {
         mainLoad.appendChild(viewerElement);
 
         tlmviewer.load(viewerElement, test_file).then(() => {
+            // override title
             viewerElement.getElementsByClassName(
-                "tlmviewer-legend"
+                "tlmviewer-title"
             )[0].innerHTML = test_file;
         });
     }

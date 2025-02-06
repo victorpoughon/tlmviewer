@@ -356,6 +356,7 @@ export class TLMScene {
 
     public variables: string[];
     public colorDim: string;
+    public title: string;
 
     constructor(root: any, dim: number) {
         this.root = root;
@@ -397,6 +398,9 @@ export class TLMScene {
         if (data.show_optical_axis ?? true) {
             this.opticalAxis.add(makeLine2([-500, 0, 0], [500, 0, 0], "#e3e3e3"));
         }
+
+        // Title
+        this.title = root.title ?? "";
 
         // Setup the actual THREE scene
         this.scene.add(this.model);
