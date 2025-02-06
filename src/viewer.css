@@ -10,32 +10,6 @@
 	--name-width: 50%;
 }
 
-.tlmviewer-toolbar {
-    box-sizing: border-box;
-    font-family: monospace;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    /* border: 2px solid #cccccc; */
-    height: 40px;
-    /* width: 50px; */
-    position: absolute;
-
-    padding: 6px 6px;
-    gap: 6px;
-
-    background: rgb(30, 30, 30);
-
-    border-bottom: 1px solid grey;
-    border-right: 1px solid grey;
-    border-bottom-right-radius: 2px;
-
-    top: 0;
-    left: 0;
-
-    /* box-shadow: 10px 10px 30px 3px rgba(255,255,255,0.45); */
-}
-
 .tlmviewer .tlmviewer-title {
     position: absolute;
     color: white;
@@ -50,20 +24,6 @@
     text-align: right;
     font-family: monospace;
     font-weight: bold;
-}
-
-.tlmviewer .tlmviewer-toolbar button,
-.tlmviewer .tlmviewer-toolbar button:hover {
-    height: 100%;
-    aspect-ratio: 1;
-    border: 0;
-    margin: 0;
-    padding: 0;
-    background-color: transparent;
-}
-
-.tlmviewer .tlmviewer-toolbar button:hover {
-    background-color: rgb(117, 117, 117);
 }
 
 .fluent-mdl2--zoom-to-fit {
