@@ -51,6 +51,8 @@ export class TLMGui {
             validColor: colors.default,
             blockedColor: colors.hide,
             outputColor: colors.default,
+            raysOpacity: 1.0,
+            raysThickness: 1.0,
             resetView() {
                 app.resetView();
             },
@@ -83,6 +85,14 @@ export class TLMGui {
             .onChange((value: ColorOption) => {
                 this.scene.setupOutputRays(value);
             });
+
+        folderColors.add(this.controller, "raysOpacity", 0, 1).name("Opacity").onFinishChange((value: number) => {
+            this.scene.setRaysOpacity(value);
+        });
+
+        folderColors.add(this.controller, "raysThickness", 1, 5).name("Thickness").onFinishChange((value: number) => {
+            this.scene.setRaysThickness(value);
+        });
 
         folderColors
             .addColor(this.controller, "backgroundColor")
@@ -120,7 +130,6 @@ export class TLMGui {
         this.updateCameraLayers();
 
         gui.open(false);
-
     }
 
     public updateCameraLayers() {

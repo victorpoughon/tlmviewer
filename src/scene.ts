@@ -32,7 +32,8 @@ export function makeLine2(start: number[], end: number[], color: string) {
         color: color,
         linewidth: 1.1,
         worldUnits: false,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
+        transparent: true
     });
 
     const points = [];
@@ -316,7 +317,7 @@ function makeRays(
             color = colormap(normalizedX, CET_I2);
         } else {
             // true color
-            const wavelength = variables[colorOption.colorDim][index]
+            const wavelength = variables[colorOption.colorDim][index];
             color = arrayToRgb(wavelengthToRgb([wavelength])[0]);
         }
 
@@ -380,10 +381,10 @@ export class TLMScene {
     public validRays: THREE.Group;
     public blockedRays: THREE.Group;
     public outputRays: THREE.Group;
-    public opticalAxis: THREE.Group;
     public points: THREE.Group;
     public arrows: THREE.Group;
-
+    
+    public opticalAxis: THREE.Group;
     public otherAxes: THREE.Group;
 
     public scene: THREE.Scene;
@@ -395,7 +396,7 @@ export class TLMScene {
         this.root = root;
         this.dim = dim;
         this.scene = new THREE.Scene();
-        const data = get_required(root, "data");
+        // const data = get_required(root, "data");
 
         this.variables = extractVariables(root);
 
@@ -418,24 +419,21 @@ export class TLMScene {
 
         // Setup axes helper
         this.otherAxes = new THREE.Group();
-        if (data.show_axes ?? true) {
-            if (dim == 2) {
-                this.otherAxes.add(
-                    makeLine2([0, -500, 0], [0, 500, 0], "#e3e3e3")
-                );
-            } else if (dim == 3) {
-                const axesHelper = new THREE.AxesHelper(5);
-                this.otherAxes.add(axesHelper);
-            }
+        if (dim == 2) {
+            this.otherAxes.add(
+                makeLine2([0, -500, 0], [0, 500, 0], "#e3e3e3")
+            );
+        } else if (dim == 3) {
+            const axesHelper = new THREE.AxesHelper(5);
+            this.otherAxes.add(axesHelper);
         }
+        
 
         // Setup optical axis
         this.opticalAxis = new THREE.Group();
-        if (data.show_optical_axis ?? true) {
-            this.opticalAxis.add(
-                makeLine2([-500, 0, 0], [500, 0, 0], "#e3e3e3")
-            );
-        }
+        this.opticalAxis.add(
+            makeLine2([-500, 0, 0], [500, 0, 0], "#e3e3e3")
+        );
 
         // Title
         this.title = root.title ?? "";
@@ -473,7 +471,7 @@ export class TLMScene {
     public setupPoints(dim: number) {
         this.points?.removeFromParent();
         this.points = new THREE.Group();
-        
+
         const data = get_required(this.root, "data");
 
         for (const element of data) {
@@ -546,6 +544,36 @@ export class TLMScene {
                 }
             }
         });
+    }
+
+    public setRaysOpacity(opacity: number): void {
+        const update = (child: THREE.Object3D) => {
+            if (
+                child instanceof THREE.Mesh &&
+                child.material instanceof LineMaterial
+            ) {
+                (child.material as LineMaterial).opacity = opacity;
+            }
+        };
+
+        this.validRays.traverse(update);
+        this.blockedRays.traverse(update);
+        this.outputRays.traverse(update);
+    }
+
+    public setRaysThickness(thickness: number): void {
+        const update = (child: THREE.Object3D) => {
+            if (
+                child instanceof THREE.Mesh &&
+                child.material instanceof LineMaterial
+            ) {
+                (child.material as LineMaterial).linewidth = thickness;
+            }
+        };
+
+        this.validRays.traverse(update);
+        this.blockedRays.traverse(update);
+        this.outputRays.traverse(update);
     }
 
     public getBB(): THREE.Box3 {
