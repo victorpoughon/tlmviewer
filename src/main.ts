@@ -10,7 +10,7 @@ import { get_default } from "./utility.ts";
 import viewerTemplate from "./viewer.html?raw";
 import "./viewer.css";
 
-export class ThreeJSApp {
+export class TLMViewerApp {
     public scene: TLMScene;
 
     public renderer: THREE.WebGLRenderer;
@@ -19,11 +19,7 @@ export class ThreeJSApp {
     public viewport: HTMLElement;
     public gui: TLMGui;
 
-    constructor(
-        container: HTMLElement,
-        scene: TLMScene,
-        camera: string
-    ) {
+    constructor(container: HTMLElement, scene: TLMScene, camera: string) {
         const viewport =
             container.getElementsByClassName("tlmviewer-viewport")[0];
 
@@ -58,7 +54,7 @@ export class ThreeJSApp {
         // needs to be called before gui is setup
         // so that default are correctly selected
         this.scene.defaults();
-        
+
         // LIL GUI
         this.gui = new TLMGui(this, container, this.scene);
         this.gui.updateCameraLayers();
@@ -223,10 +219,7 @@ export class ThreeJSApp {
     }
 }
 
-function setupApp(
-    container: HTMLElement,
-    data: any,
-): ThreeJSApp {
+function setupApp(container: HTMLElement, data: any): TLMViewerApp {
     const mode = get_default(data, "mode", ["3D", "2D"]);
     const camera = get_default(data, "camera", [
         "orthographic",
@@ -236,13 +229,12 @@ function setupApp(
 
     const scene = new TLMScene(data, mode === "3D" ? 3 : 2);
 
-    const app = new ThreeJSApp(container, scene, camera);
+    const app = new TLMViewerApp(container, scene, camera);
 
     return app;
 }
 
 function tlmviewerRun(container: HTMLElement, data: any) {
-    
     try {
         container.innerHTML = viewerTemplate;
 
@@ -275,13 +267,13 @@ async function load(container: HTMLElement, url: string): Promise<void> {
 // For each element with class "tlmviewer" in the document
 // If it has a data-url attribute, use it to load tlmviewer
 async function loadAll(): Promise<Promise<void>[]> {
-    const elements = document.querySelectorAll('.tlmviewer');
+    const elements = document.querySelectorAll(".tlmviewer");
     const promises: Promise<void>[] = [];
 
     // For each ".tlmviewer" element, load tlmviewer with the data-url attribute
     elements.forEach((element) => {
-        const url = element.getAttribute('data-url');
-        
+        const url = element.getAttribute("data-url");
+
         // Call the async load function and add the promise to the array
         if (url) {
             promises.push(load(element as HTMLElement, url));

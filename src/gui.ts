@@ -2,14 +2,14 @@ import * as THREE from "three";
 import GUI from "lil-gui";
 
 import { TLMScene } from "./scene.ts";
-import { ThreeJSApp } from "./main.ts";
+import { TLMViewerApp } from "./main.ts";
 
 export class TLMGui {
-    private app: ThreeJSApp;
+    private app: TLMViewerApp;
     private scene: TLMScene;
     private controller: any;
 
-    constructor(app: ThreeJSApp, container: HTMLElement, scene: TLMScene) {
+    constructor(app: TLMViewerApp, container: HTMLElement, scene: TLMScene) {
         this.scene = scene;
         this.app = app;
 
