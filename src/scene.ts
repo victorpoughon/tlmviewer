@@ -6,7 +6,9 @@ import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
 import { get_required } from "./utility.ts";
 import { colormap } from "./color.ts";
-import { CET_I2 } from "./colormaps.ts";
+import { CET_I2 } from "./CET_I2.ts";
+
+import { wavelengthToRgb, arrayToRgb } from "./true_color.ts";
 
 export function makeLine(start: number[], end: number[], color: string) {
     console.assert(start.length == 3);
@@ -30,7 +32,7 @@ export function makeLine2(start: number[], end: number[], color: string) {
         color: color,
         linewidth: 1.1,
         worldUnits: false,
-        side: THREE.DoubleSide,
+        side: THREE.DoubleSide
     });
 
     const points = [];
@@ -302,7 +304,7 @@ function makeRays(
             !variables.hasOwnProperty(colorOption.colorDim)
         ) {
             color = default_color;
-        } else {
+        } else if (colorOption.trueColor == false) {
             if (!domain.hasOwnProperty(colorOption.colorDim)) {
                 throw new Error(
                     `${colorOption.colorDim} missing from ray domain object`
@@ -312,6 +314,10 @@ function makeRays(
             const normalizedX =
                 (variables[colorOption.colorDim][index] - min) / (max - min);
             color = colormap(normalizedX, CET_I2);
+        } else {
+            // true color
+            const wavelength = variables[colorOption.colorDim][index]
+            color = arrayToRgb(wavelengthToRgb([wavelength])[0]);
         }
 
         const line = makeLine2(start, end, color);
@@ -447,7 +453,7 @@ export class TLMScene {
     public setupValidRays(color: ColorOption) {
         this.validRays?.removeFromParent();
         this.validRays = new THREE.Group();
-        // this.validRays.add(this.setupRaysLayer(0, color));
+        this.validRays.add(this.setupRaysLayer(0, color));
         this.validRays.add(this.setupRaysLayer(1, color));
         this.scene.add(this.validRays);
     }
@@ -472,7 +478,6 @@ export class TLMScene {
 
         for (const element of data) {
             if (get_required(element, "type") == "points") {
-                console.log("SETTING UP POINTS");
                 this.points.add(makePoints(element, dim));
             }
         }
