@@ -258,7 +258,11 @@ function makeArrows(element: any, dim: number): THREE.Group {
     return group;
 }
 
-function makeRays(element: any, dim: number, color_dim: string): THREE.Group {
+function makeRays(
+    element: any,
+    dim: number,
+    colorOption: ColorOption
+): THREE.Group {
     const points = get_required(element, "points");
     const default_color = element.color ?? "#ffa724";
     const variables = element.variables ?? {};
@@ -266,6 +270,10 @@ function makeRays(element: any, dim: number, color_dim: string): THREE.Group {
     const expectedLength = 2 * dim;
 
     const group = new THREE.Group();
+
+    if (colorOption.show == false) {
+        return group;
+    }
 
     if (!(Symbol.iterator in Object(points))) {
         throw new Error("points field of ray is not iterable");
@@ -289,15 +297,20 @@ function makeRays(element: any, dim: number, color_dim: string): THREE.Group {
 
         var color;
 
-        if (!variables.hasOwnProperty(color_dim)) {
+        if (
+            colorOption.colorDim == null ||
+            !variables.hasOwnProperty(colorOption.colorDim)
+        ) {
             color = default_color;
         } else {
-            if (!domain.hasOwnProperty(color_dim)) {
-                throw new Error(`${color_dim} missing from ray domain object`);
+            if (!domain.hasOwnProperty(colorOption.colorDim)) {
+                throw new Error(
+                    `${colorOption.colorDim} missing from ray domain object`
+                );
             }
-            const [min, max] = domain[color_dim];
+            const [min, max] = domain[colorOption.colorDim];
             const normalizedX =
-                (variables[color_dim][index] - min) / (max - min);
+                (variables[colorOption.colorDim][index] - min) / (max - min);
             color = colormap(normalizedX, CET_I2);
         }
 
@@ -305,13 +318,12 @@ function makeRays(element: any, dim: number, color_dim: string): THREE.Group {
         group.add(line);
     }
 
-    // Add layers
-    applyLayerGroup(group, element["layers"] ?? [0]);
+    // Dont apply layers because visiblity is handled by not setting up the rays at all
 
     return group;
 }
 
-function makeElement(element: any, dim: number): THREE.Group {
+export function makeElement(element: any, dim: number): THREE.Group {
     const type: string = get_required(element, "type");
 
     type MakerFunction = (element: any, _dim: number) => THREE.Group;
@@ -332,9 +344,8 @@ function makeElement(element: any, dim: number): THREE.Group {
 }
 
 // Extract available variables from the scene
-// includes "default" to mean "use default color"
 function extractVariables(root: any): string[] {
-    const variables = new Set(["default"]);
+    const variables: Set<string> = new Set([]);
 
     const data = get_required(root, "data");
     for (const element of data) {
@@ -347,18 +358,31 @@ function extractVariables(root: any): string[] {
     return Array.from(variables);
 }
 
+// Color option
+export type ColorOption = {
+    show: boolean;
+    colorDim: string | null;
+    trueColor: boolean;
+};
+
 export class TLMScene {
     private root: any;
     private dim: number;
 
-    public model: THREE.Group;
-    public rays: THREE.Group;
+    // Model
+    public surfaces: THREE.Group;
+    public validRays: THREE.Group;
+    public blockedRays: THREE.Group;
+    public outputRays: THREE.Group;
     public opticalAxis: THREE.Group;
+    public points: THREE.Group;
+    public arrows: THREE.Group;
+
     public otherAxes: THREE.Group;
+
     public scene: THREE.Scene;
 
     public variables: string[];
-    public colorDim: string;
     public title: string;
 
     constructor(root: any, dim: number) {
@@ -367,23 +391,26 @@ export class TLMScene {
         this.scene = new THREE.Scene();
         const data = get_required(root, "data");
 
-        // Setup all nodes except for rays
-        this.model = new THREE.Group();
-        for (const element of data) {
-            if (get_required(element, "type") != "rays") {
-                const sceneElement = makeElement(element, dim);
-                this.model.add(sceneElement);
-            }
-        }
-
         this.variables = extractVariables(root);
 
-        // Setup all ray nodes
-        this.rays = new THREE.Group();
-        this.colorDim = "default";
-        this.setupRays(this.colorDim);
+        // Setup surfaces
+        this.surfaces = new THREE.Group();
+        this.setupSurfaces(dim);
 
-        // Axes helper
+        // Setup rays
+        this.validRays = new THREE.Group();
+        this.blockedRays = new THREE.Group();
+        this.outputRays = new THREE.Group();
+
+        // Setup points
+        this.points = new THREE.Group();
+        this.setupPoints(dim);
+
+        // Setup arrows
+        this.arrows = new THREE.Group();
+        this.setupArrows(dim);
+
+        // Setup axes helper
         this.otherAxes = new THREE.Group();
         if (data.show_axes ?? true) {
             if (dim == 2) {
@@ -396,7 +423,7 @@ export class TLMScene {
             }
         }
 
-        // Optical Axis
+        // Setup optical axis
         this.opticalAxis = new THREE.Group();
         if (data.show_optical_axis ?? true) {
             this.opticalAxis.add(
@@ -408,33 +435,120 @@ export class TLMScene {
         this.title = root.title ?? "";
 
         // Setup the actual THREE scene
-        this.scene.add(this.model);
-        this.scene.add(this.rays);
+        this.scene.add(this.surfaces);
         this.scene.add(this.otherAxes);
         this.scene.add(this.opticalAxis);
+
+        // Default for gui
+        this.opticalAxis.visible = false;
+        this.otherAxes.visible = false;
     }
 
-    // Setup rays with selected color dim
-    public setupRays(color_dim: string) {
-        this.colorDim = color_dim;
-        this.rays.removeFromParent();
-        this.rays = new THREE.Group();
+    public setupValidRays(color: ColorOption) {
+        this.validRays?.removeFromParent();
+        this.validRays = new THREE.Group();
+        // this.validRays.add(this.setupRaysLayer(0, color));
+        this.validRays.add(this.setupRaysLayer(1, color));
+        this.scene.add(this.validRays);
+    }
+
+    public setupBlockedRays(color: ColorOption) {
+        this.blockedRays?.removeFromParent();
+        this.blockedRays = this.setupRaysLayer(2, color);
+        this.scene.add(this.blockedRays);
+    }
+
+    public setupOutputRays(color: ColorOption) {
+        this.outputRays?.removeFromParent();
+        this.outputRays = this.setupRaysLayer(3, color);
+        this.scene.add(this.outputRays);
+    }
+
+    public setupPoints(dim: number) {
+        this.points?.removeFromParent();
+        this.points = new THREE.Group();
+        
+        const data = get_required(this.root, "data");
+
+        for (const element of data) {
+            if (get_required(element, "type") == "points") {
+                console.log("SETTING UP POINTS");
+                this.points.add(makePoints(element, dim));
+            }
+        }
+        this.scene.add(this.points);
+    }
+
+    public setupArrows(dim: number) {
+        this.arrows?.removeFromParent();
+        this.arrows = new THREE.Group();
+
+        const data = get_required(this.root, "data");
+
+        for (const element of data) {
+            if (get_required(element, "type") == "arrows") {
+                this.points.add(makeArrows(element, dim));
+            }
+        }
+        this.scene.add(this.arrows);
+    }
+
+    public setupRaysLayer(layer: number, color: ColorOption) {
+        const group = new THREE.Group();
 
         const data = get_required(this.root, "data");
 
         for (const element of data) {
             if (get_required(element, "type") == "rays") {
-                const elem = makeRays(element, this.dim, color_dim);
-                this.rays.add(elem);
+                // TODO support only one layer per node
+                const dataLayer = (element["layers"] ?? [0])[0];
+                if (dataLayer === layer) {
+                    group.add(makeRays(element, this.dim, color));
+                }
             }
         }
-        this.scene.add(this.rays);
+
+        return group;
+    }
+
+    public setupSurfaces(dim: number) {
+        // Setup all nodes except for rays
+        this.surfaces?.removeFromParent();
+        this.surfaces = new THREE.Group();
+
+        const data = get_required(this.root, "data");
+
+        for (const element of data) {
+            if (get_required(element, "type") == "surfaces") {
+                const elem = makeSurfaces(element, dim);
+                this.surfaces.add(elem);
+            }
+        }
+    }
+
+    public setSurfacesColor(color: THREE.Color): void {
+        this.surfaces.traverse((child: THREE.Object3D) => {
+            if (
+                child instanceof THREE.Mesh &&
+                child.material instanceof THREE.Material
+            ) {
+                if ("color" in child.material) {
+                    (
+                        child.material as THREE.Material & {
+                            color: THREE.Color;
+                        }
+                    ).color = color;
+                }
+            }
+        });
     }
 
     public getBB(): THREE.Box3 {
         const bbox = new THREE.Box3();
-        bbox.union(new THREE.Box3().setFromObject(this.model));
-        bbox.union(new THREE.Box3().setFromObject(this.rays));
+        bbox.union(new THREE.Box3().setFromObject(this.surfaces));
+        bbox.union(new THREE.Box3().setFromObject(this.validRays));
+        bbox.union(new THREE.Box3().setFromObject(this.blockedRays));
+        bbox.union(new THREE.Box3().setFromObject(this.outputRays));
 
         if (bbox.isEmpty()) {
             // make sure axes are visible in default empty view
@@ -443,16 +557,5 @@ export class TLMScene {
         }
 
         return bbox;
-    }
-
-    public defaults() {
-        // Color dim
-        if (this.variables.includes("object")) {
-            this.setupRays("object");
-        }
-
-        // Visibility
-        this.opticalAxis.visible = false;
-        this.otherAxes.visible = false;
     }
 }

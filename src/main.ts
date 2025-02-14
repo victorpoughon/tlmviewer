@@ -49,11 +49,7 @@ export class TLMViewerApp {
 
         // Title
         const titleDiv = container.getElementsByClassName("tlmviewer-title")[0];
-        titleDiv.innerHTML = scene.title;
-
-        // needs to be called before gui is setup
-        // so that default are correctly selected
-        this.scene.defaults();
+        titleDiv.innerHTML = scene.title;   
 
         // LIL GUI
         this.gui = new TLMGui(this, container, this.scene);

@@ -1,8 +1,14 @@
 import * as THREE from "three";
 import GUI from "lil-gui";
 
-import { TLMScene } from "./scene.ts";
+import { TLMScene, ColorOption } from "./scene.ts";
 import { TLMViewerApp } from "./main.ts";
+
+type RGBColor = {
+    r: number;
+    g: number;
+    b: number;
+};
 
 export class TLMGui {
     private app: TLMViewerApp;
@@ -13,49 +19,108 @@ export class TLMGui {
         this.scene = scene;
         this.app = app;
 
+        const gui = new GUI({ container: container, autoPlace: false });
+
+        const colors: Record<string, ColorOption> = {
+            default: { show: true, colorDim: null, trueColor: false },
+            hide: { show: false, colorDim: null, trueColor: false },
+        };
+
+        for (const varName of this.scene.variables) {
+            if (varName === "wavelength") {
+                colors["wavelength"] = {
+                    show: true,
+                    colorDim: "wavelength",
+                    trueColor: false,
+                };
+                colors["wavelength (true color)"] = {
+                    show: true,
+                    colorDim: "wavelength",
+                    trueColor: true,
+                };
+            } else {
+                colors[varName] = {
+                    show: true,
+                    colorDim: varName,
+                    trueColor: false,
+                };
+            }
+        }
+
         this.controller = {
-            colorDim: this.scene.colorDim,
+            validColor: colors.default,
+            blockedColor: colors.hide,
+            outputColor: colors.default,
             resetView() {
                 app.resetView();
             },
             backgroundColor: { r: 0, g: 0, b: 0 },
-            showValidRays: true,
-            showBlockedRays: false,
-            showOutputRays: true,
+            surfacesColor: { r: 0, g: 1, b: 1 },
+
             showKinematicJoints: false,
         };
-        const gui = new GUI({ container: container, autoPlace: false });
 
-        gui.add(this.controller, "colorDim", this.scene.variables)
-            .name("Rays Color")
-            .onChange((value: string) => {
-                this.scene.setupRays(value);
-            });
         gui.add(this.controller, "resetView").name("Reset Camera");
-        gui.addColor(this.controller, "backgroundColor")
-            .name("Background color")
-            .onChange((value: object) => {
-                this.scene.scene.background = new THREE.Color( // @ts-ignore
-                    value.r, // @ts-ignore
-                    value.g, // @ts-ignore
-                    value.b // @ts-ignore
+
+        const folderColors = gui.addFolder("Colors");
+        folderColors
+            .add(this.controller, "validColor", colors)
+            .name("Valid rays")
+            .onChange((value: ColorOption) => {
+                this.scene.setupValidRays(value);
+            });
+
+        folderColors
+            .add(this.controller, "blockedColor", colors)
+            .name("Blocked rays")
+            .onChange((value: ColorOption) => {
+                this.scene.setupBlockedRays(value);
+            });
+
+        folderColors
+            .add(this.controller, "outputColor", colors)
+            .name("Output rays")
+            .onChange((value: ColorOption) => {
+                this.scene.setupOutputRays(value);
+            });
+
+        folderColors
+            .addColor(this.controller, "backgroundColor")
+            .name("Background")
+            .onChange((value: RGBColor) => {
+                this.scene.scene.background = new THREE.Color(
+                    value.r,
+                    value.g,
+                    value.b
                 );
+            });
+
+        folderColors
+            .addColor(this.controller, "surfacesColor")
+            .name("Surfaces")
+            .onChange((value: RGBColor) => {
+                const color = new THREE.Color(value.r, value.g, value.b);
+                this.scene.setSurfacesColor(color);
             });
 
         const folderShow = gui.addFolder("Visible");
         folderShow.add(this.scene.opticalAxis, "visible").name("Optical axis");
         folderShow.add(this.scene.otherAxes, "visible").name("Other axes");
-        folderShow.add(this.controller, "showValidRays").name("Valid rays");
-        folderShow.add(this.controller, "showBlockedRays").name("Blocked rays");
-        folderShow.add(this.controller, "showOutputRays").name("Output rays");
         folderShow
             .add(this.controller, "showKinematicJoints")
             .name("Kinematic joints");
 
+        this.scene.setupValidRays(this.controller.validColor);
+        this.scene.setupBlockedRays(this.controller.blockedColor);
+        this.scene.setupOutputRays(this.controller.outputColor);
+
         folderShow.onChange((_: Object) => {
             this.updateCameraLayers();
         });
+        this.updateCameraLayers();
+
         gui.open(false);
+
     }
 
     public updateCameraLayers() {
@@ -69,9 +134,6 @@ export class TLMGui {
         };
 
         this.app.camera.layers.enable(0);
-        setCameraLayer(this.controller.showValidRays, 1);
-        setCameraLayer(this.controller.showBlockedRays, 2);
-        setCameraLayer(this.controller.showOutputRays, 3);
         setCameraLayer(this.controller.showKinematicJoints, 4);
     }
 }
