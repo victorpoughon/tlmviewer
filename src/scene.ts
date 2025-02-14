@@ -6,7 +6,7 @@ import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
 import { get_required } from "./utility.ts";
 import { colormap } from "./color.ts";
-import {CET_I2} from "./colormaps.ts";
+import { CET_I2 } from "./colormaps.ts";
 
 export function makeLine(start: number[], end: number[], color: string) {
     console.assert(start.length == 3);
@@ -273,7 +273,9 @@ function makeRays(element: any, dim: number, color_dim: string): THREE.Group {
 
     for (const [index, ray] of points.entries()) {
         if (ray.length != expectedLength) {
-            throw new Error(`Invalid ray array length, got ${ray.length} for dim ${dim}`);
+            throw new Error(
+                `Invalid ray array length, got ${ray.length} for dim ${dim}`
+            );
         }
 
         var start, end;
@@ -287,14 +289,15 @@ function makeRays(element: any, dim: number, color_dim: string): THREE.Group {
 
         var color;
 
-        if (!(variables.hasOwnProperty(color_dim))) {
+        if (!variables.hasOwnProperty(color_dim)) {
             color = default_color;
         } else {
             if (!domain.hasOwnProperty(color_dim)) {
                 throw new Error(`${color_dim} missing from ray domain object`);
             }
             const [min, max] = domain[color_dim];
-            const normalizedX = (variables[color_dim][index] - min) / (max - min);
+            const normalizedX =
+                (variables[color_dim][index] - min) / (max - min);
             color = colormap(normalizedX, CET_I2);
         }
 
@@ -396,7 +399,9 @@ export class TLMScene {
         // Optical Axis
         this.opticalAxis = new THREE.Group();
         if (data.show_optical_axis ?? true) {
-            this.opticalAxis.add(makeLine2([-500, 0, 0], [500, 0, 0], "#e3e3e3"));
+            this.opticalAxis.add(
+                makeLine2([-500, 0, 0], [500, 0, 0], "#e3e3e3")
+            );
         }
 
         // Title
@@ -426,10 +431,10 @@ export class TLMScene {
         this.scene.add(this.rays);
     }
 
-    public getBB() : THREE.Box3 {
+    public getBB(): THREE.Box3 {
         const bbox = new THREE.Box3();
         bbox.union(new THREE.Box3().setFromObject(this.model));
-        bbox.union(new THREE.Box3().setFromObject(this.rays))
+        bbox.union(new THREE.Box3().setFromObject(this.rays));
 
         if (bbox.isEmpty()) {
             // make sure axes are visible in default empty view
@@ -438,5 +443,16 @@ export class TLMScene {
         }
 
         return bbox;
+    }
+
+    public defaults() {
+        // Color dim
+        if (this.variables.includes("object")) {
+            this.setupRays("object");
+        }
+
+        // Visibility
+        this.opticalAxis.visible = false;
+        this.otherAxes.visible = false;
     }
 }
