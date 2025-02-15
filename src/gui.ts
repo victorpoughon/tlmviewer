@@ -65,33 +65,43 @@ export class TLMGui {
         gui.add(this.controller, "resetView").name("Reset Camera");
 
         const folderColors = gui.addFolder("Colors");
-        folderColors
+        
+        const controllerValidColor = folderColors
             .add(this.controller, "validColor", colors)
-            .name("Valid rays")
-            .onChange((value: ColorOption) => {
-                this.scene.setupValidRays(value);
-            });
+            .name("Valid rays");
 
-        folderColors
+        const controllerBlockedColor = folderColors
             .add(this.controller, "blockedColor", colors)
-            .name("Blocked rays")
-            .onChange((value: ColorOption) => {
-                this.scene.setupBlockedRays(value);
-            });
+            .name("Blocked rays");
 
-        folderColors
+        const controllerOutputColor = folderColors
             .add(this.controller, "outputColor", colors)
-            .name("Output rays")
-            .onChange((value: ColorOption) => {
-                this.scene.setupOutputRays(value);
-            });
+            .name("Output rays");
 
-        folderColors.add(this.controller, "raysOpacity", 0, 1).name("Opacity").onFinishChange((value: number) => {
+        const controllerOpacity = folderColors.add(this.controller, "raysOpacity", 0, 1).name("Opacity").onFinishChange((value: number) => {
             this.scene.setRaysOpacity(value);
         });
 
-        folderColors.add(this.controller, "raysThickness", 1, 5).name("Thickness").onFinishChange((value: number) => {
+        const controllerThickness = folderColors.add(this.controller, "raysThickness", 0.1, 10).name("Thickness").onFinishChange((value: number) => {
             this.scene.setRaysThickness(value);
+        });
+
+        controllerValidColor.onChange((value: ColorOption) => {
+            this.scene.setupValidRays(value);
+            this.scene.setRaysOpacity(controllerOpacity.getValue());
+            this.scene.setRaysThickness(controllerThickness.getValue());
+        });
+
+        controllerBlockedColor.onChange((value: ColorOption) => {
+            this.scene.setupBlockedRays(value);
+            this.scene.setRaysOpacity(controllerOpacity.getValue());
+            this.scene.setRaysThickness(controllerThickness.getValue());
+        });
+
+        controllerOutputColor.onChange((value: ColorOption) => {
+            this.scene.setupOutputRays(value);
+            this.scene.setRaysOpacity(controllerOpacity.getValue());
+            this.scene.setRaysThickness(controllerThickness.getValue());
         });
 
         folderColors

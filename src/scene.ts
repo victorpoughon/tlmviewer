@@ -352,7 +352,7 @@ function makeRays(
 
     const material = new LineMaterial({
         ...(use_default_color ? { color: default_color } : {}),
-        linewidth: 1.2,
+        linewidth: 1,
         vertexColors: !use_default_color,
         dashed: false,
         transparent: true,
