@@ -3,12 +3,14 @@ import * as THREE from "three";
 import { Line2 } from "three/addons/lines/Line2.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
+import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
+import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
 
 import { get_required } from "./utility.ts";
-import { colormap } from "./color.ts";
 import { CET_I2 } from "./CET_I2.ts";
 
-import { wavelengthToRgb, arrayToRgb } from "./true_color.ts";
+import { colormap } from "./color.ts";
+import { wavelengthToRgb } from "./true_color.ts";
 
 export function makeLine(start: number[], end: number[], color: string) {
     console.assert(start.length == 3);
@@ -33,7 +35,7 @@ export function makeLine2(start: number[], end: number[], color: string) {
         linewidth: 1.1,
         worldUnits: false,
         side: THREE.DoubleSide,
-        transparent: true
+        transparent: true,
     });
 
     const points = [];
@@ -282,48 +284,82 @@ function makeRays(
         throw new Error("points field of ray is not iterable");
     }
 
-    for (const [index, ray] of points.entries()) {
+    // POSITION DATA
+    const positions = [];
+    for (const [_, ray] of points.entries()) {
         if (ray.length != expectedLength) {
             throw new Error(
                 `Invalid ray array length, got ${ray.length} for dim ${dim}`
             );
         }
 
-        var start, end;
         if (dim == 2) {
-            start = ray.slice(0, 2).concat([0]);
-            end = ray.slice(2, 4).concat([0]);
+            positions.push(ray[0], ray[1], 0, ray[2], ray[3], 0);
         } else {
-            start = ray.slice(0, 3);
-            end = ray.slice(3, 6);
+            positions.push(ray[0], ray[1], ray[2], ray[3], ray[4], ray[5]);
         }
-
-        var color;
-
-        if (
-            colorOption.colorDim == null ||
-            !variables.hasOwnProperty(colorOption.colorDim)
-        ) {
-            color = default_color;
-        } else if (colorOption.trueColor == false) {
-            if (!domain.hasOwnProperty(colorOption.colorDim)) {
-                throw new Error(
-                    `${colorOption.colorDim} missing from ray domain object`
-                );
-            }
-            const [min, max] = domain[colorOption.colorDim];
-            const normalizedX =
-                (variables[colorOption.colorDim][index] - min) / (max - min);
-            color = colormap(normalizedX, CET_I2);
-        } else {
-            // true color
-            const wavelength = variables[colorOption.colorDim][index];
-            color = arrayToRgb(wavelengthToRgb([wavelength])[0]);
-        }
-
-        const line = makeLine2(start, end, color);
-        group.add(line);
     }
+
+    // COLOR DATA
+    const colors = [];
+    var use_default_color: boolean = true;
+
+    // Default color
+    if (colorOption.colorDim == null) {
+        // || !variables.hasOwnProperty(colorOption.colorDim
+        use_default_color = true;
+    }
+    // Color from variable data
+    else {
+        use_default_color = false;
+        for (const [index, _] of points.entries()) {
+            var color: Array<number>;
+
+            if (colorOption.trueColor == false) {
+                if (!domain.hasOwnProperty(colorOption.colorDim)) {
+                    throw new Error(
+                        `${colorOption.colorDim} missing from ray domain object`
+                    );
+                }
+                const [min, max] = domain[colorOption.colorDim];
+                const normalizedX =
+                    (variables[colorOption.colorDim][index] - min) /
+                    (max - min);
+                color = colormap(normalizedX, CET_I2);
+            } else {
+                // true color
+                const wavelength = variables[colorOption.colorDim][index];
+                color = wavelengthToRgb([wavelength])[0];
+            }
+
+            colors.push(
+                color[0],
+                color[1],
+                color[2],
+                color[0],
+                color[1],
+                color[2]
+            );
+        }
+    }
+
+    const geometry = new LineSegmentsGeometry();
+    geometry.setPositions(positions);
+
+    if (!use_default_color) {
+        geometry.setColors(colors);
+    }
+
+    const material = new LineMaterial({
+        ...(use_default_color ? { color: default_color } : {}),
+        linewidth: 1.2,
+        vertexColors: !use_default_color,
+        dashed: false,
+        transparent: true,
+    });
+
+    const lines = new LineSegments2(geometry, material);
+    group.add(lines);
 
     // Dont apply layers because visiblity is handled by not setting up the rays at all
 
@@ -383,7 +419,7 @@ export class TLMScene {
     public outputRays: THREE.Group;
     public points: THREE.Group;
     public arrows: THREE.Group;
-    
+
     public opticalAxis: THREE.Group;
     public otherAxes: THREE.Group;
 
@@ -420,20 +456,15 @@ export class TLMScene {
         // Setup axes helper
         this.otherAxes = new THREE.Group();
         if (dim == 2) {
-            this.otherAxes.add(
-                makeLine2([0, -500, 0], [0, 500, 0], "#e3e3e3")
-            );
+            this.otherAxes.add(makeLine2([0, -500, 0], [0, 500, 0], "#e3e3e3"));
         } else if (dim == 3) {
             const axesHelper = new THREE.AxesHelper(5);
             this.otherAxes.add(axesHelper);
         }
-        
 
         // Setup optical axis
         this.opticalAxis = new THREE.Group();
-        this.opticalAxis.add(
-            makeLine2([-500, 0, 0], [500, 0, 0], "#e3e3e3")
-        );
+        this.opticalAxis.add(makeLine2([-500, 0, 0], [500, 0, 0], "#e3e3e3"));
 
         // Title
         this.title = root.title ?? "";

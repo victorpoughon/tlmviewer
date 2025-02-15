@@ -6,7 +6,9 @@ const embed_tests = [
     "/tests2D/test_ray_variables3D.json",
 ];
 
-const load_tests = ["/testsEmbed/landscape.json"];
+const load_tests = [
+    "/testsEmbed/landscape.json",
+];
 
 function runTest(json, test_file, testContainer) {
     const source = document.createElement("h3");

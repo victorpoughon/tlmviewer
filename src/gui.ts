@@ -129,7 +129,9 @@ export class TLMGui {
         });
         this.updateCameraLayers();
 
-        gui.open(false);
+        gui.open(true);
+        folderShow.open(false);
+        folderColors.open(false);
     }
 
     public updateCameraLayers() {
