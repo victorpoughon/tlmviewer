@@ -210,6 +210,8 @@ function makePoints(element: any, dim: number): THREE.Group {
     for (const point of vertices) {
         const geometry = new THREE.SphereGeometry(0.1, 8, 8);
         const material = new THREE.MeshBasicMaterial({ color: color });
+        material.transparent = true;
+        material.opacity = 0.8;
         const sphere = new THREE.Mesh(geometry, material);
 
         if (point.length != dim) {
