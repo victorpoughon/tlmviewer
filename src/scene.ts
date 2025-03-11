@@ -334,14 +334,13 @@ function makeRays(
                 color = wavelengthToRgb([wavelength])[0];
             }
 
+            const linear_color = new THREE.Color().setRGB(color[0], color[1], color[2], THREE.SRGBColorSpace);
+
             colors.push(
-                color[0],
-                color[1],
-                color[2],
-                color[0],
-                color[1],
-                color[2]
+                ...linear_color.toArray(),
+                ...linear_color.toArray(),
             );
+            console.log(color, linear_color);
         }
     }
 
