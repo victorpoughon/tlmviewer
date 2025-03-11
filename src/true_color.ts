@@ -111,7 +111,6 @@ export function arrayToRgb(colorArray: number[]): string {
     const r = Math.floor(256*colorArray[0]);
     const g = Math.floor(256*colorArray[1]);
     const b = Math.floor(256*colorArray[2]);
-    console.log(r, g, b);
 
     return `rgb(${r}, ${g}, ${b})`;
 }

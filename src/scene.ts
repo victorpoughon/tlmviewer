@@ -340,7 +340,6 @@ function makeRays(
                 ...linear_color.toArray(),
                 ...linear_color.toArray(),
             );
-            console.log(color, linear_color);
         }
     }
 

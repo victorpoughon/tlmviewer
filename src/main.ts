@@ -245,7 +245,8 @@ function tlmviewerRun(container: HTMLElement, data: any) {
 
         app.animate();
     } catch (error) {
-        container.innerHTML = "tlmviewer error: " + error;
+        container.innerHTML = "<span style='color: red'>tlmviewer error: " + error + "</span>";
+        throw error;
     }
 }
 
@@ -254,14 +255,20 @@ function embed(container: HTMLElement, json_data: string) {
         const data = JSON.parse(json_data);
         tlmviewerRun(container, data);
     } catch (error) {
-        container.innerHTML = "tlmviewer error: " + error;
+        container.innerHTML = "<span style='color: red'>tlmviewer error: " + error + "</span>";
+        throw error;
     }
 }
 
 async function load(container: HTMLElement, url: string): Promise<void> {
-    return fetch(url)
-        .then((response) => response.json())
-        .then((data) => tlmviewerRun(container, data));
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        tlmviewerRun(container, data);
+    } catch(error) {
+        container.innerHTML = "<span style='color: red'>tlmviewer error: " + error + "</span>";
+        throw error;
+    }
 }
 
 // For each element with class "tlmviewer" in the document
