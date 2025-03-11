@@ -54,6 +54,10 @@ export class TLMViewerApp {
         // LIL GUI
         this.gui = new TLMGui(this, container, this.scene);
         this.gui.updateCameraLayers();
+
+        if (camera === "XY") {
+            this.resetView();
+        }
     }
 
     // Handle window resize events
