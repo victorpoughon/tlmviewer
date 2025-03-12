@@ -1,9 +1,8 @@
 import { tlmviewer } from "../src/main.ts";
 
 const embed_tests = [
+    "/tests2D/test_controls.json",
     "/tests2D/test_colormap.json",
-    "/tests2D/test_ray_variables.json",
-    "/tests2D/test_ray_variables3D.json",
 ];
 
 const load_tests = [
