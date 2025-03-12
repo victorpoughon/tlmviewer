@@ -62,6 +62,13 @@ export class TLMGui {
             showKinematicJoints: false,
         };
 
+        // If 'object' variable is available, default to it for valid and output rays
+        if (this.scene.variables.includes("object")) {
+            console.log("setting obejct var");
+            this.controller.validColor = colors["object"];
+            this.controller.outputColor = colors["object"];
+        }
+
         gui.add(this.controller, "resetView").name("Reset Camera");
 
         const folderColors = gui.addFolder("Colors");
@@ -139,7 +146,7 @@ export class TLMGui {
         });
         this.updateCameraLayers();
 
-        gui.open(true);
+        gui.open(false);
         folderShow.open(false);
         folderColors.open(false);
     }
