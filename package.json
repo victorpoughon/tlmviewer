@@ -27,10 +27,10 @@
     "lil-gui": "^0.20.0",
     "three": "^0.171.0",
     "typescript": "~5.6.2",
-    "vite": "^6.0.3"
-  },
-  "dependencies": {
+    "vite": "^6.0.3",
     "vite-plugin-css-injected-by-js": "^3.5.2",
     "vite-plugin-package-version": "^1.1.0"
+  },
+  "dependencies": {
   }
 }
