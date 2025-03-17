@@ -140,10 +140,11 @@ export class TLMGui {
             .addColor(this.controller, "backgroundColor")
             .name("Background")
             .onChange((value: RGBColor) => {
-                this.scene.scene.background = new THREE.Color(
+                this.scene.scene.background = new THREE.Color().setRGB(
                     value.r,
                     value.g,
-                    value.b
+                    value.b,
+                    THREE.SRGBColorSpace
                 );
             });
 
