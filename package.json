@@ -1,9 +1,12 @@
 {
   "name": "tlmviewer",
-  "private": true,
+  "author": "Victor Poughon",
+  "private": false,
   "version": "0.0.1",
   "description": "3D viewer for torchlensmaker",
+  "license": "GPL v3",
   "type": "module",
+  "git repository": "https://github.com/victorpoughon/tlmviewer",
   "files": [
     "dist"
   ],
@@ -27,6 +30,7 @@
     "vite": "^6.0.3"
   },
   "dependencies": {
-    "vite-plugin-css-injected-by-js": "^3.5.2"
+    "vite-plugin-css-injected-by-js": "^3.5.2",
+    "vite-plugin-package-version": "^1.1.0"
   }
 }
