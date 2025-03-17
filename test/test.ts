@@ -1,4 +1,4 @@
-import { tlmviewer } from "../src/main.ts";
+import tlmviewer from "../src/main.ts";
 
 const embed_tests = [
     "/tests2D/test_controls.json",

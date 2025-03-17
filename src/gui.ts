@@ -86,7 +86,6 @@ export class TLMGui {
 
         // If 'object' variable is available, default to it for valid and output rays
         if (this.scene.variables.includes("object")) {
-            console.log("setting obejct var");
             this.controller.validColor = this.colorOptions["object"];
             this.controller.outputColor = this.colorOptions["object"];
         }

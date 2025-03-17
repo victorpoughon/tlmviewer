@@ -296,10 +296,11 @@ async function loadAll(): Promise<Promise<void>[]> {
     return promises;
 }
 
-export const tlmviewer = {
+export default {
     embed: embed,
     load: load,
     loadAll: loadAll,
 };
 
-console.log("tlmviewer loaded");
+// @ts-ignore
+console.log(`tlmviewer-${import.meta.env.PACKAGE_VERSION} loaded`);
