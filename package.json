@@ -11,7 +11,8 @@
     "url": "https://github.com/victorpoughon/tlmviewer"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "main": "./dist/tlmviewer-0.0.9.js",
   "module": "./dist/tlmviewer-0.0.9.js",
