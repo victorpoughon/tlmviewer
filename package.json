@@ -2,7 +2,7 @@
   "name": "tlmviewer",
   "author": "Victor Poughon",
   "private": false,
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "3D viewer for torchlensmaker",
   "license": "GPL v3",
   "type": "module",
@@ -10,8 +10,8 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/tlmviewer-0.0.8.js",
-  "module": "./dist/tlmviewer-0.0.8.js",
+  "main": "./dist/tlmviewer-0.0.9.js",
+  "module": "./dist/tlmviewer-0.0.9.js",
   "exports": "./src/main.ts",
   "scripts": {
     "dev": "vite",
