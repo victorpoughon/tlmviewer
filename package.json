@@ -11,12 +11,8 @@
     "dist"
   ],
   "main": "./dist/tlmviewer-0.0.8.js",
-  "module": "./dist/tlmviewer0.0.8.js",
-  "exports": {
-    ".": {
-      "import": "./dist/tlmviewer0.0.8.js"
-    }
-  },
+  "module": "./dist/tlmviewer-0.0.8.js",
+  "exports": "./src/main.ts",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
