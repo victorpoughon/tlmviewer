@@ -142,6 +142,11 @@ export class TLMViewerApp {
 
         newControls.enableRotate = false;
 
+        newControls.mouseButtons = {
+            LEFT: THREE.MOUSE.PAN,
+            RIGHT: THREE.MOUSE.PAN,
+        }
+
         this.camera = newCamera;
         this.controls = newControls;
 
