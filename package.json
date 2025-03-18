@@ -4,15 +4,22 @@
   "private": false,
   "version": "0.0.9",
   "description": "3D viewer for torchlensmaker",
-  "license": "GPL v3",
+  "license": "GPL-3.0",
   "type": "module",
-  "git repository": "https://github.com/victorpoughon/tlmviewer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/victorpoughon/tlmviewer"
+  },
   "files": [
     "dist"
   ],
   "main": "./dist/tlmviewer-0.0.9.js",
   "module": "./dist/tlmviewer-0.0.9.js",
-  "exports": "./src/main.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/tlmviewer-0.0.9.js"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
