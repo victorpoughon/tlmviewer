@@ -208,6 +208,10 @@ export class TLMGui {
             };
             const self = this;
 
+            set("color_rays", (v: string) => {
+                self.controllers.colors.validRays.load(self.colorOptions[v]);
+                self.controllers.colors.outputRays.load(self.colorOptions[v]);
+            });
             set("valid_rays", (v: string) => {self.controllers.colors.validRays.load(self.colorOptions[v])});
             set("blocked_rays", (v: string) => {self.controllers.colors.blockedRays.load(self.colorOptions[v])});
             set("output_rays", (v: string) => {self.controllers.colors.outputRays.load(self.colorOptions[v])});
