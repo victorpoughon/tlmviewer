@@ -28,22 +28,30 @@
 <body>
   <h1>tlmviewer tests</h1>
   <div id="embed-tests">
-    <h2>embed</h2>
+    <h2>embed (client code loads the json)</h2>
+    <pre>
+      // client code supplies loaded object to display
+      function embed(container: HTMLElement, json_data: string)
+    </pre>
   </div>
 
   <div id="load-tests">
-    <h2>external link</h2>
+    <h2>load tests</h2>
+    <pre>
+      // tlmviewer loads the json at given url
+      async function load(container: HTMLElement, url: string): Promise<void>
+    </pre>
   </div>
+
   <script type="module" src="./test/test.ts"></script>
 
   <div id="load-all-tests">
     <h2>load all</h2>
-    <div class="tlmviewer" data-url="/testsEmbed/landscape.json" style="height: 800px; width: 1800px;"></div>
+    <pre>load_all(): library loads the json from the data-url html attribute</pre>
+    <div class="tlmviewer" data-url="/tests/landscape.json" style="height: 800px; width: 1800px;"></div>
 
-    <div class="tlmviewer" data-url="/testsEmbed/rainbow.json" style="height: 800px; width: 100%;"></div>
+    <div class="tlmviewer" data-url="/tests/rainbow.json" style="height: 800px; width: 100%;"></div>
   </div>
-
-
 
 </body>
 

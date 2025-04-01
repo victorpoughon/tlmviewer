@@ -1,12 +1,9 @@
 import tlmviewer from "../src/main.ts";
 
-const embed_tests = [
-    "/tests2D/test_controls.json",
-    "/tests2D/test_colormap.json",
-];
-
-const load_tests = [
-    "/testsEmbed/landscape.json",
+const all_tests = [
+    "/tests/test_controls.json",
+    "/tests/test_colormap.json",
+    "/tests/landscape.json"
 ];
 
 function runTest(json, test_file, testContainer) {
@@ -35,7 +32,7 @@ window.onload = () => {
     }
 
     // test tlmviewer.embed
-    for (const test_file of embed_tests) {
+    for (const test_file of all_tests) {
         const testContainer = document.createElement("div");
         mainEmbed.appendChild(testContainer);
 
@@ -45,7 +42,7 @@ window.onload = () => {
     }
 
     // test tlmviewer.load
-    for (const test_file of load_tests) {
+    for (const test_file of all_tests) {
         const viewerElement = document.createElement("div");
         viewerElement.style.height = "450px";
         viewerElement.style.width = "800px";
