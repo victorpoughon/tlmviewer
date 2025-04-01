@@ -13,7 +13,8 @@ import { colormap } from "./color.ts";
 import { wavelengthToRgb } from "./true_color.ts";
 
 // Scene elements
-import { ArrowElement } from "./elements/ArrowElement.ts";
+import { ArrowsElement } from "./elements/ArrowsElement.ts";
+import { PointsElement } from "./elements/PointsElement.ts";
 
 export function makeLine(start: number[], end: number[], color: string) {
     console.assert(start.length == 3);
@@ -194,49 +195,6 @@ function makeSurface(
     return lathe;
 }
 
-function applyLayerGroup(obj: THREE.Object3D, layers: Array<number>) {
-    obj.traverse((child) => {
-        child.layers.disableAll();
-    });
-    obj.traverse((child) => {
-        for (const layer of layers) {
-            child.layers.enable(layer);
-        }
-    });
-}
-
-function makePoints(element: any, dim: number): THREE.Group {
-    const vertices = get_required(element, "data");
-    const color = element.color ?? "#ffffff";
-
-    const group = new THREE.Group();
-    for (const point of vertices) {
-        const geometry = new THREE.SphereGeometry(0.1, 8, 8);
-        const material = new THREE.MeshBasicMaterial({ color: color });
-        material.transparent = true;
-        material.opacity = 0.8;
-        const sphere = new THREE.Mesh(geometry, material);
-
-        if (point.length != dim) {
-            throw new Error(
-                `point array length is ${point.length} (expected ${dim})`
-            );
-        }
-        if (dim == 2) {
-            sphere.position.set(point[0], point[1], 2.0);
-        } else {
-            sphere.position.set(point[0], point[1], point[2]);
-        }
-
-        group.add(sphere);
-    }
-
-    // Add layers
-    applyLayerGroup(group, element["layers"] ?? [0]);
-
-    return group;
-}
-
 function makeRays(
     element: any,
     dim: number,
@@ -346,7 +304,6 @@ export function makeElement(element: any, dim: number): THREE.Group {
     type MakerFunction = (element: any, _dim: number) => THREE.Group;
     const makers: { [key: string]: MakerFunction } = {
         surfaces: makeSurfaces,
-        points: makePoints,
     };
 
     if (!makers.hasOwnProperty(type)) {
@@ -390,7 +347,6 @@ export class TLMScene {
     public validRays: THREE.Group;
     public blockedRays: THREE.Group;
     public outputRays: THREE.Group;
-    public points: THREE.Group;
     public sceneGraph: THREE.Group;
 
     public opticalAxis: THREE.Group;
@@ -418,11 +374,7 @@ export class TLMScene {
         this.blockedRays = new THREE.Group();
         this.outputRays = new THREE.Group();
 
-        // Setup points
-        this.points = new THREE.Group();
-        this.setupPoints(dim);
-
-        // Setup arrows
+        // Setup scene graph
         this.sceneGraph = new THREE.Group();
         this.initSceneGraph(dim);
 
@@ -457,7 +409,8 @@ export class TLMScene {
     public initSceneGraph(dim: number) {
 
         const sceneElementTypes = [
-            ArrowElement,
+            PointsElement,
+            ArrowsElement,
         ];
 
         const matchElementType = (elementData: any) => {
@@ -504,20 +457,6 @@ export class TLMScene {
         this.outputRays?.removeFromParent();
         this.outputRays = this.setupRaysLayer(3, color);
         this.scene.add(this.outputRays);
-    }
-
-    public setupPoints(dim: number) {
-        this.points?.removeFromParent();
-        this.points = new THREE.Group();
-
-        const data = get_required(this.root, "data");
-
-        for (const element of data) {
-            if (get_required(element, "type") == "points") {
-                this.points.add(makePoints(element, dim));
-            }
-        }
-        this.scene.add(this.points);
     }
 
     public setupRaysLayer(layer: number, color: ColorOption) {

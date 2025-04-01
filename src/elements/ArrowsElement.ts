@@ -4,7 +4,7 @@ import { get_required } from "../utility.ts";
 
 import { AbstractSceneElement } from "./AbstractSceneElement.ts";
 
-export class ArrowElement extends AbstractSceneElement {
+export class ArrowsElement extends AbstractSceneElement {
     constructor() {
         super();
     }
@@ -50,6 +50,4 @@ export class ArrowElement extends AbstractSceneElement {
 
         return group;
     }
-
-    public update(group: THREE.Group, options: any) {}
 }
