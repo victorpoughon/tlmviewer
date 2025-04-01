@@ -12,6 +12,9 @@ import { CET_I2 } from "./CET_I2.ts";
 import { colormap } from "./color.ts";
 import { wavelengthToRgb } from "./true_color.ts";
 
+// Scene elements
+import { ArrowElement } from "./elements/ArrowElement.ts";
+
 export function makeLine(start: number[], end: number[], color: string) {
     console.assert(start.length == 3);
     console.assert(end.length == 3);
@@ -234,37 +237,6 @@ function makePoints(element: any, dim: number): THREE.Group {
     return group;
 }
 
-function makeArrows(element: any, dim: number): THREE.Group {
-    const arrows = get_required(element, "data");
-
-    const group = new THREE.Group();
-
-    for (const arrow of arrows) {
-        var start, end, length;
-        if (dim == 2) {
-            console.assert(arrow.length == 5);
-            start = arrow.slice(0, 2);
-            end = arrow.slice(2, 4);
-            length = arrow[4];
-        } else {
-            console.assert(arrow.length == 7);
-            start = arrow.slice(0, 3);
-            end = arrow.slice(3, 6);
-            length = arrow[6];
-        }
-
-        const dir = new THREE.Vector3(...start);
-        dir.normalize();
-        const origin = new THREE.Vector3(...end);
-        const color = 0xffff00;
-
-        const arrowHelper = new THREE.ArrowHelper(dir, origin, length, color);
-        group.add(arrowHelper);
-    }
-
-    return group;
-}
-
 function makeRays(
     element: any,
     dim: number,
@@ -334,12 +306,14 @@ function makeRays(
                 color = wavelengthToRgb([wavelength])[0];
             }
 
-            const linear_color = new THREE.Color().setRGB(color[0], color[1], color[2], THREE.SRGBColorSpace);
-
-            colors.push(
-                ...linear_color.toArray(),
-                ...linear_color.toArray(),
+            const linear_color = new THREE.Color().setRGB(
+                color[0],
+                color[1],
+                color[2],
+                THREE.SRGBColorSpace
             );
+
+            colors.push(...linear_color.toArray(), ...linear_color.toArray());
         }
     }
 
@@ -373,7 +347,6 @@ export function makeElement(element: any, dim: number): THREE.Group {
     const makers: { [key: string]: MakerFunction } = {
         surfaces: makeSurfaces,
         points: makePoints,
-        arrows: makeArrows,
     };
 
     if (!makers.hasOwnProperty(type)) {
@@ -418,7 +391,7 @@ export class TLMScene {
     public blockedRays: THREE.Group;
     public outputRays: THREE.Group;
     public points: THREE.Group;
-    public arrows: THREE.Group;
+    public sceneGraph: THREE.Group;
 
     public opticalAxis: THREE.Group;
     public otherAxes: THREE.Group;
@@ -450,8 +423,8 @@ export class TLMScene {
         this.setupPoints(dim);
 
         // Setup arrows
-        this.arrows = new THREE.Group();
-        this.setupArrows(dim);
+        this.sceneGraph = new THREE.Group();
+        this.initSceneGraph(dim);
 
         // Setup axes helper
         this.otherAxes = new THREE.Group();
@@ -474,9 +447,43 @@ export class TLMScene {
         this.scene.add(this.otherAxes);
         this.scene.add(this.opticalAxis);
 
+        this.scene.add(this.sceneGraph);
+
         // Default for gui
         this.opticalAxis.visible = false;
         this.otherAxes.visible = false;
+    }
+
+    public initSceneGraph(dim: number) {
+
+        const sceneElementTypes = [
+            ArrowElement,
+        ];
+
+        const matchElementType = (elementData: any) => {
+            for (const type of sceneElementTypes) {
+                if (type.match(elementData)) {
+                    return type;
+                }
+            }
+            // for now we skip unknown elements
+            // when migration is complete, this should be an error
+            return null;
+        }
+
+        const data = get_required(this.root, "data");
+        for (const elementData of data) {
+            // Find element type
+            const type = matchElementType(elementData);
+
+            // TODO raise error instead
+            if (type === null) {
+                continue;
+            }
+
+            const instance = new type();
+            this.sceneGraph.add(instance.loadJSON(elementData, dim));
+        }
     }
 
     public setupValidRays(color: ColorOption) {
@@ -511,20 +518,6 @@ export class TLMScene {
             }
         }
         this.scene.add(this.points);
-    }
-
-    public setupArrows(dim: number) {
-        this.arrows?.removeFromParent();
-        this.arrows = new THREE.Group();
-
-        const data = get_required(this.root, "data");
-
-        for (const element of data) {
-            if (get_required(element, "type") == "arrows") {
-                this.points.add(makeArrows(element, dim));
-            }
-        }
-        this.scene.add(this.arrows);
     }
 
     public setupRaysLayer(layer: number, color: ColorOption) {
