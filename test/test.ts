@@ -1,10 +1,12 @@
 import tlmviewer from "../src/main.ts";
 
-const all_tests = [
-    "/tests/test_controls.json",
-    "/tests/test_colormap.json",
-    "/tests/landscape.json"
-];
+async function fetchManifest(): Promise<any> {
+    return fetch("/testscenes.json")
+        .then((response) => response.json())
+        .then((files) => {
+            return files;
+        });
+}
 
 function runTest(json, test_file, testContainer) {
     const source = document.createElement("h3");
@@ -21,8 +23,10 @@ function runTest(json, test_file, testContainer) {
 }
 
 // Use window.onload to ensure the DOM is fully loaded
-window.onload = () => {
+window.onload = async () => {
     console.log("loading tlmviewer tests");
+    const all_tests = (await fetchManifest()).toSorted();
+    console.log(`loaded ${all_tests.length} json test files from manifest`);
 
     const mainEmbed = document.getElementById("embed-tests");
     const mainLoad = document.getElementById("load-tests");
