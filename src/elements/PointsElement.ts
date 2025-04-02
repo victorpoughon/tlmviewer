@@ -16,8 +16,8 @@ function applyLayerGroup(obj: THREE.Object3D, layers: Array<number>) {
 }
 
 export class PointsElement extends AbstractSceneElement {
-    constructor() {
-        super();
+    constructor(elementData: any, dim: number) {
+        super(elementData, dim);
     }
 
     public static match(elementData: any): boolean {
@@ -25,9 +25,9 @@ export class PointsElement extends AbstractSceneElement {
         return type === "points";
     }
 
-    public loadJSON(elementData: any, dim: number): THREE.Group {
-        const vertices = get_required(elementData, "data");
-        const color = elementData.color ?? "#ffffff";
+    public makeGroup(): THREE.Group {
+        const vertices = get_required(this.elementData, "data");
+        const color = this.elementData.color ?? "#ffffff";
 
         const group = new THREE.Group();
         for (const point of vertices) {
@@ -37,12 +37,12 @@ export class PointsElement extends AbstractSceneElement {
             material.opacity = 0.8;
             const sphere = new THREE.Mesh(geometry, material);
 
-            if (point.length != dim) {
+            if (point.length != this.dim) {
                 throw new Error(
-                    `point array length is ${point.length} (expected ${dim})`
+                    `point array length is ${point.length} (expected ${this.dim})`
                 );
             }
-            if (dim == 2) {
+            if (this.dim == 2) {
                 sphere.position.set(point[0], point[1], 2.0);
             } else {
                 sphere.position.set(point[0], point[1], point[2]);
@@ -52,7 +52,7 @@ export class PointsElement extends AbstractSceneElement {
         }
 
         // Add layers
-        applyLayerGroup(group, elementData["layers"] ?? [0]);
+        applyLayerGroup(group, this.elementData["layers"] ?? [0]);
 
         return group;
     }

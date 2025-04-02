@@ -144,21 +144,20 @@ function makeSurface(
 }
 
 export class LatheSurfacesElement extends AbstractSceneElement {
-    constructor() {
-        super();
+    constructor(elementData: any, dim: number) {
+        super(elementData, dim);
     }
 
-    // True if the given scene element data object matches this class
     public static match(elementData: any): boolean {
         const type = get_required(elementData, "type");
         return type === "surfaces";
     }
 
-    public loadJSON(elementData: any, dim: number): THREE.Group {
-        if (dim == 2) {
-            return makeSurfaces2D(elementData);
+    public makeGroup(): THREE.Group {
+        if (this.dim == 2) {
+            return makeSurfaces2D(this.elementData);
         } else {
-            return makeSurfaces3D(elementData);
+            return makeSurfaces3D(this.elementData);
         }
     }
 

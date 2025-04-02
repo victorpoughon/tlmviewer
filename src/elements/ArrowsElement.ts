@@ -5,8 +5,8 @@ import { get_required } from "../utility.ts";
 import { AbstractSceneElement } from "./AbstractSceneElement.ts";
 
 export class ArrowsElement extends AbstractSceneElement {
-    constructor() {
-        super();
+    constructor(elementData: any, dim: number) {
+        super(elementData, dim);
     }
 
     // True if the given scene element data object matches this class
@@ -15,14 +15,14 @@ export class ArrowsElement extends AbstractSceneElement {
         return type === "arrows";
     }
 
-    public loadJSON(elementData: any, dim: number): THREE.Group {
-        const arrows = get_required(elementData, "data");
+    public makeGroup(): THREE.Group {
+        const arrows = get_required(this.elementData, "data");
 
         const group = new THREE.Group();
 
         for (const arrow of arrows) {
             var start, end, length;
-            if (dim == 2) {
+            if (this.dim == 2) {
                 console.assert(arrow.length == 5);
                 start = arrow.slice(0, 2);
                 end = arrow.slice(2, 4);
