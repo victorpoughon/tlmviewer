@@ -1,7 +1,8 @@
 import * as THREE from "three";
 import { GUI, Controller } from "lil-gui";
 
-import { TLMScene, ColorOption } from "./scene.ts";
+import {ColorOption } from "./elements/RaysElement.ts";
+import { TLMScene } from "./scene.ts";
 import { TLMViewerApp } from "./main.ts";
 
 type RGBColor = {
