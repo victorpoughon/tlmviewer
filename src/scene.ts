@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { get_required } from "./utility.ts";
 
 // Scene elements
+import { AbstractSceneElement } from "./elements/AbstractSceneElement.ts";
 import { ArrowsElement } from "./elements/ArrowsElement.ts";
 import { PointsElement } from "./elements/PointsElement.ts";
 import { LatheSurfacesElement } from "./elements/LatheSurfacesElement.ts";
@@ -113,6 +114,20 @@ export class TLMScene {
         }
     }
 
+    // Call a function on all elements of the scene graph matching a given
+    // subtype of AbstractSceneElement
+    public updateElements<T extends AbstractSceneElement>(
+        type: new (...args: any[]) => T,
+        f: (group: THREE.Group, element: T) => void
+    ): void {
+        this.sceneGraph.traverse((child: THREE.Object3D) => {
+            if (child.userData instanceof type) {
+                const element = child.userData as T;
+                f(child as THREE.Group, element);
+            }
+        });
+    }
+
     public setupValidRays(color: ColorOption) {
         this.setRaysColorOption(0, color);
         this.setRaysColorOption(1, color);
@@ -127,45 +142,41 @@ export class TLMScene {
     }
 
     public setRaysColorOption(layer: number, color: ColorOption) {
-        this.sceneGraph.traverse((child: THREE.Object3D) => {
-            if (child.userData instanceof RaysElement) {
-                const element = child.userData as RaysElement;
+        this.updateElements(
+            RaysElement,
+            (group: THREE.Group, element: RaysElement) => {
                 if (element.layer === layer) {
-                    element.setColorOption(child as THREE.Group, color);
+                    element.setColorOption(group, color);
                 }
             }
-        });
+        );
     }
 
     public setRaysOpacity(opacity: number): void {
-        const update = (child: THREE.Object3D) => {
-            if (child.userData instanceof RaysElement) {
-                const element = child.userData as RaysElement;
-                element.setOpacity(child as THREE.Group, opacity);
+        this.updateElements(
+            RaysElement,
+            (group: THREE.Group, element: RaysElement) => {
+                element.setOpacity(group, opacity);
             }
-        };
-
-        this.sceneGraph.traverse(update);
+        );
     }
 
     public setRaysThickness(thickness: number): void {
-        const update = (child: THREE.Object3D) => {
-            if (child.userData instanceof RaysElement) {
-                const element = child.userData as RaysElement;
-                element.setThickness(child as THREE.Group, thickness);
+        this.updateElements(
+            RaysElement,
+            (group: THREE.Group, element: RaysElement) => {
+                element.setThickness(group, thickness);
             }
-        };
-
-        this.sceneGraph.traverse(update);
+        );
     }
 
     public setSurfacesColor(color: THREE.Color): void {
-        this.sceneGraph.traverse((child: THREE.Object3D) => {
-            if (child.userData instanceof LatheSurfacesElement) {
-                const element = child.userData as LatheSurfacesElement;
-                element.setColor(child as THREE.Group, color);
+        this.updateElements(
+            LatheSurfacesElement,
+            (group: THREE.Group, element: LatheSurfacesElement) => {
+                element.setColor(group, color);
             }
-        });
+        );
     }
 
     public getBB(): THREE.Box3 {
