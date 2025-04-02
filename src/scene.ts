@@ -7,6 +7,7 @@ import { AbstractSceneElement } from "./elements/AbstractSceneElement.ts";
 import { ArrowsElement } from "./elements/ArrowsElement.ts";
 import { PointsElement } from "./elements/PointsElement.ts";
 import { LatheSurfacesElement } from "./elements/LatheSurfacesElement.ts";
+import { PlaneSurfacesElement } from "./elements/PlaneSurfacesElement.ts";
 import { RaysElement, makeLine2, ColorOption } from "./elements/RaysElement.ts";
 
 // Extract available variables from the scene
@@ -82,6 +83,7 @@ export class TLMScene {
             ArrowsElement,
             LatheSurfacesElement,
             RaysElement,
+            PlaneSurfacesElement,
         ];
 
         const matchElementType = (elementData: any) => {
