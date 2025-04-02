@@ -6,45 +6,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" href="data:,">
   <title>tlmviewer test</title>
+
+  <style>
+    body {
+      margin: 0 auto;
+      max-width: 1200px;
+      margin-bottom: 100px;
+    }
+
+    a {
+      font-family: monospace;
+      text-decoration: none;
+    }
+  
+    .tlmviewer {
+      /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
+      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+      background: grey;
+    }
+    h1, h2, h3 {
+      font-family: monospace; 
+      margin-top: 2rem;
+    }
+  </style>
+  
+  <script type="module" src="./test/test.ts"></script>
 </head>
 
-<style>
-  body {
-    margin: 0 auto;
-    max-width: 1200px;
-    margin-bottom: 100px;
-  }
-
-  main .tlmviewer {
-    /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-  }
-  h1, h2, h3 {
-    font-family: monospace; 
-    margin-top: 2rem;
-  }
-</style>
 
 <body>
   <h1>tlmviewer tests</h1>
-  <div id="embed-tests">
-    <h2>embed (client code loads the json)</h2>
-    <pre>
-      // client code supplies loaded object to display
-      function embed(container: HTMLElement, json_data: string)
-    </pre>
+
+  <div class="tlmviewer" id="main-viewer" style="height: 650px; width: 1000px;"></div>
+
+  <ul id="tests-list">
+  </ul>
+
   </div>
-
-  <div id="load-tests">
-    <h2>load tests</h2>
-    <pre>
-      // tlmviewer loads the json at given url
-      async function load(container: HTMLElement, url: string): Promise<void>
-    </pre>
-  </div>
-
-  <script type="module" src="./test/test.ts"></script>
-
+  
   <div id="load-all-tests">
     <h2>load all</h2>
     <pre>load_all(): library loads the json from the data-url html attribute</pre>
