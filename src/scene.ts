@@ -6,6 +6,7 @@ import { get_required } from "./utility.ts";
 import { AbstractSceneElement } from "./elements/AbstractSceneElement.ts";
 import { ArrowsElement } from "./elements/ArrowsElement.ts";
 import { PointsElement } from "./elements/PointsElement.ts";
+import { SurfaceBaseElement } from "./elements/SurfaceBaseElement.ts";
 import { SurfaceLatheElement } from "./elements/SurfaceLatheElement.ts";
 import { SurfacePlaneElement } from "./elements/SurfacePlaneElement.ts";
 import { WIPXYElement } from "./elements/WIPXYElement.ts";
@@ -124,7 +125,7 @@ export class TLMScene {
     // Call a function on all elements of the scene graph matching a given
     // subtype of AbstractSceneElement
     public updateElements<T extends AbstractSceneElement>(
-        type: new (...args: any[]) => T,
+        type: Function & { prototype: T },
         f: (group: THREE.Group, element: T) => void
     ): void {
         this.sceneGraph.traverse((child: THREE.Object3D) => {
@@ -179,8 +180,8 @@ export class TLMScene {
 
     public setSurfacesColor(color: THREE.Color): void {
         this.updateElements(
-            SurfaceLatheElement,
-            (group: THREE.Group, element: SurfaceLatheElement) => {
+            SurfaceBaseElement,
+            (group: THREE.Group, element: SurfaceBaseElement) => {
                 element.setColor(group, color);
             }
         );
