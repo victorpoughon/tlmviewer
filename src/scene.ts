@@ -6,8 +6,9 @@ import { get_required } from "./utility.ts";
 import { AbstractSceneElement } from "./elements/AbstractSceneElement.ts";
 import { ArrowsElement } from "./elements/ArrowsElement.ts";
 import { PointsElement } from "./elements/PointsElement.ts";
-import { LatheSurfacesElement } from "./elements/LatheSurfacesElement.ts";
-import { PlaneSurfacesElement } from "./elements/PlaneSurfacesElement.ts";
+import { SurfaceLatheElement } from "./elements/SurfaceLatheElement.ts";
+import { SurfacePlaneElement } from "./elements/SurfacePlaneElement.ts";
+import { WIPXYElement } from "./elements/WIPXYElement.ts";
 import { RaysElement, makeLine2, ColorOption } from "./elements/RaysElement.ts";
 
 // Extract available variables from the scene
@@ -81,9 +82,10 @@ export class TLMScene {
         const sceneElementTypes = [
             PointsElement,
             ArrowsElement,
-            LatheSurfacesElement,
+            SurfaceLatheElement,
+            SurfacePlaneElement,
             RaysElement,
-            PlaneSurfacesElement,
+            WIPXYElement,
         ];
 
         const matchElementType = (elementData: any) => {
@@ -177,8 +179,8 @@ export class TLMScene {
 
     public setSurfacesColor(color: THREE.Color): void {
         this.updateElements(
-            LatheSurfacesElement,
-            (group: THREE.Group, element: LatheSurfacesElement) => {
+            SurfaceLatheElement,
+            (group: THREE.Group, element: SurfaceLatheElement) => {
                 element.setColor(group, color);
             }
         );

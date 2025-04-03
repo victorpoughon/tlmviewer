@@ -3,6 +3,8 @@
     "camera": "orthographic",
     "title": "freeform tests",
     "data": [
-        
+        {
+            "type": "surface-polynomial"
+        }
     ]
 }
