@@ -9,6 +9,7 @@ import { PointsElement } from "./elements/PointsElement.ts";
 import { SurfaceBaseElement } from "./elements/SurfaceBaseElement.ts";
 import { SurfaceLatheElement } from "./elements/SurfaceLatheElement.ts";
 import { SurfacePlaneElement } from "./elements/SurfacePlaneElement.ts";
+import { SurfaceSphereRElement } from "./elements/SurfaceSphereRElement.ts";
 import { WIPXYElement } from "./elements/WIPXYElement.ts";
 import { RaysElement, makeLine2, ColorOption } from "./elements/RaysElement.ts";
 
@@ -85,6 +86,7 @@ export class TLMScene {
             ArrowsElement,
             SurfaceLatheElement,
             SurfacePlaneElement,
+            SurfaceSphereRElement,
             RaysElement,
             WIPXYElement,
         ];
