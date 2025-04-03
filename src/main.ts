@@ -49,15 +49,13 @@ export class TLMViewerApp {
 
         // Title
         const titleDiv = container.getElementsByClassName("tlmviewer-title")[0];
-        titleDiv.innerHTML = scene.title;   
+        titleDiv.innerHTML = scene.title;
 
         // LIL GUI
         this.gui = new TLMGui(this, container, this.scene);
         this.gui.updateCameraLayers();
 
-        if (camera === "XY") {
-            this.resetView();
-        }
+        this.resetView();
     }
 
     // Handle window resize events
@@ -145,7 +143,7 @@ export class TLMViewerApp {
         newControls.mouseButtons = {
             LEFT: THREE.MOUSE.PAN,
             RIGHT: THREE.MOUSE.PAN,
-        }
+        };
 
         this.camera = newCamera;
         this.controls = newControls;
@@ -234,14 +232,13 @@ function setupApp(container: HTMLElement, data: any): TLMViewerApp {
 
     const scene = new TLMScene(data, mode === "3D" ? 3 : 2);
 
-    
     const app = new TLMViewerApp(container, scene, camera);
-    
+
     const controls = data["controls"] ?? null;
     if (controls !== null) {
         app.gui.setControlsFromJson(controls);
     }
-    
+
     return app;
 }
 
@@ -256,7 +253,8 @@ function tlmviewerRun(container: HTMLElement, data: any) {
 
         app.animate();
     } catch (error) {
-        container.innerHTML = "<span style='color: red'>tlmviewer error: " + error + "</span>";
+        container.innerHTML =
+            "<span style='color: red'>tlmviewer error: " + error + "</span>";
         throw error;
     }
 }
@@ -266,7 +264,8 @@ function embed(container: HTMLElement, json_data: string) {
         const data = JSON.parse(json_data);
         tlmviewerRun(container, data);
     } catch (error) {
-        container.innerHTML = "<span style='color: red'>tlmviewer error: " + error + "</span>";
+        container.innerHTML =
+            "<span style='color: red'>tlmviewer error: " + error + "</span>";
         throw error;
     }
 }
@@ -276,8 +275,9 @@ async function load(container: HTMLElement, url: string): Promise<void> {
         const response = await fetch(url);
         const data = await response.json();
         tlmviewerRun(container, data);
-    } catch(error) {
-        container.innerHTML = "<span style='color: red'>tlmviewer error: " + error + "</span>";
+    } catch (error) {
+        container.innerHTML =
+            "<span style='color: red'>tlmviewer error: " + error + "</span>";
         throw error;
     }
 }
