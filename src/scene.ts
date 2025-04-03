@@ -92,8 +92,6 @@ export class TLMScene {
                     return type;
                 }
             }
-            // for now we skip unknown elements
-            // when migration is complete, this should be an error
             return null;
         };
 
@@ -102,17 +100,22 @@ export class TLMScene {
             // Find element type
             const type = matchElementType(elementData);
 
-            // TODO raise error instead
             if (type === null) {
-                continue;
+                // Emit a warning for unknown element types
+                console.warn(
+                    `tlmviewer: Unknown scene element type ${get_required(
+                        elementData,
+                        "type"
+                    )}`
+                );
+            } else {
+                // Create the threeJS group that represents the element
+                // and store the Element object in its userData
+                const instance = new type(elementData, dim);
+                const obj = instance.makeGroup();
+                obj.userData = instance;
+                this.sceneGraph.add(obj);
             }
-
-            // Create the threeJS group that represents the element
-            // and store the Element object in its userData
-            const instance = new type(elementData, dim);
-            const obj = instance.makeGroup();
-            obj.userData = instance;
-            this.sceneGraph.add(obj);
         }
     }
 
