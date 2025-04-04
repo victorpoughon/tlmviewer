@@ -47,7 +47,7 @@ export class SurfaceSphereRElement extends SurfaceBaseElement {
         return sphereSamplesAngular(diameter, arc_radius, 0.0, 101);
     }
 
-    public makeGeometry3D(): [THREE.BufferGeometry, THREE.Matrix4] {
+    public makeGeometry3D(): [THREE.BufferGeometry, THREE.Matrix4, string | null] {
         const matrix = get_required(this.elementData, "matrix");
         const userTransform = arrayToMatrix4(matrix);
         const fullSamples: Array<Array<number>> = this.makeSamples2D();
@@ -76,6 +76,6 @@ export class SurfaceSphereRElement extends SurfaceBaseElement {
 
         const geometry = new THREE.LatheGeometry(tpoints, segments);
 
-        return [geometry, transform];
+        return [geometry, transform, null];
     }
 }

@@ -4,6 +4,8 @@ import { Line2 } from "three/addons/lines/Line2.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
+import CustomShaderMaterial from "three-custom-shader-material/vanilla";
+
 import { get_required } from "../utility.ts";
 
 import { AbstractSceneElement } from "./AbstractSceneElement.ts";
@@ -42,7 +44,6 @@ function homogeneousMatrix3to4(matrix: number[][]): number[][] {
     ];
 }
 
-
 export abstract class SurfaceBaseElement extends AbstractSceneElement {
     constructor(elementData: any, dim: number) {
         super(elementData, dim);
@@ -53,8 +54,13 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
         return type === "surface-lathe";
     }
 
-    public abstract makeSamples2D() : Array<Array<number>>;
-    public abstract makeGeometry3D(): [THREE.BufferGeometry, THREE.Matrix4];
+    public abstract makeSamples2D(): Array<Array<number>>;
+
+    public abstract makeGeometry3D(): [
+        THREE.BufferGeometry, // geometry
+        THREE.Matrix4, // transform
+        string | null // optional vertex shader
+    ];
 
     public makeGroup(): THREE.Group {
         if (this.dim == 2) {
@@ -66,38 +72,41 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
 
     private makeSurface2D(): THREE.Group {
         const group = new THREE.Group();
-    
-        const matrix4 = homogeneousMatrix3to4(get_required(this.elementData, "matrix"));
+
+        const matrix4 = homogeneousMatrix3to4(
+            get_required(this.elementData, "matrix")
+        );
         const samples = this.makeSamples2D();
-    
+
         const material = new LineMaterial({
             color: "cyan",
             linewidth: 2,
             worldUnits: false,
             side: THREE.DoubleSide,
         });
-    
+
         const points: number[] = [];
         for (const p of samples) {
             points.push(p[0], p[1], 1.0);
         }
-    
+
         const geometry = new LineGeometry();
         geometry.setPositions(points);
         const line_mesh = new Line2(geometry, material);
         line_mesh.applyMatrix4(arrayToMatrix4(matrix4));
         group.add(line_mesh);
-        
+
         return group;
     }
-    
-    private makeSurface3D(): THREE.Group {
-    
-        const group = new THREE.Group();
-        const userTransform: THREE.Matrix4 = arrayToMatrix4(get_required(this.elementData, "matrix"));
 
-        const [geometry, transform] = this.makeGeometry3D();
-        
+    private makeSurface3D(): THREE.Group {
+        const group = new THREE.Group();
+        const userTransform: THREE.Matrix4 = arrayToMatrix4(
+            get_required(this.elementData, "matrix")
+        );
+
+        const [geometry, transform, vertexShader] = this.makeGeometry3D();
+
         // Clip planes are encoded as [x, y, z, c], where:
         //     [x, y, z] is the normal vector in surface local frame
         //     c is the constant in surface local frame
@@ -111,20 +120,24 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
             tplane.applyMatrix4(userTransform);
             clipPlanes.push(tplane);
         }
-    
-        const material = new THREE.MeshNormalMaterial({
+
+        const material = new CustomShaderMaterial({
+            baseMaterial: THREE.MeshNormalMaterial,
+            vertexShader: vertexShader ?? undefined,
+
+            // Base material properties
             side: THREE.DoubleSide,
             clippingPlanes: clipPlanes,
             clipIntersection: false,
+            transparent: true,
+            opacity: 0.8,
         });
-        material.transparent = true;
-        material.opacity = 0.8;
-        
+
         const mesh = new THREE.Mesh(geometry, material);
         mesh.applyMatrix4(transform);
-    
+
         group.add(mesh);
-    
+
         return group;
     }
 

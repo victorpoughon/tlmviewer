@@ -10,7 +10,7 @@ import { SurfaceBaseElement } from "./elements/SurfaceBaseElement.ts";
 import { SurfaceLatheElement } from "./elements/SurfaceLatheElement.ts";
 import { SurfacePlaneElement } from "./elements/SurfacePlaneElement.ts";
 import { SurfaceSphereRElement } from "./elements/SurfaceSphereRElement.ts";
-import { WIPXYElement } from "./elements/WIPXYElement.ts";
+// import { SurfaceSagElement } from "./elements/SurfaceSagElement.ts";
 import { RaysElement, makeLine2, ColorOption } from "./elements/RaysElement.ts";
 
 // Extract available variables from the scene
@@ -33,6 +33,9 @@ export class TLMScene {
 
     // Model
     public sceneGraph: THREE.Group;
+
+    // public ambientLight: THREE.Light;
+    // public directionalLight: THREE.Light;
 
     public opticalAxis: THREE.Group;
     public otherAxes: THREE.Group;
@@ -75,6 +78,12 @@ export class TLMScene {
 
         this.scene.add(this.sceneGraph);
 
+        // this.ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        // this.scene.add(this.ambientLight);
+
+        // this.directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+        // this.scene.add(this.directionalLight);
+
         // Default for gui
         this.opticalAxis.visible = false;
         this.otherAxes.visible = false;
@@ -87,8 +96,8 @@ export class TLMScene {
             SurfaceLatheElement,
             SurfacePlaneElement,
             SurfaceSphereRElement,
+            // SurfaceSagElement,
             RaysElement,
-            WIPXYElement,
         ];
 
         const matchElementType = (elementData: any) => {

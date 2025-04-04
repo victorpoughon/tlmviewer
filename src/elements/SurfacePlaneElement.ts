@@ -22,7 +22,7 @@ export class SurfacePlaneElement extends SurfaceBaseElement {
         ];
     }
 
-    public makeGeometry3D(): [THREE.BufferGeometry, THREE.Matrix4] {
+    public makeGeometry3D(): [THREE.BufferGeometry, THREE.Matrix4, string | null] {
         const matrix = get_required(this.elementData, "matrix");
         const userTransform = arrayToMatrix4(matrix);
 
@@ -35,6 +35,6 @@ export class SurfacePlaneElement extends SurfaceBaseElement {
         const radius = get_required(this.elementData, "radius");
         const geometry = new THREE.RingGeometry(0, radius, 128, 8);
 
-        return [geometry, transform];
+        return [geometry, transform, null];
     }
 }

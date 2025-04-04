@@ -19,7 +19,7 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
         return get_required(this.elementData, "samples");
     }
 
-    public makeGeometry3D(): [THREE.BufferGeometry, THREE.Matrix4] {
+    public makeGeometry3D(): [THREE.BufferGeometry, THREE.Matrix4, string | null] {
         const matrix = get_required(this.elementData, "matrix");
         const userTransform = arrayToMatrix4(matrix);
         const samples: Array<Array<number>> = get_required(this.elementData, "samples");
@@ -45,6 +45,6 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
 
         const geometry = new THREE.LatheGeometry(tpoints, segments);
 
-        return [geometry, transform];
+        return [geometry, transform, null];
     }
 }

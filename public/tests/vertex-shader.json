@@ -1,0 +1,14 @@
+{
+    "mode": "3D",
+    "camera": "orthographic",
+    "title": "freeform tests",
+    "data": [
+        {
+            "type": "surface-vertex-shader"
+        }
+    ],
+    "controls": {
+        "show_optical_axis": true,
+        "show_other_axes": true
+    }
+}
