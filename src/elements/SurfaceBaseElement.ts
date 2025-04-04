@@ -30,7 +30,7 @@ export function arrayToMatrix4(array: Array<Array<number>>): THREE.Matrix4 {
 
 // Convert a 3x3 homogeneous matrix to a 4x4 homogeneous matrix,
 // by inserting identity transform to the new axis
-function homogeneousMatrix3to4(matrix: number[][]): number[][] {
+export function homogeneousMatrix3to4(matrix: number[][]): number[][] {
     // Check if the input matrix is 3x3
     if (matrix.length !== 3 || matrix.some((row) => row.length !== 3)) {
         throw new Error("Input matrix must be 3x3");
@@ -44,6 +44,14 @@ function homogeneousMatrix3to4(matrix: number[][]): number[][] {
     ];
 }
 
+export function samples2DToPoints(samples: Array<Array<number>>) {
+    const points: number[] = [];
+    for (const p of samples) {
+        points.push(p[0], p[1], 1.0);
+    }
+    return points;
+}
+
 export abstract class SurfaceBaseElement extends AbstractSceneElement {
     constructor(elementData: any, dim: number) {
         super(elementData, dim);
@@ -54,7 +62,11 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
         return type === "surface-lathe";
     }
 
-    public abstract makeSamples2D(): Array<Array<number>>;
+    public abstract makeGeometry2D(): [
+        LineGeometry, // geometry
+        THREE.Matrix4, // transform
+        string | null // optional vertex shader
+    ];
 
     public abstract makeGeometry3D(): [
         THREE.BufferGeometry, // geometry
@@ -73,10 +85,8 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
     private makeSurface2D(): THREE.Group {
         const group = new THREE.Group();
 
-        const matrix4 = homogeneousMatrix3to4(
-            get_required(this.elementData, "matrix")
-        );
-        const samples = this.makeSamples2D();
+        // TODO shader
+        const [geometry, transform, _vertexShader] = this.makeGeometry2D();
 
         const material = new LineMaterial({
             color: "cyan",
@@ -85,15 +95,8 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
             side: THREE.DoubleSide,
         });
 
-        const points: number[] = [];
-        for (const p of samples) {
-            points.push(p[0], p[1], 1.0);
-        }
-
-        const geometry = new LineGeometry();
-        geometry.setPositions(points);
         const line_mesh = new Line2(geometry, material);
-        line_mesh.applyMatrix4(arrayToMatrix4(matrix4));
+        line_mesh.applyMatrix4(transform);
         group.add(line_mesh);
 
         return group;

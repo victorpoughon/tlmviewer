@@ -2,8 +2,14 @@ import * as THREE from "three";
 
 import { get_required } from "../utility.ts";
 
-import { SurfaceBaseElement, arrayToMatrix4 } from "./SurfaceBaseElement.ts";
+import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
+import {
+    SurfaceBaseElement,
+    arrayToMatrix4,
+    homogeneousMatrix3to4,
+    samples2DToPoints,
+} from "./SurfaceBaseElement.ts";
 
 export class SurfaceLatheElement extends SurfaceBaseElement {
     constructor(elementData: any, dim: number) {
@@ -15,14 +21,36 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
         return type === "surface-lathe";
     }
 
-    public makeSamples2D() : Array<Array<number>> {
-        return get_required(this.elementData, "samples");
+    public makeGeometry2D(): [
+        LineGeometry, // geometry
+        THREE.Matrix4, // transform
+        string | null // optional vertex shader
+    ] {
+        const matrix4 = homogeneousMatrix3to4(
+            get_required(this.elementData, "matrix")
+        );
+        const transform = arrayToMatrix4(matrix4);
+
+        const samples = get_required(this.elementData, "samples");
+        const points = samples2DToPoints(samples);
+
+        const geometry = new LineGeometry();
+        geometry.setPositions(points);
+
+        return [geometry, transform, null];
     }
 
-    public makeGeometry3D(): [THREE.BufferGeometry, THREE.Matrix4, string | null] {
+    public makeGeometry3D(): [
+        THREE.BufferGeometry,
+        THREE.Matrix4,
+        string | null
+    ] {
         const matrix = get_required(this.elementData, "matrix");
         const userTransform = arrayToMatrix4(matrix);
-        const samples: Array<Array<number>> = get_required(this.elementData, "samples");
+        const samples: Array<Array<number>> = get_required(
+            this.elementData,
+            "samples"
+        );
 
         const segments = 50;
         // threejs lathe surface makes a revolution around the Y axis
