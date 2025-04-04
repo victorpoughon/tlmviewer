@@ -6,8 +6,6 @@ import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
 import {
     SurfaceBaseElement,
-    arrayToMatrix4,
-    homogeneousMatrix3to4,
     samples2DToPoints,
 } from "./SurfaceBaseElement.ts";
 
@@ -57,13 +55,7 @@ export class SurfaceSphereRElement extends SurfaceBaseElement {
     public makeGeometry2D(): [
         LineGeometry, // geometry
         THREE.Matrix4, // transform
-        string | null // optional vertex shader
-    ] {
-        const matrix4 = homogeneousMatrix3to4(
-            get_required(this.elementData, "matrix")
-        );
-        const transform = arrayToMatrix4(matrix4);
-        
+    ] {        
         const samples = this.makeSamples2D();
 
         const points = samples2DToPoints(samples);
@@ -71,7 +63,7 @@ export class SurfaceSphereRElement extends SurfaceBaseElement {
         const geometry = new LineGeometry();
         geometry.setPositions(points);
 
-        return [geometry, transform, null];
+        return [geometry, this.getTransform2D()];
     }
 
     public makeGeometry3D(): [
@@ -79,8 +71,7 @@ export class SurfaceSphereRElement extends SurfaceBaseElement {
         THREE.Matrix4,
         string | null
     ] {
-        const matrix = get_required(this.elementData, "matrix");
-        const userTransform = arrayToMatrix4(matrix);
+        const userTransform = this.getTransform3D();
         const fullSamples: Array<Array<number>> = this.makeSamples2D();
 
         // Keep strictly positive sample because lathe rotates by 2π

@@ -10,7 +10,7 @@ import { SurfaceBaseElement } from "./elements/SurfaceBaseElement.ts";
 import { SurfaceLatheElement } from "./elements/SurfaceLatheElement.ts";
 import { SurfacePlaneElement } from "./elements/SurfacePlaneElement.ts";
 import { SurfaceSphereRElement } from "./elements/SurfaceSphereRElement.ts";
-// import { SurfaceSagElement } from "./elements/SurfaceSagElement.ts";
+import { SurfaceSagElement } from "./elements/SurfaceSagElement.ts";
 import { RaysElement, makeLine2, ColorOption } from "./elements/RaysElement.ts";
 
 // Extract available variables from the scene
@@ -96,7 +96,7 @@ export class TLMScene {
             SurfaceLatheElement,
             SurfacePlaneElement,
             SurfaceSphereRElement,
-            // SurfaceSagElement,
+            SurfaceSagElement,
             RaysElement,
         ];
 

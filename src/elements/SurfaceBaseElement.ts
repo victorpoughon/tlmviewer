@@ -62,10 +62,26 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
         return type === "surface-lathe";
     }
 
+    // Get the Matrix4 tranform from the element data
+    // Expecting a 2D transform
+    public getTransform2D(): THREE.Matrix4 {
+        const matrix3 = get_required(this.elementData, "matrix");
+        // TODO more error checking on matrix3 array shape here
+        const matrix4 = homogeneousMatrix3to4(matrix3);
+        return arrayToMatrix4(matrix4);
+    }
+
+    // Get the Matrix4 tranform from the element data
+    // Expecting a 3D transform
+    public getTransform3D(): THREE.Matrix4 {
+        const matrix4 = get_required(this.elementData, "matrix");
+        // TODO more error checking on matrix4 array shape here
+        return arrayToMatrix4(matrix4);
+    }
+
     public abstract makeGeometry2D(): [
         LineGeometry, // geometry
-        THREE.Matrix4, // transform
-        string | null // optional vertex shader
+        THREE.Matrix4 // transform
     ];
 
     public abstract makeGeometry3D(): [
@@ -85,8 +101,7 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
     private makeSurface2D(): THREE.Group {
         const group = new THREE.Group();
 
-        // TODO shader
-        const [geometry, transform, _vertexShader] = this.makeGeometry2D();
+        const [geometry, transform] = this.makeGeometry2D();
 
         const material = new LineMaterial({
             color: "cyan",

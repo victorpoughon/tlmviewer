@@ -5,8 +5,6 @@ import { get_required } from "../utility.ts";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import {
     SurfaceBaseElement,
-    arrayToMatrix4,
-    homogeneousMatrix3to4,
     samples2DToPoints,
 } from "./SurfaceBaseElement.ts";
 
@@ -20,15 +18,7 @@ export class SurfacePlaneElement extends SurfaceBaseElement {
         return type === "surface-plane";
     }
 
-    public makeGeometry2D(): [
-            LineGeometry,
-            THREE.Matrix4,
-            string | null
-        ] {
-        const matrix4 = homogeneousMatrix3to4(
-                    get_required(this.elementData, "matrix")
-                );
-                const transform = arrayToMatrix4(matrix4);
+    public makeGeometry2D(): [LineGeometry, THREE.Matrix4] {
 
         const radius = get_required(this.elementData, "radius");
         const samples = [
@@ -37,16 +27,19 @@ export class SurfacePlaneElement extends SurfaceBaseElement {
         ];
 
         const points = samples2DToPoints(samples);
-        
+
         const geometry = new LineGeometry();
         geometry.setPositions(points);
 
-        return [geometry, transform, null]
+        return [geometry, this.getTransform2D()];
     }
 
-    public makeGeometry3D(): [THREE.BufferGeometry, THREE.Matrix4, string | null] {
-        const matrix = get_required(this.elementData, "matrix");
-        const userTransform = arrayToMatrix4(matrix);
+    public makeGeometry3D(): [
+        THREE.BufferGeometry,
+        THREE.Matrix4,
+        string | null
+    ] {
+        const userTransform = this.getTransform3D();
 
         // Make the composed transform
         const base = new THREE.Matrix4().makeRotationY(Math.PI / 2);

@@ -4,12 +4,7 @@ import { get_required } from "../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
-import {
-    SurfaceBaseElement,
-    arrayToMatrix4,
-    homogeneousMatrix3to4,
-    samples2DToPoints,
-} from "./SurfaceBaseElement.ts";
+import { SurfaceBaseElement, samples2DToPoints } from "./SurfaceBaseElement.ts";
 
 export class SurfaceLatheElement extends SurfaceBaseElement {
     constructor(elementData: any, dim: number) {
@@ -24,20 +19,14 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
     public makeGeometry2D(): [
         LineGeometry, // geometry
         THREE.Matrix4, // transform
-        string | null // optional vertex shader
     ] {
-        const matrix4 = homogeneousMatrix3to4(
-            get_required(this.elementData, "matrix")
-        );
-        const transform = arrayToMatrix4(matrix4);
-
         const samples = get_required(this.elementData, "samples");
         const points = samples2DToPoints(samples);
 
         const geometry = new LineGeometry();
         geometry.setPositions(points);
 
-        return [geometry, transform, null];
+        return [geometry, this.getTransform2D()];
     }
 
     public makeGeometry3D(): [
@@ -45,8 +34,7 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
         THREE.Matrix4,
         string | null
     ] {
-        const matrix = get_required(this.elementData, "matrix");
-        const userTransform = arrayToMatrix4(matrix);
+        const userTransform = this.getTransform3D();
         const samples: Array<Array<number>> = get_required(
             this.elementData,
             "samples"
