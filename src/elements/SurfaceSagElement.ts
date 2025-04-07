@@ -79,22 +79,28 @@ export class SurfaceSagElement extends SurfaceBaseElement {
         return [geometry, userTransform, vertexShader];
     }
 
-    public sagType(): AbstractSagBase {
-        const type = getRequired<string>(this.elementData, "sag-type");
+    public sagType(): SagFunction {
+        const sagFunction = getRequired<string>(this.elementData, "sag-function");
+        return parseSagFunction(sagFunction);
+    }
+        
+}
 
-        if (type == "parabola") {
-            const A = getRequired<number>(this.elementData, "A");
-            return new ParabolaSag(A);
-        } else if (type == "sphere") {
-            const C = getRequired<number>(this.elementData, "C");
-            return new SphereSag(C);
-        } else {
-            throw Error(`Uknown surface sag type ${type}`);
-        }
+function parseSagFunction(obj: any) : SagFunction {
+    const type = getRequired<string>(obj, "sag-type");
+
+    if (type == "parabolic") {
+        const A = getRequired<number>(obj, "A");
+        return new ParabolicSag(A);
+    } else if (type == "spherical") {
+        const C = getRequired<number>(obj, "C");
+        return new SphericalSag(C);
+    } else {
+        throw Error(`Uknown surface sag type ${type}`);
     }
 }
 
-abstract class AbstractSagBase {
+abstract class SagFunction {
     public abstract shader3D(): string;
     public abstract sagFunction2D(): (r: number) => number;
 
@@ -118,7 +124,7 @@ abstract class AbstractSagBase {
     }
 }
 
-class ParabolaSag extends AbstractSagBase {
+class ParabolicSag extends SagFunction {
     private A: number;
 
     constructor(A: number) {
@@ -140,7 +146,7 @@ class ParabolaSag extends AbstractSagBase {
     }
 }
 
-class SphereSag extends AbstractSagBase {
+class SphericalSag extends SagFunction {
     private C: number;
 
     constructor(C: number) {
