@@ -19,3 +19,11 @@ export function get_default(obj: any, key: string, options: string[]): string {
 export function get_required(obj: any, key: string): any {
     return obj[key] ?? raise_error(`missing required key '${key}'`);
 }
+
+export function getRequired<T>(obj: any, key: string): T {
+    if (obj.hasOwnProperty(key)) {
+        return obj[key] as T;
+    } else {
+        throw Error(`missing required key '${key}'`);
+    }
+}

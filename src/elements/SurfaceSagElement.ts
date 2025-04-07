@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { get_required } from "../utility.ts";
+import { get_required, getRequired } from "../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
@@ -41,14 +41,9 @@ export class SurfaceSagElement extends SurfaceBaseElement {
     }
 
     public makeGeometry2D(): [LineGeometry, THREE.Matrix4] {
-        // parabola only for now
-
-        const A = get_required(this.elementData, "A");
         const diameter = get_required(this.elementData, "diameter");
 
-        const sag = (r: number): number => {
-            return A * Math.pow(r, 2.0);
-        };
+        const sag = this.sagType().sagFunction2D();
 
         const geometry = sagGeometry2D(
             sag,
@@ -79,26 +74,100 @@ export class SurfaceSagElement extends SurfaceBaseElement {
             256
         ).rotateY(Math.PI / 2);
 
-        const A = get_required(this.elementData, "A");
+        const vertexShader = this.sagType().sagShader3D();
 
-        // parabola sag vertex shader
-        const vertexShader = /* glsl */ `
+        return [geometry, userTransform, vertexShader];
+    }
+
+    public sagType(): AbstractSagBase {
+        const type = getRequired<string>(this.elementData, "sag-type");
+
+        if (type == "parabola") {
+            const A = getRequired<number>(this.elementData, "A");
+            return new ParabolaSag(A);
+        } else if (type == "sphere") {
+            const C = getRequired<number>(this.elementData, "C");
+            return new SphereSag(C);
+        } else {
+            throw Error(`Uknown surface sag type ${type}`);
+        }
+    }
+}
+
+abstract class AbstractSagBase {
+    public abstract shader3D(): string;
+    public abstract sagFunction2D(): (r: number) => number;
+
+    public sagShader3D(): string {
+        const vertexShader = `
               void main() {
                 vec3 pos = position;
                 float y = pos.y;
                 float z = pos.z;
                 float r2 = pow(pos.y, 2.0) + pow(pos.z, 2.0);
-                float r = sqrt(r2);
+                float x = 0.0;
 
-                float A = ${A};
+                ${this.shader3D()}
 
-                // sag function
-                pos.x = A * r2;
-
+                pos.x = x;
                 csm_Position = pos;
                 }
                 `;
 
-        return [geometry, userTransform, vertexShader];
+        return vertexShader;
+    }
+}
+
+class ParabolaSag extends AbstractSagBase {
+    private A: number;
+
+    constructor(A: number) {
+        super();
+        this.A = A;
+    }
+
+    public shader3D() {
+        return `
+            float A = ${this.A};
+            x += A * r2;
+        `;
+    }
+
+    public sagFunction2D() {
+        return (r: number): number => {
+            return this.A * Math.pow(r, 2.0);
+        };
+    }
+}
+
+class SphereSag extends AbstractSagBase {
+    private C: number;
+
+    constructor(C: number) {
+        super();
+        this.C = C;
+    }
+
+    public shader3D() {
+        return `
+            float C = ${this.C};
+            float C2 = pow(C, 2.0);
+
+            float num = C * r2;
+            float denom = 1.0 + sqrt(1.0 - r2 * C2);
+            x += num / denom;
+        `;
+    }
+
+    public sagFunction2D() {
+        return (r: number): number => {
+            const r2 = Math.pow(r, 2.0);
+            const C2 = Math.pow(this.C, 2.0);
+
+            const num = this.C * r2;
+            const denom = 1 + Math.sqrt(1 - r2 * C2);
+
+            return num / denom;
+        };
     }
 }
