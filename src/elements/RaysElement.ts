@@ -10,7 +10,7 @@ import { CET_I2 } from "../CET_I2.ts";
 import { colormap } from "../color.ts";
 import { wavelengthToRgb } from "../true_color.ts";
 
-import { get_required } from "../utility.ts";
+import { getRequired } from "../utility.ts";
 
 import { AbstractSceneElement } from "./AbstractSceneElement.ts";
 
@@ -62,7 +62,7 @@ function makeRays(
     dim: number,
     colorOption: ColorOption
 ): THREE.Group {
-    const points = get_required(element, "points");
+    const points = getRequired<number[][]>(element, "points");
     const default_color = element.color ?? "#ffa724";
     const variables = element.variables ?? {};
     const domain = element.domain ?? {};
@@ -170,7 +170,7 @@ export class RaysElement extends AbstractSceneElement {
     }
 
     public static match(elementData: any): boolean {
-        const type = get_required(elementData, "type");
+        const type = getRequired<string>(elementData, "type");
         return type === "rays";
     }
 

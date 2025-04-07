@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { get_required } from "../utility.ts";
+import { getRequired } from "../utility.ts";
 
 import { AbstractSceneElement } from "./AbstractSceneElement.ts";
 
@@ -21,12 +21,12 @@ export class PointsElement extends AbstractSceneElement {
     }
 
     public static match(elementData: any): boolean {
-        const type = get_required(elementData, "type");
+        const type = getRequired<string>(elementData, "type");
         return type === "points";
     }
 
     public makeGroup(): THREE.Group {
-        const vertices = get_required(this.elementData, "data");
+        const vertices = getRequired<number[][]>(this.elementData, "data");
         const color = this.elementData.color ?? "#ffffff";
 
         const group = new THREE.Group();

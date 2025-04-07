@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { get_required } from "../utility.ts";
+import { getRequired } from "../utility.ts";
 
 import { AbstractSceneElement } from "./AbstractSceneElement.ts";
 
@@ -10,7 +10,7 @@ export class WIPXYElement extends AbstractSceneElement {
     }
 
     public static match(elementData: any): boolean {
-        const type = get_required(elementData, "type");
+        const type = getRequired<string>(elementData, "type");
         return type === "surface-polynomial";
     }
 

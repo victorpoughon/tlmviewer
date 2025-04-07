@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { get_required } from "../utility.ts";
+import { getRequired } from "../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
@@ -12,7 +12,7 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
     }
 
     public static match(elementData: any): boolean {
-        const type = get_required(elementData, "type");
+        const type = getRequired<string>(elementData, "type");
         return type === "surface-lathe";
     }
 
@@ -20,7 +20,7 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
         LineGeometry, // geometry
         THREE.Matrix4, // transform
     ] {
-        const samples = get_required(this.elementData, "samples");
+        const samples = getRequired<number[][]>(this.elementData, "samples");
         const points = samples2DToPoints(samples);
 
         const geometry = new LineGeometry();
@@ -35,7 +35,7 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
         string | null
     ] {
         const userTransform = this.getTransform3D();
-        const samples: Array<Array<number>> = get_required(
+        const samples: Array<Array<number>> = getRequired<number[][]>(
             this.elementData,
             "samples"
         );

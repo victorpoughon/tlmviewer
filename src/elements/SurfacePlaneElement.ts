@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { get_required } from "../utility.ts";
+import { getRequired } from "../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import {
@@ -14,13 +14,13 @@ export class SurfacePlaneElement extends SurfaceBaseElement {
     }
 
     public static match(elementData: any): boolean {
-        const type = get_required(elementData, "type");
+        const type = getRequired<string>(elementData, "type");
         return type === "surface-plane";
     }
 
     public makeGeometry2D(): [LineGeometry, THREE.Matrix4] {
 
-        const radius = get_required(this.elementData, "radius");
+        const radius = getRequired<number>(this.elementData, "radius");
         const samples = [
             [0, -radius],
             [0, radius],
@@ -47,7 +47,7 @@ export class SurfacePlaneElement extends SurfaceBaseElement {
         const transform = new THREE.Matrix4();
         transform.multiplyMatrices(userTransform, base);
 
-        const radius = get_required(this.elementData, "radius");
+        const radius = getRequired<number>(this.elementData, "radius");
         const geometry = new THREE.RingGeometry(0, radius, 128, 8);
 
         return [geometry, transform, null];

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { get_required } from "../utility.ts";
+import { getRequired } from "../utility.ts";
 
 import { AbstractSceneElement } from "./AbstractSceneElement.ts";
 
@@ -11,12 +11,12 @@ export class ArrowsElement extends AbstractSceneElement {
 
     // True if the given scene element data object matches this class
     public static match(elementData: any): boolean {
-        const type = get_required(elementData, "type");
+        const type = getRequired<string>(elementData, "type");
         return type === "arrows";
     }
 
     public makeGroup(): THREE.Group {
-        const arrows = get_required(this.elementData, "data");
+        const arrows = getRequired<any[]>(this.elementData, "data");
 
         const group = new THREE.Group();
 

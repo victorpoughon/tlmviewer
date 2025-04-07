@@ -6,7 +6,7 @@ import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
 import CustomShaderMaterial from "three-custom-shader-material/vanilla";
 
-import { get_required } from "../utility.ts";
+import { getRequired } from "../utility.ts";
 
 import { AbstractSceneElement } from "./AbstractSceneElement.ts";
 
@@ -58,14 +58,14 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
     }
 
     public static match(elementData: any): boolean {
-        const type = get_required(elementData, "type");
+        const type = getRequired<string>(elementData, "type");
         return type === "surface-lathe";
     }
 
     // Get the Matrix4 tranform from the element data
     // Expecting a 2D transform
     public getTransform2D(): THREE.Matrix4 {
-        const matrix3 = get_required(this.elementData, "matrix");
+        const matrix3 = getRequired<number[][]>(this.elementData, "matrix");
         // TODO more error checking on matrix3 array shape here
         const matrix4 = homogeneousMatrix3to4(matrix3);
         return arrayToMatrix4(matrix4);
@@ -74,7 +74,7 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
     // Get the Matrix4 tranform from the element data
     // Expecting a 3D transform
     public getTransform3D(): THREE.Matrix4 {
-        const matrix4 = get_required(this.elementData, "matrix");
+        const matrix4 = getRequired<number[][]>(this.elementData, "matrix");
         // TODO more error checking on matrix4 array shape here
         return arrayToMatrix4(matrix4);
     }
@@ -120,7 +120,7 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
     private makeSurface3D(): THREE.Group {
         const group = new THREE.Group();
         const userTransform: THREE.Matrix4 = arrayToMatrix4(
-            get_required(this.elementData, "matrix")
+            getRequired<number[][]>(this.elementData, "matrix")
         );
 
         const [geometry, transform, vertexShader] = this.makeGeometry3D();

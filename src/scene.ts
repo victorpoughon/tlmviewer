@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { get_required } from "./utility.ts";
+import { getRequired } from "./utility.ts";
 
 // Scene elements
 import { AbstractSceneElement } from "./elements/AbstractSceneElement.ts";
@@ -17,9 +17,9 @@ import { RaysElement, makeLine2, ColorOption } from "./elements/RaysElement.ts";
 function extractVariables(root: any): string[] {
     const variables: Set<string> = new Set([]);
 
-    const data = get_required(root, "data");
+    const data = getRequired<any[]>(root, "data");
     for (const element of data) {
-        if (get_required(element, "type") == "rays") {
+        if (getRequired<string>(element, "type") == "rays") {
             const thisVars = element.variables ?? {};
             Object.keys(thisVars).forEach((v: string) => variables.add(v));
         }
@@ -48,7 +48,6 @@ export class TLMScene {
     constructor(root: any, dim: number) {
         this.root = root;
         this.scene = new THREE.Scene();
-        // const data = get_required(root, "data");
 
         this.variables = extractVariables(root);
 
@@ -109,7 +108,7 @@ export class TLMScene {
             return null;
         };
 
-        const data = get_required(this.root, "data");
+        const data = getRequired<any[]>(this.root, "data");
         for (const elementData of data) {
             // Find element type
             const type = matchElementType(elementData);
@@ -117,7 +116,7 @@ export class TLMScene {
             if (type === null) {
                 // Emit a warning for unknown element types
                 console.warn(
-                    `tlmviewer: Unknown scene element type ${get_required(
+                    `tlmviewer: Unknown scene element type ${getRequired<string>(
                         elementData,
                         "type"
                     )}`

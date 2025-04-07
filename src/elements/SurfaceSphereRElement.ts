@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { get_required } from "../utility.ts";
+import { getRequired } from "../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
@@ -40,13 +40,13 @@ export class SurfaceSphereRElement extends SurfaceBaseElement {
     }
 
     public static match(elementData: any): boolean {
-        const type = get_required(elementData, "type");
+        const type = getRequired<string>(elementData, "type");
         return type === "surface-sphere-r";
     }
 
     public makeSamples2D(): Array<Array<number>> {
-        const arc_radius = get_required(this.elementData, "R");
-        const diameter = get_required(this.elementData, "diameter");
+        const arc_radius = getRequired<number>(this.elementData, "R");
+        const diameter = getRequired<number>(this.elementData, "diameter");
 
         // Make sure N is odd so that we get a point at exactly 0
         return sphereSamplesAngular(diameter, arc_radius, 0.0, 101);

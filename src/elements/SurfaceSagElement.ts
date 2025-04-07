@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { get_required, getRequired } from "../utility.ts";
+import { getRequired } from "../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
@@ -36,12 +36,12 @@ export class SurfaceSagElement extends SurfaceBaseElement {
     }
 
     public static match(elementData: any): boolean {
-        const type = get_required(elementData, "type");
+        const type = getRequired<string>(elementData, "type");
         return type === "surface-sag";
     }
 
     public makeGeometry2D(): [LineGeometry, THREE.Matrix4] {
-        const diameter = get_required(this.elementData, "diameter");
+        const diameter = getRequired<number>(this.elementData, "diameter");
 
         const sag = this.sagType().sagFunction2D();
 
@@ -66,7 +66,7 @@ export class SurfaceSagElement extends SurfaceBaseElement {
         // We use ring geometry as the base geometry
         // But could consider using a custom geometry
         // for better distribution of vertices over the disk
-        const diameter = get_required(this.elementData, "diameter");
+        const diameter = getRequired<number>(this.elementData, "diameter");
         const geometry = new THREE.RingGeometry(
             0,
             diameter / 2,
