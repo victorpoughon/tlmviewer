@@ -88,7 +88,7 @@ export class SurfaceSagElement extends SurfaceBaseElement {
     }
 }
 
-function parseSagFunction(obj: any): SagFunction {
+export function parseSagFunction(obj: any): SagFunction {
     const type = getRequired<string>(obj, "sag-type");
 
     if (type === "parabolic") {
@@ -110,6 +110,14 @@ function parseSagFunction(obj: any): SagFunction {
 }
 
 abstract class SagFunction {
+    public name: string;
+
+    constructor() {
+        // Name is a random string that can be used as a valid GLSL identifier
+        const uuid = crypto.randomUUID();
+        this.name = "sag_" + uuid.replace(/[^a-zA-Z0-9_]/g, "_");
+    }
+
     public abstract shader3D(): string;
     public abstract sagFunction2D(): (r: number) => number;
 
