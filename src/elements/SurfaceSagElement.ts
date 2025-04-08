@@ -80,21 +80,30 @@ export class SurfaceSagElement extends SurfaceBaseElement {
     }
 
     public sagType(): SagFunction {
-        const sagFunction = getRequired<string>(this.elementData, "sag-function");
+        const sagFunction = getRequired<string>(
+            this.elementData,
+            "sag-function"
+        );
         return parseSagFunction(sagFunction);
     }
-        
 }
 
-function parseSagFunction(obj: any) : SagFunction {
+function parseSagFunction(obj: any): SagFunction {
     const type = getRequired<string>(obj, "sag-type");
 
-    if (type == "parabolic") {
+    if (type === "parabolic") {
         const A = getRequired<number>(obj, "A");
         return new ParabolicSag(A);
-    } else if (type == "spherical") {
+    } else if (type === "spherical") {
         const C = getRequired<number>(obj, "C");
         return new SphericalSag(C);
+    } else if (type === "aspheric") {
+        const coefficients = getRequired<Array<number>>(obj, "coefficients");
+        return new AsphericSag(coefficients);
+    } else if (type === "conical") {
+        const C = getRequired<number>(obj, "C");
+        const K = getRequired<number>(obj, "K");
+        return new ConicalSag(C, K);
     } else {
         throw Error(`Uknown surface sag type ${type}`);
     }
@@ -174,6 +183,72 @@ class SphericalSag extends SagFunction {
             const denom = 1 + Math.sqrt(1 - r2 * C2);
 
             return num / denom;
+        };
+    }
+}
+
+class ConicalSag extends SagFunction {
+    private C: number;
+    private K: number;
+
+    constructor(C: number, K: number) {
+        super();
+        this.C = C;
+        this.K = K;
+    }
+
+    public shader3D() {
+        return `
+            float C = ${this.C};
+            float K = ${this.K};
+            float C2 = pow(C, 2.0);
+            
+            x += (C * r2) / (1.0 + sqrt(1.0 - (1.0+K) * r2 * C2));
+        `;
+    }
+
+    public sagFunction2D() {
+        return (r: number): number => {
+            const C = this.C;
+            const K = this.K;
+            const C2 = Math.pow(C, 2.0);
+            const r2 = Math.pow(r, 2.0);
+
+            return (C * r2) / (1 + Math.sqrt(1 - (1 + K) * r2 * C2));
+        };
+    }
+}
+
+class AsphericSag extends SagFunction {
+    private coefficients: Array<number>;
+
+    constructor(coefficients: Array<number>) {
+        super();
+        this.coefficients = coefficients;
+    }
+
+    public shader3D() {
+        const M = this.coefficients.length;
+        const str = this.coefficients.map((c) => c.toFixed(8)).join(", ");
+        return `
+        float coefficients[${M}] = float[](${str});
+        float acc = 0.0;
+        for (int i = 0; i < ${M}; i++) {
+            acc += coefficients[i] * pow(r2, 2.0 + float(i));
+        }
+        x += acc;
+        `;
+    }
+
+    public sagFunction2D() {
+        return (r: number): number => {
+            var acc = 0.0;
+
+            for (const [i, c] of this.coefficients.entries()) {
+                acc += c * Math.pow(r, 4 + 2 * i);
+            }
+
+            return acc;
         };
     }
 }
