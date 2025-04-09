@@ -34,8 +34,8 @@ export class TLMScene {
     // Model
     public sceneGraph: THREE.Group;
 
-    // public ambientLight: THREE.Light;
-    // public directionalLight: THREE.Light;
+    public ambientLight: THREE.Light;
+    public directionalLight: THREE.Light;
 
     public opticalAxis: THREE.Group;
     public otherAxes: THREE.Group;
@@ -77,11 +77,12 @@ export class TLMScene {
 
         this.scene.add(this.sceneGraph);
 
-        // this.ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
-        // this.scene.add(this.ambientLight);
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        this.scene.add(this.ambientLight);
 
-        // this.directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
-        // this.scene.add(this.directionalLight);
+        this.directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
+        this.directionalLight.position.set(100, 100, 100);
+        this.scene.add(this.directionalLight);
 
         // Default for gui
         this.opticalAxis.visible = false;
