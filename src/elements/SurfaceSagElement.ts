@@ -143,6 +143,10 @@ export function glslRender(Gs: string[], Ggrads: string[], entry: string) {
     return vertexShader;
 }
 
+function glslFloat(name: string, val: number) {
+    return `float ${name} = ${val.toFixed(8)};`;
+}
+
 abstract class SagFunction {
     public name: string;
 
@@ -240,7 +244,7 @@ class SphericalSag extends SagFunction {
         return [
             this.glslFunctionG(
                 `
-                float C = ${this.C.toFixed(8)};
+                ${glslFloat("C", this.C)}
                 float C2 = pow(C, 2.0);
 
                 float num = C * r2;
@@ -255,7 +259,7 @@ class SphericalSag extends SagFunction {
         return [
             this.glslFunctionGgrad(
                 `
-                float C = ${this.C.toFixed(8)};
+                ${glslFloat("C", this.C)}
                 float C2 = pow(C, 2.0);
 
                 float denom = sqrt(1.0 - r2 * C2);
@@ -297,8 +301,8 @@ class ConicalSag extends SagFunction {
         return [
             this.glslFunctionG(
                 `
-                float C = ${this.C};
-                float K = ${this.K};
+                ${glslFloat("C", this.C)}
+                ${glslFloat("K", this.K)}
                 float C2 = pow(C, 2.0);
                 
                 x = (C * r2) / (1.0 + sqrt(1.0 - (1.0+K) * r2 * C2));
@@ -311,9 +315,9 @@ class ConicalSag extends SagFunction {
         return [
             this.glslFunctionGgrad(
                 `
-                float C = ${this.C.toFixed(8)};
+                ${glslFloat("C", this.C)}
+                ${glslFloat("K", this.K)}
                 float C2 = pow(C, 2.0);
-                float K = ${this.K.toFixed(8)};
 
                 float denom = sqrt(1.0 - (1.0 + K) * r2 * C2);
                 Gy = (y * C) / denom;
@@ -350,6 +354,11 @@ class AsphericSag extends SagFunction {
     public shaderG(): string[] {
         const M = this.coefficients.length;
         const str = this.coefficients.map((c) => c.toFixed(8)).join(", ");
+
+        if (M === 0) {
+            return [this.glslFunctionG("")];
+        }
+
         return [
             this.glslFunctionG(
                 `
@@ -365,6 +374,11 @@ class AsphericSag extends SagFunction {
     public shaderGgrad() : string[] {
         const M = this.coefficients.length;
         const str = this.coefficients.map((c) => c.toFixed(8)).join(", ");
+
+        if (M === 0) {
+            return [this.glslFunctionGgrad("")];
+        }
+
         return [
             this.glslFunctionGgrad(
                 `
