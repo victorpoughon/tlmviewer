@@ -131,11 +131,11 @@ export function glslRender(Gs: string[], Ggrads: string[], entry: string) {
                 pos.x = ${entry}_G(y, z, r2);
                 csm_Position = pos;
 
-                vec3 Ggrad = -${entry}_Ggrad(y, z, r2);
-                csm_Normal = normalize(vec3(1.0, Ggrad.y, Ggrad.z));
+                vec3 Ggrad = ${entry}_Ggrad(y, z, r2);
+                csm_Normal = -normalize(vec3(-1.0, Ggrad.y, Ggrad.z));
             }
             `;
-            // Note the minus sign before the gradient above
+            // Note the minus sign before the normal above
             // this is to match the RingGeometry which expects surface gradients
             // pointing towards +X, but by construction surface normals in TLM
             // point towards -X for sag surfaces.
@@ -209,6 +209,9 @@ class ParabolicSag extends SagFunction {
         return [
             this.glslFunctionGgrad(
                 `
+                float A = ${this.A};
+                Gy = 2.0 * A * y;
+                Gz = 2.0 * A * z;
                 `
             ),
         ];
@@ -247,11 +250,6 @@ class SphericalSag extends SagFunction {
             ),
         ];
     }
-
-    // C = self.C
-    // r2 = torch.pow(y, 2) + torch.pow(z, 2)
-    // denom = safe_sqrt(1 - r2 * torch.pow(C, 2))
-    // return safe_div(y * C, denom), safe_div(z * C, denom)
 
     public shaderGgrad() : string[] {
         return [
@@ -313,6 +311,13 @@ class ConicalSag extends SagFunction {
         return [
             this.glslFunctionGgrad(
                 `
+                float C = ${this.C.toFixed(8)};
+                float C2 = pow(C, 2.0);
+                float K = ${this.K.toFixed(8)};
+
+                float denom = sqrt(1.0 - (1.0 + K) * r2 * C2);
+                Gy = (y * C) / denom;
+                Gz = (z * C) / denom;
                 `
             ),
         ];
@@ -358,9 +363,20 @@ class AsphericSag extends SagFunction {
     }
 
     public shaderGgrad() : string[] {
+        const M = this.coefficients.length;
+        const str = this.coefficients.map((c) => c.toFixed(8)).join(", ");
         return [
             this.glslFunctionGgrad(
                 `
+                float sumterm = 0.0;
+                float coefficients[${M}] = float[](${str});
+
+                for (int i = 0 ; i < ${M} ; i++) {
+                    sumterm += coefficients[i] * (4.0 + 2.0*float(i)) * pow(r2, 1.0+float(i));
+                }
+
+                Gy = y * sumterm;
+                Gz = z * sumterm;
                 `
             ),
         ];
@@ -395,7 +411,7 @@ class SagSum extends SagFunction {
         var funcs: string[] = [];
         var names: string[] = [];
 
-        // Append all terms shader chunks
+        // Append all terms shader functions
         for (const t of this.terms) {
             funcs.push(...t.shaderG());
             names.push(t.name);
@@ -410,12 +426,25 @@ class SagSum extends SagFunction {
     }
 
     public shaderGgrad() : string[] {
-        return [
-            this.glslFunctionGgrad(
-                `
-                `
-            ),
-        ];
+        var funcs: string[] = [];
+        var names: string[] = [];
+
+        // Append all terms shader functions
+        for (const t of this.terms) {
+            funcs.push(...t.shaderGgrad());
+            names.push(t.name);
+        }
+
+        // Make the sum function and add it the the list of functions
+        const sumStr = names.map((n) => `${n}_Ggrad(y, z, r2)`).join(" + ");
+        const sumFunction = this.glslFunctionGgrad(`
+                vec3 Ggrad = ${sumStr};
+                Gy = Ggrad.y;
+                Gz = Ggrad.z;
+            `
+        );
+        funcs.push(sumFunction);
+        return funcs;
     }
 
     public sagFunction2D() {
