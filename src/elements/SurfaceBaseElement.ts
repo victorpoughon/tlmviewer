@@ -141,19 +141,24 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
 
         const material = new CustomShaderMaterial({
             baseMaterial: THREE.MeshNormalMaterial,
+            // baseMaterial: THREE.MeshLambertMaterial,
+            // baseMaterial: THREE.MeshPhongMaterial,
             vertexShader: vertexShader ?? undefined,
 
             // Base material properties
+            // color: 0x049ef4,
             side: THREE.DoubleSide,
             clippingPlanes: clipPlanes,
             clipIntersection: false,
-            transparent: true,
+            transparent: false,
             opacity: 0.8,
+            // shininess: 50,
+            // specular: 0x5e5e5e,
+            // wireframe: true,
         });
 
         const mesh = new THREE.Mesh(geometry, material);
         mesh.applyMatrix4(transform);
-
         group.add(mesh);
 
         return group;

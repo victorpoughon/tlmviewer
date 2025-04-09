@@ -74,7 +74,8 @@ export class SurfaceSagElement extends SurfaceBaseElement {
             256
         ).rotateY(Math.PI / 2);
 
-        const vertexShader = this.sagType().sagShader3D();
+        const sag = this.sagType();
+        const vertexShader = glslRender(sag.shaderG(), sag.shaderGgrad(), sag.name);
 
         return [geometry, userTransform, vertexShader];
     }
@@ -104,9 +105,42 @@ export function parseSagFunction(obj: any): SagFunction {
         const C = getRequired<number>(obj, "C");
         const K = getRequired<number>(obj, "K");
         return new ConicalSag(C, K);
+    } else if (type === "sum") {
+        var terms: SagFunction[] = [];
+        for (const t of getRequired<any[]>(obj, "terms")) {
+            terms.push(parseSagFunction(t));
+        }
+        return new SagSum(terms);
     } else {
         throw Error(`Uknown surface sag type ${type}`);
     }
+}
+
+export function glslRender(Gs: string[], Ggrads: string[], entry: string) {
+    const vertexShader = `
+            ${Gs.join("\n")}
+
+            ${Ggrads.join("\n")}
+
+            void main() {
+                vec3 pos = position;
+                float y = pos.y;
+                float z = pos.z;
+                float r2 = pow(pos.y, 2.0) + pow(pos.z, 2.0);
+
+                pos.x = ${entry}_G(y, z, r2);
+                csm_Position = pos;
+
+                vec3 Ggrad = -${entry}_Ggrad(y, z, r2);
+                csm_Normal = normalize(vec3(1.0, Ggrad.y, Ggrad.z));
+            }
+            `;
+            // Note the minus sign before the gradient above
+            // this is to match the RingGeometry which expects surface gradients
+            // pointing towards +X, but by construction surface normals in TLM
+            // point towards -X for sag surfaces.
+
+    return vertexShader;
 }
 
 abstract class SagFunction {
@@ -115,30 +149,37 @@ abstract class SagFunction {
     constructor() {
         // Name is a random string that can be used as a valid GLSL identifier
         const uuid = crypto.randomUUID();
-        this.name = "sag_" + uuid.replace(/[^a-zA-Z0-9_]/g, "_");
+        this.name =
+            `${this.type()}_` +
+            uuid.slice(0, 8);
     }
 
-    public abstract shader3D(): string;
-    public abstract sagFunction2D(): (r: number) => number;
+    public abstract type(): string;
 
-    public sagShader3D(): string {
-        const vertexShader = `
-              void main() {
-                vec3 pos = position;
-                float y = pos.y;
-                float z = pos.z;
-                float r2 = pow(pos.y, 2.0) + pow(pos.z, 2.0);
+    public glslFunctionG(chunk: string) {
+        return `
+            float ${this.name}_G(float y, float z, float r2) {
+                // ${JSON.stringify(this)}
                 float x = 0.0;
-
-                ${this.shader3D()}
-
-                pos.x = x;
-                csm_Position = pos;
-                }
-                `;
-
-        return vertexShader;
+                ${chunk}
+                return x;
+            }`;
     }
+
+    public glslFunctionGgrad(chunk: string) {
+        return `
+            vec3 ${this.name}_Ggrad(float y, float z, float r2) {
+                // ${JSON.stringify(this)}
+                float Gy = 0.0;
+                float Gz = 0.0;
+                ${chunk}
+                return vec3(-1.0, Gy, Gz);
+            }`;
+    }
+
+    public abstract shaderG(): string[];
+    public abstract shaderGgrad() : string[];
+    public abstract sagFunction2D(): (r: number) => number;
 }
 
 class ParabolicSag extends SagFunction {
@@ -149,11 +190,28 @@ class ParabolicSag extends SagFunction {
         this.A = A;
     }
 
-    public shader3D() {
-        return `
-            float A = ${this.A};
-            x += A * r2;
-        `;
+    public type(): string {
+        return "parabolic";
+    }
+
+    public shaderG(): string[] {
+        return [
+            this.glslFunctionG(
+                `
+                float A = ${this.A};
+                x = A * r2;
+                `
+            ),
+        ];
+    }
+
+    public shaderGgrad() : string[] {
+        return [
+            this.glslFunctionGgrad(
+                `
+                `
+            ),
+        ];
     }
 
     public sagFunction2D() {
@@ -171,15 +229,43 @@ class SphericalSag extends SagFunction {
         this.C = C;
     }
 
-    public shader3D() {
-        return `
-            float C = ${this.C};
-            float C2 = pow(C, 2.0);
+    public type(): string {
+        return "spherical";
+    }
 
-            float num = C * r2;
-            float denom = 1.0 + sqrt(1.0 - r2 * C2);
-            x += num / denom;
-        `;
+    public shaderG(): string[] {
+        return [
+            this.glslFunctionG(
+                `
+                float C = ${this.C.toFixed(8)};
+                float C2 = pow(C, 2.0);
+
+                float num = C * r2;
+                float denom = 1.0 + sqrt(1.0 - r2 * C2);
+                x = num / denom;
+                `
+            ),
+        ];
+    }
+
+    // C = self.C
+    // r2 = torch.pow(y, 2) + torch.pow(z, 2)
+    // denom = safe_sqrt(1 - r2 * torch.pow(C, 2))
+    // return safe_div(y * C, denom), safe_div(z * C, denom)
+
+    public shaderGgrad() : string[] {
+        return [
+            this.glslFunctionGgrad(
+                `
+                float C = ${this.C.toFixed(8)};
+                float C2 = pow(C, 2.0);
+
+                float denom = sqrt(1.0 - r2 * C2);
+                Gy = (y * C) / denom;
+                Gz = (z * C) / denom;
+                `
+            ),
+        ];
     }
 
     public sagFunction2D() {
@@ -205,14 +291,31 @@ class ConicalSag extends SagFunction {
         this.K = K;
     }
 
-    public shader3D() {
-        return `
-            float C = ${this.C};
-            float K = ${this.K};
-            float C2 = pow(C, 2.0);
-            
-            x += (C * r2) / (1.0 + sqrt(1.0 - (1.0+K) * r2 * C2));
-        `;
+    public type(): string {
+        return "conical";
+    }
+
+    public shaderG(): string[] {
+        return [
+            this.glslFunctionG(
+                `
+                float C = ${this.C};
+                float K = ${this.K};
+                float C2 = pow(C, 2.0);
+                
+                x = (C * r2) / (1.0 + sqrt(1.0 - (1.0+K) * r2 * C2));
+                `
+            ),
+        ];
+    }
+
+    public shaderGgrad() : string[] {
+        return [
+            this.glslFunctionGgrad(
+                `
+                `
+            ),
+        ];
     }
 
     public sagFunction2D() {
@@ -235,17 +338,32 @@ class AsphericSag extends SagFunction {
         this.coefficients = coefficients;
     }
 
-    public shader3D() {
+    public type(): string {
+        return "aspheric";
+    }
+
+    public shaderG(): string[] {
         const M = this.coefficients.length;
         const str = this.coefficients.map((c) => c.toFixed(8)).join(", ");
-        return `
-        float coefficients[${M}] = float[](${str});
-        float acc = 0.0;
-        for (int i = 0; i < ${M}; i++) {
-            acc += coefficients[i] * pow(r2, 2.0 + float(i));
-        }
-        x += acc;
-        `;
+        return [
+            this.glslFunctionG(
+                `
+                float coefficients[${M}] = float[](${str});
+                for (int i = 0; i < ${M}; i++) {
+                    x += coefficients[i] * pow(r2, 2.0 + float(i));
+                }
+                `
+            ),
+        ];
+    }
+
+    public shaderGgrad() : string[] {
+        return [
+            this.glslFunctionGgrad(
+                `
+                `
+            ),
+        ];
     }
 
     public sagFunction2D() {
@@ -258,5 +376,58 @@ class AsphericSag extends SagFunction {
 
             return acc;
         };
+    }
+}
+
+class SagSum extends SagFunction {
+    private terms: SagFunction[];
+
+    constructor(terms: SagFunction[]) {
+        super();
+        this.terms = terms;
+    }
+
+    public type(): string {
+        return "sum";
+    }
+
+    public shaderG(): string[] {
+        var funcs: string[] = [];
+        var names: string[] = [];
+
+        // Append all terms shader chunks
+        for (const t of this.terms) {
+            funcs.push(...t.shaderG());
+            names.push(t.name);
+        }
+
+        // Make the sum function and add it the the list of functions
+        const sumFunction = this.glslFunctionG(
+            "x = " + names.map((n) => `${n}_G(y, z, r2)`).join(" + ") + ";"
+        );
+        funcs.push(sumFunction);
+        return funcs;
+    }
+
+    public shaderGgrad() : string[] {
+        return [
+            this.glslFunctionGgrad(
+                `
+                `
+            ),
+        ];
+    }
+
+    public sagFunction2D() {
+        const f = (r: number): number => {
+            var x = 0.0;
+
+            for (const t of this.terms) {
+                x += t.sagFunction2D()(r);
+            }
+            return x;
+        };
+
+        return f;
     }
 }
