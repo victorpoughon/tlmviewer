@@ -185,37 +185,50 @@ abstract class SagFunction {
 
 class ParabolicSag extends SagFunction {
     private A: number;
+    private normalize: boolean;
 
-    constructor(A: number) {
+    constructor(A: number, normalize: boolean) {
         super();
         this.A = A;
+        this.normalize = normalize;
     }
 
     public static fromObj(obj: any, _tau: number): ParabolicSag {
         const A = getRequired<number>(obj, "A");
-        return new ParabolicSag(A);
+        const normalize = obj.normalize ?? false;
+        return new ParabolicSag(A, normalize);
     }
 
     public type(): string {
         return "parabolic";
     }
 
-    public shaderG(_tau: number): string[] {
+    public unnorm(tau: number): number {
+        if (this.normalize) {
+            return this.A / tau;
+        } else {
+            return this.A;
+        }
+    }
+
+    public shaderG(tau: number): string[] {
+        const A = this.unnorm(tau);
         return [
             this.glslFunctionG(
                 `
-                float A = ${this.A};
+                ${glslFloat("A", A)}
                 x = A * r2;
                 `
             ),
         ];
     }
 
-    public shaderGgrad(_tau: number): string[] {
+    public shaderGgrad(tau: number): string[] {
+        const A = this.unnorm(tau);
         return [
             this.glslFunctionGgrad(
                 `
-                float A = ${this.A};
+                ${glslFloat("A", A)}
                 Gy = 2.0 * A * y;
                 Gz = 2.0 * A * z;
                 `
@@ -223,9 +236,10 @@ class ParabolicSag extends SagFunction {
         ];
     }
 
-    public sagFunction2D(_tau: number) {
+    public sagFunction2D(tau: number) {
+        const A = this.unnorm(tau);
         return (r: number): number => {
-            return this.A * Math.pow(r, 2.0);
+            return A * Math.pow(r, 2.0);
         };
     }
 }
