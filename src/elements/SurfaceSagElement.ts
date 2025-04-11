@@ -43,7 +43,7 @@ export class SurfaceSagElement extends SurfaceBaseElement {
     public makeGeometry2D(): [LineGeometry, THREE.Matrix4] {
         const diameter = getRequired<number>(this.elementData, "diameter");
         const tau = diameter / 2;
-        const sag = this.sagType().sagFunction2D(tau);
+        const sag = this.sagType(tau).sagFunction2D(tau);
 
         const geometry = sagGeometry2D(
             sag,
@@ -75,7 +75,7 @@ export class SurfaceSagElement extends SurfaceBaseElement {
         ).rotateY(Math.PI / 2);
 
         const tau = diameter / 2;
-        const sag = this.sagType();
+        const sag = this.sagType(tau);
         const vertexShader = glslRender(
             sag.shaderG(tau),
             sag.shaderGgrad(tau),
@@ -85,41 +85,28 @@ export class SurfaceSagElement extends SurfaceBaseElement {
         return [geometry, userTransform, vertexShader];
     }
 
-    public sagType(): SagFunction {
+    public sagType(tau: number): SagFunction {
         const sagFunction = getRequired<string>(
             this.elementData,
             "sag-function"
         );
-        return parseSagFunction(sagFunction);
+        return parseSagFunction(sagFunction, tau);
     }
 }
 
-export function parseSagFunction(obj: any): SagFunction {
+export function parseSagFunction(obj: any, tau: number): SagFunction {
     const type = getRequired<string>(obj, "sag-type");
 
     if (type === "parabolic") {
-        const A = getRequired<number>(obj, "A");
-        return new ParabolicSag(A);
+        return ParabolicSag.fromObj(obj, tau);
     } else if (type === "spherical") {
-        const C = getRequired<number>(obj, "C");
-        return new SphericalSag(C);
+        return SphericalSag.fromObj(obj, tau);
     } else if (type === "aspheric") {
-        const coefficients = getRequired<Array<number>>(obj, "coefficients");
-        const normalize = obj.normalize ?? false;
-        return new AsphericSag(coefficients, normalize);
+        return AsphericSag.fromObj(obj, tau);
     } else if (type === "conical") {
-        const C = getRequired<number>(obj, "C");
-        const K = getRequired<number>(obj, "K");
-        const normalize = obj.normalize ?? false;
-        // TODO verify K domain and raise error
-        // TODO refactor this into SagFunction.fromObj()
-        return new ConicalSag(C, K, normalize);
+        return ConicalSag.fromObj(obj, tau);
     } else if (type === "sum") {
-        var terms: SagFunction[] = [];
-        for (const t of getRequired<any[]>(obj, "terms")) {
-            terms.push(parseSagFunction(t));
-        }
-        return new SagSum(terms);
+        return SagSum.fromObj(obj, tau);
     } else {
         throw Error(`Uknown surface sag type ${type}`);
     }
@@ -204,6 +191,11 @@ class ParabolicSag extends SagFunction {
         this.A = A;
     }
 
+    public static fromObj(obj: any, _tau: number): ParabolicSag {
+        const A = getRequired<number>(obj, "A");
+        return new ParabolicSag(A);
+    }
+
     public type(): string {
         return "parabolic";
     }
@@ -244,6 +236,12 @@ class SphericalSag extends SagFunction {
     constructor(C: number) {
         super();
         this.C = C;
+    }
+
+    public static fromObj(obj: any, _tau: number): SphericalSag {
+        const C = getRequired<number>(obj, "C");
+        // TODO check domain error
+        return new SphericalSag(C);
     }
 
     public type(): string {
@@ -303,6 +301,20 @@ class ConicalSag extends SagFunction {
         this.C = C;
         this.K = K;
         this.normalize = normalize;
+    }
+
+    public static fromObj(obj: any, tau: number): ConicalSag {
+        const C = getRequired<number>(obj, "C");
+        const K = getRequired<number>(obj, "K");
+        const normalize = obj.normalize ?? false;
+
+        // Check for out of domain error
+        if (tau >= Math.sqrt(1.0 / (Math.pow(C, 2.0) * (1.0 + K)))) {
+            throw Error("ConicalSag: out of domain error");
+        }
+
+        // TODO verify K domain and raise error
+        return new ConicalSag(C, K, normalize);
     }
 
     public type(): string {
@@ -372,6 +384,12 @@ class AsphericSag extends SagFunction {
         this.normalize = normalize;
     }
 
+    public static fromObj(obj: any, _tau: number): AsphericSag {
+        const coefficients = getRequired<Array<number>>(obj, "coefficients");
+        const normalize = obj.normalize ?? false;
+        return new AsphericSag(coefficients, normalize);
+    }
+
     public type(): string {
         return "aspheric";
     }
@@ -379,7 +397,9 @@ class AsphericSag extends SagFunction {
     // Unnormalize coefficients
     public unnorm(tau: number): Array<number> {
         if (this.normalize) {
-            return this.coefficients.map((c: number, i: number) => c / Math.pow(tau, 3 + 2 * i));
+            return this.coefficients.map(
+                (c: number, i: number) => c / Math.pow(tau, 3 + 2 * i)
+            );
         } else {
             return this.coefficients;
         }
@@ -452,6 +472,14 @@ class SagSum extends SagFunction {
     constructor(terms: SagFunction[]) {
         super();
         this.terms = terms;
+    }
+
+    public static fromObj(obj: any, tau: number): SagSum {
+        var terms: SagFunction[] = [];
+        for (const t of getRequired<any[]>(obj, "terms")) {
+            terms.push(parseSagFunction(t, tau));
+        }
+        return new SagSum(terms);
     }
 
     public type(): string {
