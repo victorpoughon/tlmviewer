@@ -238,9 +238,12 @@ class SphericalSag extends SagFunction {
         this.C = C;
     }
 
-    public static fromObj(obj: any, _tau: number): SphericalSag {
+    public static fromObj(obj: any, tau: number): SphericalSag {
         const C = getRequired<number>(obj, "C");
-        // TODO check domain error
+
+        if (C !== 0.0 && Math.abs(1 / C) <= tau) {
+            throw Error("SphericalSag: out of domain error");
+        }
         return new SphericalSag(C);
     }
 
