@@ -246,30 +246,43 @@ class ParabolicSag extends SagFunction {
 
 class SphericalSag extends SagFunction {
     private C: number;
+    private normalize: boolean;
 
-    constructor(C: number) {
+    constructor(C: number, normalize: boolean) {
         super();
         this.C = C;
+        this.normalize = normalize;
     }
 
     public static fromObj(obj: any, tau: number): SphericalSag {
         const C = getRequired<number>(obj, "C");
+        const normalize = obj.normalize ?? false;
 
-        if (C !== 0.0 && Math.abs(1 / C) <= tau) {
+        const C_unnormed = normalize ? C / tau : C;
+        if (C_unnormed !== 0.0 && Math.abs(1 / C_unnormed) <= tau) {
             throw Error("SphericalSag: out of domain error");
         }
-        return new SphericalSag(C);
+        return new SphericalSag(C, normalize);
     }
 
     public type(): string {
         return "spherical";
     }
 
-    public shaderG(_tau: number): string[] {
+    public unnorm(tau: number): number {
+        if (this.normalize) {
+            return this.C / tau;
+        } else {
+            return this.C;
+        }
+    }
+
+    public shaderG(tau: number): string[] {
+        const C = this.unnorm(tau);
         return [
             this.glslFunctionG(
                 `
-                ${glslFloat("C", this.C)}
+                ${glslFloat("C", C)}
                 float C2 = pow(C, 2.0);
 
                 float num = C * r2;
@@ -280,11 +293,12 @@ class SphericalSag extends SagFunction {
         ];
     }
 
-    public shaderGgrad(_tau: number): string[] {
+    public shaderGgrad(tau: number): string[] {
+        const C = this.unnorm(tau);
         return [
             this.glslFunctionGgrad(
                 `
-                ${glslFloat("C", this.C)}
+                ${glslFloat("C", C)}
                 float C2 = pow(C, 2.0);
 
                 float denom = sqrt(1.0 - r2 * C2);
@@ -295,12 +309,13 @@ class SphericalSag extends SagFunction {
         ];
     }
 
-    public sagFunction2D(_tau: number) {
+    public sagFunction2D(tau: number) {
+        const C = this.unnorm(tau);
         return (r: number): number => {
             const r2 = Math.pow(r, 2.0);
-            const C2 = Math.pow(this.C, 2.0);
+            const C2 = Math.pow(C, 2.0);
 
-            const num = this.C * r2;
+            const num = C * r2;
             const denom = 1 + Math.sqrt(1 - r2 * C2);
 
             return num / denom;
