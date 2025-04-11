@@ -341,11 +341,11 @@ class ConicalSag extends SagFunction {
         const normalize = obj.normalize ?? false;
 
         // Check for out of domain error
-        if (tau >= Math.sqrt(1.0 / (Math.pow(C, 2.0) * (1.0 + K)))) {
+        const C_unnormed = normalize ? C / tau : C;
+        if (tau >= Math.sqrt(1.0 / (Math.pow(C_unnormed, 2.0) * (1.0 + K)))) {
             throw Error("ConicalSag: out of domain error");
         }
 
-        // TODO verify K domain and raise error
         return new ConicalSag(C, K, normalize);
     }
 
