@@ -107,6 +107,8 @@ export function parseSagFunction(obj: any, tau: number): SagFunction {
         return ConicalSag.fromObj(obj, tau);
     } else if (type === "sum") {
         return SagSum.fromObj(obj, tau);
+    } else if (type === "xypolynomial") {
+        return XYPolynomialSag.fromObj(obj, tau);
     } else {
         throw Error(`Uknown surface sag type ${type}`);
     }
@@ -568,5 +570,113 @@ class SagSum extends SagFunction {
         };
 
         return f;
+    }
+}
+
+// Like Array.map but for a 2D array
+function map2d<T>(
+    array: number[][],
+    f: (value: number, p: number, q: number) => T
+): T[][] {
+    return array.map((row, p) => row.map((value, q) => f(value, p, q)));
+}
+
+class XYPolynomialSag extends SagFunction {
+    private coefficients: number[][];
+    private normalize: boolean;
+
+    constructor(coefficients: number[][], normalize: boolean) {
+        super();
+        this.coefficients = coefficients;
+        this.normalize = normalize;
+    }
+
+    public static fromObj(obj: any, _tau: number): XYPolynomialSag {
+        const coefficients = getRequired<number[][]>(obj, "coefficients");
+        const normalize = obj.normalize ?? false;
+        return new XYPolynomialSag(coefficients, normalize);
+    }
+
+    public type(): string {
+        return "xypolynomial";
+    }
+
+    // Unnormalize coefficients
+    public unnorm(tau: number): number[][] {
+        if (this.normalize) {
+            return map2d(
+                this.coefficients,
+                (c: number, p: number, q: number): number =>
+                    (c * tau) / (Math.pow(tau, p) * Math.pow(tau, q))
+            );
+        } else {
+            return this.coefficients;
+        }
+    }
+
+    public shaderG(tau: number): string[] {
+        const alphas = this.unnorm(tau);
+        const P = alphas.length;
+        const Q = alphas[0].length;
+
+        if (alphas.length === 0) {
+            return [this.glslFunctionG("")];
+        }
+
+        var code: string = "";
+        for (var p = 0; p < P; p++) {
+            for (var q = 0; q < Q; q++) {
+                if (alphas[p][q] !== 0.0) {
+                    const cstr = alphas[p][q].toFixed(8);
+                    const powy = p > 0 ? ` * ${Array(p).fill("y").join('*')}` : ``;
+                    const powz = q > 0 ? ` * ${Array(q).fill("z").join('*')}` : ``;
+                    code += `
+                x += ${cstr}${powy}${powz};`;
+                }
+            }
+        }
+
+        return [this.glslFunctionG(code)];
+    }
+
+    public shaderGgrad(tau: number): string[] {
+        const alphas = this.unnorm(tau);
+        const P = alphas.length;
+        const Q = alphas[0].length;
+
+        if (alphas.length === 0) {
+            return [this.glslFunctionGgrad("")];
+        }
+
+        var code: string = "";
+        for (var p = 0; p < P; p++) {
+            for (var q = 0; q < Q; q++) {
+                if (alphas[p][q] !== 0.0) {
+                    const cstr = ` * ${alphas[p][q].toFixed(8)}`;
+                    const pstr = p.toFixed(1);
+                    const qstr = q.toFixed(1);
+                    const powy = p > 0 ? ` * ${Array(p).fill("y").join('*')}` : ``;
+                    const powym = p > 1 ? ` * ${Array(p-1).fill("y").join('*')}` : ``;
+                    const powz = q > 0 ? ` * ${Array(q).fill("z").join('*')}` : ``;
+                    const powzm = q > 1 ? ` * ${Array(q-1).fill("z").join('*')}` : ``;
+
+                    if (p > 0) {
+                        code += `
+                Gy += ${pstr}${cstr}${powym}${powz};`;
+                    }
+
+                    if (q > 0) {
+                        code += `
+                Gz += ${qstr}${cstr}${powy}${powzm};`;
+                    }
+                }
+            }
+        }
+
+        return [this.glslFunctionGgrad(code)];
+    }
+
+    public sagFunction2D(_tau: number): never {
+        throw Error("Cannot sample XYPolynomial in 2D");
     }
 }

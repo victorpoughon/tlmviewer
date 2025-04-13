@@ -1,0 +1,82 @@
+{
+    "mode": "3D",
+    "camera": "orthographic",
+    "data": [
+        {
+            "type": "surface-sag",
+            "diameter": 1.0,
+            "sag-function": {
+                "sag-type": "xypolynomial",
+                "coefficients": [
+                    [
+                        0.0,
+                        0.4,
+                        -0.6,
+                        0
+                    ],
+                    [
+                        0.1,
+                        -0.2,
+                        0.5,
+                        0.5
+                    ],
+                    [
+                        0.01,
+                        2.5,
+                        0.01,
+                        0.01
+                    ]
+                ]
+            },
+            "bcyl": [
+                -1.0,
+                1.0,
+                1.0,
+                0.5
+            ],
+            "matrix": [
+                [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            ]
+        },
+        {
+            "type": "points",
+            "data": [
+                [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            ],
+            "layers": [
+                4
+            ]
+        }
+    ],
+    "controls": {
+        "show_optical_axis": true,
+        "show_other_axes": true
+    }
+}

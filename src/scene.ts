@@ -125,7 +125,7 @@ export class TLMScene {
             // Emit a warning for unknown element types
             if (matches.length === 0) {
                 console.warn(
-                    `tlmviewer: Unknown scene element type ${elementData}`
+                    `tlmviewer: Unknown scene element ${JSON.stringify(elementData)}`
                 );
             }
 
