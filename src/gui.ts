@@ -231,13 +231,7 @@ export class TLMGui {
     }
 
     // Set controls state from a JSON object
-    public setControlsFromJson(controls: any) {
-
-        if (typeof controls === "boolean" && controls === false) {
-            this.gui.hide();
-            return;
-        }
-        
+    public setControlsFromJson(controls: any) {      
         const set = function (key: string, setter: any) {
             if (controls.hasOwnProperty(key)) {
                 setter(controls[key]);
@@ -277,7 +271,13 @@ export class TLMGui {
             console.log("loading bcyl");
             self.controllers.visible.bcyl.load(v);
         });
-    
+
+        // Finish with visibility of the gui itself
+        set("show_controls", (v: boolean) => {
+            if (!v) {
+                self.gui.hide();
+            }
+        });
     }
 
     public updateCameraLayers() {
