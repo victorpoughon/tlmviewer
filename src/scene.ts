@@ -11,6 +11,7 @@ import { SurfaceLatheElement } from "./elements/SurfaceLatheElement.ts";
 import { SurfacePlaneElement } from "./elements/SurfacePlaneElement.ts";
 import { SurfaceSphereRElement } from "./elements/SurfaceSphereRElement.ts";
 import { SurfaceSagElement } from "./elements/SurfaceSagElement.ts";
+import { BcylElement } from "./elements/BcylElement.ts";
 import { RaysElement, makeLine2, ColorOption } from "./elements/RaysElement.ts";
 
 // Extract available variables from the scene
@@ -26,6 +27,30 @@ function extractVariables(root: any): string[] {
     }
 
     return Array.from(variables);
+}
+
+// Return the list of matching elemnt types for a given json object
+function matchingElementTypes(
+    elementData: any
+) {
+    const sceneElementTypes = [
+        PointsElement,
+        ArrowsElement,
+        SurfaceLatheElement,
+        SurfacePlaneElement,
+        SurfaceSphereRElement,
+        SurfaceSagElement,
+        RaysElement,
+        BcylElement,
+    ];
+
+    const matches = [];
+    for (const type of sceneElementTypes) {
+        if (type.match(elementData)) {
+            matches.push(type);
+        }
+    }
+    return matches;
 }
 
 export class TLMScene {
@@ -80,7 +105,7 @@ export class TLMScene {
         this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         this.scene.add(this.ambientLight);
 
-        this.directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
         this.directionalLight.position.set(100, 100, 100);
         this.scene.add(this.directionalLight);
 
@@ -90,39 +115,21 @@ export class TLMScene {
     }
 
     public initSceneGraph(dim: number) {
-        const sceneElementTypes = [
-            PointsElement,
-            ArrowsElement,
-            SurfaceLatheElement,
-            SurfacePlaneElement,
-            SurfaceSphereRElement,
-            SurfaceSagElement,
-            RaysElement,
-        ];
+        // For any element type that matches with the element data
+        // Use it to make a threejs group add add it to the scene
 
-        const matchElementType = (elementData: any) => {
-            for (const type of sceneElementTypes) {
-                if (type.match(elementData)) {
-                    return type;
-                }
-            }
-            return null;
-        };
+        const elements = getRequired<any[]>(this.root, "data");
+        for (const elementData of elements) {
+            const matches = matchingElementTypes(elementData);
 
-        const data = getRequired<any[]>(this.root, "data");
-        for (const elementData of data) {
-            // Find element type
-            const type = matchElementType(elementData);
-
-            if (type === null) {
-                // Emit a warning for unknown element types
+            // Emit a warning for unknown element types
+            if (matches.length === 0) {
                 console.warn(
-                    `tlmviewer: Unknown scene element type ${getRequired<string>(
-                        elementData,
-                        "type"
-                    )}`
+                    `tlmviewer: Unknown scene element type ${elementData}`
                 );
-            } else {
+            }
+
+            for (const type of matches) {
                 // Create the threeJS group that represents the element
                 // and store the Element object in its userData
                 const instance = new type(elementData, dim);
@@ -194,6 +201,15 @@ export class TLMScene {
             SurfaceBaseElement,
             (group: THREE.Group, element: SurfaceBaseElement) => {
                 element.setColor(group, color);
+            }
+        );
+    }
+
+    public setBcylVisible(visible: boolean) : void {
+        this.updateElements(
+            BcylElement,
+            (group: THREE.Group, element: BcylElement) => {
+                element.setVisible(group, visible);
             }
         );
     }

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { GUI, Controller } from "lil-gui";
 
-import {ColorOption } from "./elements/RaysElement.ts";
+import { ColorOption } from "./elements/RaysElement.ts";
 import { TLMScene } from "./scene.ts";
 import { TLMViewerApp } from "./main.ts";
 
@@ -16,7 +16,7 @@ export class TLMGui {
     private scene: TLMScene;
     private controller: any;
     private gui: GUI;
-    
+
     private colorOptions: Record<string, ColorOption>;
 
     // Controllers
@@ -29,14 +29,20 @@ export class TLMGui {
             thickness: Controller;
             background: Controller;
             surfaces: Controller;
-        },
+        };
         visible: {
             opticalAxis: Controller;
             otherAxes: Controller;
             kinematicJoints: Controller;
-        }
+            bcyl: Controller;
+        };
     };
 
+    // GUI folders
+    private folders: {
+        colors: GUI,
+        show: GUI,
+    };
 
     constructor(app: TLMViewerApp, container: HTMLElement, scene: TLMScene) {
         this.scene = scene;
@@ -83,6 +89,7 @@ export class TLMGui {
             surfacesColor: { r: 0, g: 1, b: 1 },
 
             showKinematicJoints: false,
+            showBcyl: false,
         };
 
         // If 'object' variable is available, default to it for valid and output rays
@@ -94,7 +101,7 @@ export class TLMGui {
         this.gui.add(this.controller, "resetView").name("Reset Camera");
 
         const folderColors = this.gui.addFolder("Colors");
-        
+
         const controllerColorsValidRays = folderColors
             .add(this.controller, "validColor", this.colorOptions)
             .name("Valid rays");
@@ -114,9 +121,12 @@ export class TLMGui {
                 this.scene.setRaysOpacity(value);
             });
 
-        const controllerColorsThickness = folderColors.add(this.controller, "raysThickness", 0.1, 10).name("Thickness").onFinishChange((value: number) => {
-            this.scene.setRaysThickness(value);
-        });
+        const controllerColorsThickness = folderColors
+            .add(this.controller, "raysThickness", 0.1, 10)
+            .name("Thickness")
+            .onFinishChange((value: number) => {
+                this.scene.setRaysThickness(value);
+            });
 
         controllerColorsValidRays.onChange((value: ColorOption) => {
             this.scene.setupValidRays(value);
@@ -157,24 +167,25 @@ export class TLMGui {
             });
 
         const folderShow = this.gui.addFolder("Visible");
-        const controllerVisibleOpticalAxis = folderShow.add(this.scene.opticalAxis, "visible").name("Optical axis");
-        const controllerVisibleOtherAxes = folderShow.add(this.scene.otherAxes, "visible").name("Other axes");
+        const controllerVisibleOpticalAxis = folderShow
+            .add(this.scene.opticalAxis, "visible")
+            .name("Optical axis");
+        const controllerVisibleOtherAxes = folderShow
+            .add(this.scene.otherAxes, "visible")
+            .name("Other axes");
         const controllerVisibleKinematicJoints = folderShow
             .add(this.controller, "showKinematicJoints")
             .name("Kinematic joints");
-
-        this.scene.setupValidRays(this.controller.validColor);
-        this.scene.setupBlockedRays(this.controller.blockedColor);
-        this.scene.setupOutputRays(this.controller.outputColor);
-
+        const controllerVisibleBcyl = folderShow
+            .add(this.controller, "showBcyl")
+            .name("Bounding Cylinders")
+            .onChange((value: boolean) => {
+                console.log("controllerVisibleBcyl", value);
+                this.scene.setBcylVisible(value);
+            });
         folderShow.onChange((_: Object) => {
             this.updateCameraLayers();
         });
-        this.updateCameraLayers();
-
-        this.gui.open(false);
-        folderShow.open(false);
-        folderColors.open(false);
 
         // Initialize this.controllers
         this.controllers = {
@@ -191,37 +202,82 @@ export class TLMGui {
                 opticalAxis: controllerVisibleOpticalAxis,
                 otherAxes: controllerVisibleOtherAxes,
                 kinematicJoints: controllerVisibleKinematicJoints,
-            }
+                bcyl: controllerVisibleBcyl,
+            },
         };
+
+        // Initialize this.folder
+        this.folders = {
+            colors: folderColors,
+            show: folderShow,
+        }
+
+        this.setDefaultGUIState();
+    }
+
+    public setDefaultGUIState() {
+        // Set default GUI state
+        this.scene.setupValidRays(this.controller.validColor);
+        this.scene.setupBlockedRays(this.controller.blockedColor);
+        this.scene.setupOutputRays(this.controller.outputColor);
+
+        this.updateCameraLayers();
+
+        this.scene.setBcylVisible(false);
+
+        this.gui.open(false);
+        this.folders.colors.open(false);
+        this.folders.show.open(false);
     }
 
     // Set controls state from a JSON object
     public setControlsFromJson(controls: any) {
-        if (typeof controls === "boolean") {
-            if (controls === false) {
-                this.gui.hide();
-            }
-        } else {
-            const set = function(key: string, setter: any) {
-                if (controls.hasOwnProperty(key)) {
-                    setter(controls[key]);
-                }
-            };
-            const self = this;
 
-            set("color_rays", (v: string) => {
-                self.controllers.colors.validRays.load(self.colorOptions[v]);
-                self.controllers.colors.outputRays.load(self.colorOptions[v]);
-            });
-            set("valid_rays", (v: string) => {self.controllers.colors.validRays.load(self.colorOptions[v])});
-            set("blocked_rays", (v: string) => {self.controllers.colors.blockedRays.load(self.colorOptions[v])});
-            set("output_rays", (v: string) => {self.controllers.colors.outputRays.load(self.colorOptions[v])});
-            set("opacity", (v: number) => {self.controllers.colors.opacity.load(v);});
-            set("thickness", (v: number) => {self.controllers.colors.thickness.load(v);});
-            set("show_optical_axis", (v: boolean) => {self.controllers.visible.opticalAxis.load(v)});
-            set("show_other_axes", (v: boolean) => {self.controllers.visible.otherAxes.load(v)});
-            set("show_kinematic_joints", (v: boolean) => {self.controllers.visible.kinematicJoints.load(v)});
+        if (typeof controls === "boolean" && controls === false) {
+            this.gui.hide();
+            return;
         }
+        
+        const set = function (key: string, setter: any) {
+            if (controls.hasOwnProperty(key)) {
+                setter(controls[key]);
+            }
+        };
+        const self = this;
+
+        set("color_rays", (v: string) => {
+            self.controllers.colors.validRays.load(self.colorOptions[v]);
+            self.controllers.colors.outputRays.load(self.colorOptions[v]);
+        });
+        set("valid_rays", (v: string) => {
+            self.controllers.colors.validRays.load(self.colorOptions[v]);
+        });
+        set("blocked_rays", (v: string) => {
+            self.controllers.colors.blockedRays.load(self.colorOptions[v]);
+        });
+        set("output_rays", (v: string) => {
+            self.controllers.colors.outputRays.load(self.colorOptions[v]);
+        });
+        set("opacity", (v: number) => {
+            self.controllers.colors.opacity.load(v);
+        });
+        set("thickness", (v: number) => {
+            self.controllers.colors.thickness.load(v);
+        });
+        set("show_optical_axis", (v: boolean) => {
+            self.controllers.visible.opticalAxis.load(v);
+        });
+        set("show_other_axes", (v: boolean) => {
+            self.controllers.visible.otherAxes.load(v);
+        });
+        set("show_kinematic_joints", (v: boolean) => {
+            self.controllers.visible.kinematicJoints.load(v);
+        });
+        set("show_bounding_cylinders", (v: boolean) => {
+            console.log("loading bcyl");
+            self.controllers.visible.bcyl.load(v);
+        });
+    
     }
 
     public updateCameraLayers() {

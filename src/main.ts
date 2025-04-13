@@ -234,10 +234,9 @@ function setupApp(container: HTMLElement, data: any): TLMViewerApp {
 
     const app = new TLMViewerApp(container, scene, camera);
 
-    const controls = data["controls"] ?? null;
-    if (controls !== null) {
-        app.gui.setControlsFromJson(controls);
-    }
+    const controls = data["controls"] ?? {};
+    app.gui.setControlsFromJson(controls);
+    
 
     return app;
 }

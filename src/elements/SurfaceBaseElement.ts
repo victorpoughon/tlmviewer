@@ -57,11 +57,6 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
         super(elementData, dim);
     }
 
-    public static match(elementData: any): boolean {
-        const type = getRequired<string>(elementData, "type");
-        return type === "surface-lathe";
-    }
-
     // Get the Matrix4 tranform from the element data
     // Expecting a 2D transform
     public getTransform2D(): THREE.Matrix4 {
