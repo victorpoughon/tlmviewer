@@ -180,7 +180,6 @@ export class TLMGui {
             .add(this.controller, "showBcyl")
             .name("Bounding Cylinders")
             .onChange((value: boolean) => {
-                console.log("controllerVisibleBcyl", value);
                 this.scene.setBcylVisible(value);
             });
         folderShow.onChange((_: Object) => {
@@ -268,7 +267,6 @@ export class TLMGui {
             self.controllers.visible.kinematicJoints.load(v);
         });
         set("show_bounding_cylinders", (v: boolean) => {
-            console.log("loading bcyl");
             self.controllers.visible.bcyl.load(v);
         });
 

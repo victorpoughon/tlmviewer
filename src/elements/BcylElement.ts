@@ -110,8 +110,6 @@ export class BcylElement extends AbstractSceneElement {
             const circlemin = circleGeometry(xmin, radius);
             const circlemax = circleGeometry(xmax, radius);
 
-            console.log(xmin, xmax);
-
             const cylinder = new THREE.CylinderGeometry(
                 radius,
                 radius,
