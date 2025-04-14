@@ -225,8 +225,8 @@ export class TLMGui {
         this.scene.setBcylVisible(false);
 
         this.gui.open(false);
-        this.folders.colors.open(false);
-        this.folders.show.open(false);
+        this.folders.colors.open(true);
+        this.folders.show.open(true);
     }
 
     // Set controls state from a JSON object
