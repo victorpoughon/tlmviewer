@@ -205,6 +205,15 @@ export class TLMScene {
         );
     }
 
+    public setSurfacesVisible(visible: boolean) : void {
+        this.updateElements(
+            SurfaceBaseElement,
+            (group: THREE.Group, element: BcylElement) => {
+                element.setVisible(group, visible);
+            }
+        );
+    }
+
     public setBcylVisible(visible: boolean) : void {
         this.updateElements(
             BcylElement,

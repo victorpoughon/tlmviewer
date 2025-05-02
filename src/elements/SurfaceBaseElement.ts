@@ -175,4 +175,8 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
             }
         });
     }
+
+    public setVisible(group: THREE.Group, visible: boolean) : void {
+        group.visible = visible;
+    }
 }

@@ -31,6 +31,7 @@ export class TLMGui {
             surfaces: Controller;
         };
         visible: {
+            surfaces: Controller;
             opticalAxis: Controller;
             otherAxes: Controller;
             kinematicJoints: Controller;
@@ -88,6 +89,7 @@ export class TLMGui {
             backgroundColor: { r: 0, g: 0, b: 0 },
             surfacesColor: { r: 0, g: 1, b: 1 },
 
+            showSurfaces: true,
             showKinematicJoints: false,
             showBcyl: false,
         };
@@ -167,6 +169,12 @@ export class TLMGui {
             });
 
         const folderShow = this.gui.addFolder("Visible");
+        const controllerVisibleSurfaces = folderShow
+            .add(this.controller, "showSurfaces")
+            .name("Surfaces")
+            .onChange((value: boolean) => {
+                this.scene.setSurfacesVisible(value);
+            });
         const controllerVisibleOpticalAxis = folderShow
             .add(this.scene.opticalAxis, "visible")
             .name("Optical axis");
@@ -198,6 +206,7 @@ export class TLMGui {
                 surfaces: controllerColorsSurfaces,
             },
             visible: {
+                surfaces: controllerVisibleSurfaces,
                 opticalAxis: controllerVisibleOpticalAxis,
                 otherAxes: controllerVisibleOtherAxes,
                 kinematicJoints: controllerVisibleKinematicJoints,
@@ -256,6 +265,9 @@ export class TLMGui {
         });
         set("thickness", (v: number) => {
             self.controllers.colors.thickness.load(v);
+        });
+        set("show_surfaces", (v: boolean) => {
+            self.controllers.visible.surfaces.load(v);
         });
         set("show_optical_axis", (v: boolean) => {
             self.controllers.visible.opticalAxis.load(v);
