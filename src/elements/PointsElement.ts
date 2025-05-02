@@ -28,10 +28,11 @@ export class PointsElement extends AbstractSceneElement {
     public makeGroup(): THREE.Group {
         const vertices = getRequired<number[][]>(this.elementData, "data");
         const color = this.elementData.color ?? "#ffffff";
+        const radius = this.elementData.radius ?? 0.1;
 
         const group = new THREE.Group();
         for (const point of vertices) {
-            const geometry = new THREE.SphereGeometry(0.1, 8, 8);
+            const geometry = new THREE.SphereGeometry(radius, 8, 8);
             const material = new THREE.MeshBasicMaterial({ color: color });
             material.transparent = true;
             material.opacity = 0.8;
