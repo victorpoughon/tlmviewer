@@ -60,7 +60,7 @@ export class TLMViewerApp {
 
     // Handle window resize events
     // @ts-ignore
-    private onWindowResize(): void {
+    public onWindowResize(): void {
         const aspect = window.innerWidth / window.innerHeight;
 
         if (this.camera instanceof THREE.PerspectiveCamera) {
@@ -236,8 +236,8 @@ function setupApp(container: HTMLElement, data: any): TLMViewerApp {
 
     const controls = data["controls"] ?? {};
     app.gui.setControlsFromJson(controls);
-    
 
+    window.addEventListener("resize", () => app.onWindowResize());
     return app;
 }
 
