@@ -3,7 +3,7 @@ import { GUI, Controller } from "lil-gui";
 
 import { ColorOption } from "./elements/RaysElement.ts";
 import { TLMScene } from "./scene.ts";
-import { TLMViewerApp } from "./main.ts";
+import { TLMViewerApp } from "./app.ts";
 
 type RGBColor = {
     r: number;
