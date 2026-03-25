@@ -13,8 +13,8 @@ export default defineConfig({
             entry: resolve(__dirname, "src/main.ts"),
             name: "tlmviewer",
             fileName: (format) =>
-                `tlmviewer-${process.env.npm_package_version}.js`,
-            formats: ["es"],
+                `tlmviewer-${process.env.npm_package_version}.${format}.js`,
+            formats: ["es", "umd"],
         },
     },
     plugins: [
