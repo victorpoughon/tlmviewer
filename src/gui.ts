@@ -41,8 +41,8 @@ export class TLMGui {
 
     // GUI folders
     private folders: {
-        colors: GUI,
-        show: GUI,
+        colors: GUI;
+        show: GUI;
     };
 
     constructor(app: TLMViewerApp, container: HTMLElement, scene: TLMScene) {
@@ -94,10 +94,10 @@ export class TLMGui {
             showBcyl: false,
         };
 
-        // If 'object' variable is available, default to it for valid and output rays
-        if (this.scene.variables.includes("object")) {
-            this.controller.validColor = this.colorOptions["object"];
-            this.controller.outputColor = this.colorOptions["object"];
+        // If 'field' variable is available, default to it for valid and output rays
+        if (this.scene.variables.includes("field")) {
+            this.controller.validColor = this.colorOptions["field"];
+            this.controller.outputColor = this.colorOptions["field"];
         }
 
         this.gui.add(this.controller, "resetView").name("Reset Camera");
@@ -156,7 +156,7 @@ export class TLMGui {
                     value.r,
                     value.g,
                     value.b,
-                    THREE.SRGBColorSpace
+                    THREE.SRGBColorSpace,
                 );
             });
 
@@ -218,7 +218,7 @@ export class TLMGui {
         this.folders = {
             colors: folderColors,
             show: folderShow,
-        }
+        };
 
         this.setDefaultGUIState();
     }
@@ -239,7 +239,7 @@ export class TLMGui {
     }
 
     // Set controls state from a JSON object
-    public setControlsFromJson(controls: any) {      
+    public setControlsFromJson(controls: any) {
         const set = function (key: string, setter: any) {
             if (controls.hasOwnProperty(key)) {
                 setter(controls[key]);

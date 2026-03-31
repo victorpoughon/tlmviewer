@@ -60,7 +60,7 @@ export function makeLine2(start: number[], end: number[], color: string) {
 function makeRays(
     element: any,
     dim: number,
-    colorOption: ColorOption
+    colorOption: ColorOption,
 ): THREE.Group {
     const points = getRequired<number[][]>(element, "points");
     const default_color = element.color ?? "#ffa724";
@@ -83,7 +83,7 @@ function makeRays(
     for (const [_, ray] of points.entries()) {
         if (ray.length != expectedLength) {
             throw new Error(
-                `Invalid ray array length, got ${ray.length} for dim ${dim}`
+                `Invalid ray array length, got ${ray.length} for dim ${dim}`,
             );
         }
 
@@ -112,13 +112,19 @@ function makeRays(
             if (colorOption.trueColor == false) {
                 if (!domain.hasOwnProperty(colorOption.colorDim)) {
                     throw new Error(
-                        `${colorOption.colorDim} missing from ray domain object`
+                        `${colorOption.colorDim} missing from ray domain object`,
                     );
                 }
                 const [min, max] = domain[colorOption.colorDim];
-                const normalizedX =
-                    (variables[colorOption.colorDim][index] - min) /
-                    (max - min);
+                const normalizedX = (() => {
+                    if (max - min >= 0.001) {
+                        return (
+                            (variables[colorOption.colorDim][index] - min) /
+                            (max - min)
+                        );
+                    }
+                    return 0.5;
+                })();
                 color = colormap(normalizedX, CET_I2);
             } else {
                 // true color
@@ -130,7 +136,7 @@ function makeRays(
                 color[0],
                 color[1],
                 color[2],
-                THREE.SRGBColorSpace
+                THREE.SRGBColorSpace,
             );
 
             colors.push(...linear_color.toArray(), ...linear_color.toArray());
