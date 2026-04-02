@@ -23,9 +23,9 @@
     "prepare": "npm run build"
   },
   "devDependencies": {
-    "@types/three": "^0.175.0",
+    "@types/three": "^0.176.0",
     "lil-gui": "^0.20.0",
-    "three": "^0.175.0",
+    "three": "^0.176.0",
     "three-custom-shader-material": "^6.3.1",
     "tsx": "^4.19.3",
     "typescript": "~5.8.3",
