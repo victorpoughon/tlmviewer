@@ -139,7 +139,12 @@ export class TLMScene {
                 // Create the threeJS group that represents the element
                 // and store the Element object in its userData
                 const data = (type as any).parse(elementData);
-                const instance = new type(data, dim, this.container, this.scene);
+                const instance = new type(
+                    data,
+                    dim,
+                    this.container,
+                    this.scene,
+                );
                 const obj = instance.makeGroup();
                 obj.userData = instance;
                 this.sceneGraph.add(obj);

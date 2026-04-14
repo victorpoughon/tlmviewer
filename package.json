@@ -20,7 +20,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "test": "node --import tsx/esm --test **/*.test.ts"
   },
   "devDependencies": {
     "@types/three": "^0.175.0",

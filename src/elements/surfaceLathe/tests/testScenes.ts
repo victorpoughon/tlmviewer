@@ -1,9 +1,5 @@
 // Compute [sag(y), y] samples for a spherical profile: sag(y) = R - sign(R)*sqrt(R²-y²)
-function sphericalSamples(
-    R: number,
-    diameter: number,
-    N: number,
-): number[][] {
+function sphericalSamples(R: number, diameter: number, N: number): number[][] {
     const yMax = diameter / 2;
     return Array.from({ length: N }, (_, i) => {
         const y = -yMax + (i * 2 * yMax) / (N - 1);
