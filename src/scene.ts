@@ -189,15 +189,6 @@ export class TLMScene {
         );
     }
 
-    public setSurfacesVisible(visible: boolean): void {
-        this.updateElements(
-            SurfaceBaseElement,
-            (element: SurfaceBaseElement) => {
-                element.setVisible(visible);
-            },
-        );
-    }
-
     public setBcylVisible(visible: boolean): void {
         this.updateElements(BcylElement, (element: BcylElement) => {
             element.setVisible(visible);

@@ -102,11 +102,13 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
     ];
 
     protected makeGroup(): THREE.Group {
-        if (this.dim == 2) {
-            return this.makeSurface2D();
-        } else {
-            return this.makeSurface3D();
-        }
+        var group = this.dim == 2 ? this.makeSurface2D():this.makeSurface3D() ;
+
+        this.addEventListener("setSurfacesVisible", e => {
+            this.group.visible = e.value;
+        });
+
+        return group;
     }
 
     private makeSurface2D(): THREE.Group {
@@ -188,7 +190,4 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
         });
     }
 
-    public setVisible(visible: boolean): void {
-        this.group.visible = visible;
-    }
 }

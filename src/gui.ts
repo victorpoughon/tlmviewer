@@ -173,7 +173,7 @@ export class TLMGui {
             .add(this.controller, "showSurfaces")
             .name("Surfaces")
             .onChange((value: boolean) => {
-                this.scene.setSurfacesVisible(value);
+                this.scene.dispatch({type: "setSurfacesVisible", value: value});
             });
         const controllerVisibleOpticalAxis = folderShow
             .add(this.scene.opticalAxis, "visible")
