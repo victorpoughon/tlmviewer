@@ -166,8 +166,8 @@ export class RaysElement extends AbstractSceneElement {
         );
 
         this.addEventListener("setValidRaysColor", e => this.setupValidRays(e.value));
-        this.addEventListener("setBlockedRaysColor", e => this.setupValidRays(e.value));
-        this.addEventListener("setOutputRaysColor", e => this.setupValidRays(e.value));
+        this.addEventListener("setBlockedRaysColor", e => this.setupBlockedRays(e.value));
+        this.addEventListener("setOutputRaysColor", e => this.setupOutputRays(e.value));
     }
 
     public setupValidRays(color: ColorOption) {
