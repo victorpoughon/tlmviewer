@@ -121,4 +121,30 @@ export const surfaceSagScenes = [
             ],
         },
     },
+    {
+        name: "surfaceSag/xypolynomial-3D",
+        data: {
+            // coefficients[p][q] is the coefficient for y^p * z^q
+            // XY polynomial is 3D only
+            title: "Surface sag — XY polynomial (3D)",
+            mode: "3D",
+            camera: "orthographic",
+            controls: { show_optical_axis: true, show_other_axes: true },
+            data: [
+                {
+                    type: "surface-sag",
+                    diameter: 10,
+                    "sag-function": {
+                        "sag-type": "xypolynomial",
+                        coefficients: [
+                            [0, 0.05, 0], // 0.05*z
+                            [0.05, 0, 0], // 0.05*y
+                            [0.01, 0, -0.01], // 0.01*y^2 - 0.01*z^2
+                        ],
+                    },
+                    matrix: translate3D(0),
+                },
+            ],
+        },
+    },
 ];
