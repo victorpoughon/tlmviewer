@@ -9,7 +9,7 @@ const fanRays3D = Array.from({ length: 5 }, (_, i) => {
 });
 
 const fieldValues = [-2, -1, 0, 1, 2];
-const fieldDomain = { field: [-2, 2] as [number, number] };
+const fieldDomain = { field: [-2, 2] };
 const fieldVariables = { field: fieldValues };
 
 export const testData2D: any[] = [
@@ -17,8 +17,8 @@ export const testData2D: any[] = [
         type: "rays",
         points: fanRays2D,
         color: "#ffa724",
-        variables: {},
-        domain: {},
+        variables: fieldVariables,
+        domain: fieldDomain,
         layers: [0],
     },
     {
