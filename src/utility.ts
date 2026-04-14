@@ -19,3 +19,11 @@ export function getRequired<T>(obj: any, key: string): T {
         throw Error(`missing required key '${key}'`);
     }
 }
+
+// Like Array.map but for a 2D array
+export function map2d<T>(
+    array: number[][],
+    f: (value: number, p: number, q: number) => T,
+): T[][] {
+    return array.map((row, p) => row.map((value, q) => f(value, p, q)));
+}
