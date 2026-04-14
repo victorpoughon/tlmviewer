@@ -1,11 +1,11 @@
 import { test } from "node:test";
-import { surfaceSphereRScenes } from "./testScenes.ts";
+import assert from "node:assert/strict";
+import { testData2D, testData3D } from "./testData.ts";
 import { SurfaceSphereRElement } from "../SurfaceSphereRElement.ts";
 
 test("SurfaceSphereRElement.parse", () => {
-    for (const scene of surfaceSphereRScenes) {
-        for (const raw of scene.data.data.filter((d: any) => SurfaceSphereRElement.match(d))) {
-            SurfaceSphereRElement.parse(raw);
-        }
+    for (const raw of [...testData2D, ...testData3D]) {
+        assert.ok(SurfaceSphereRElement.match(raw));
+        SurfaceSphereRElement.parse(raw);
     }
 });

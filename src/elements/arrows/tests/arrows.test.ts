@@ -1,11 +1,11 @@
 import { test } from "node:test";
-import { arrowsScenes } from "./testScenes.ts";
+import assert from "node:assert/strict";
+import { testData2D, testData3D } from "./testData.ts";
 import { ArrowsElement } from "../ArrowsElement.ts";
 
 test("ArrowsElement.parse", () => {
-    for (const scene of arrowsScenes) {
-        for (const raw of scene.data.data.filter((d: any) => ArrowsElement.match(d))) {
-            ArrowsElement.parse(raw);
-        }
+    for (const raw of [...testData2D, ...testData3D]) {
+        assert.ok(ArrowsElement.match(raw));
+        ArrowsElement.parse(raw);
     }
 });

@@ -1,11 +1,11 @@
 import { test } from "node:test";
-import { raysScenes } from "./testScenes.ts";
+import assert from "node:assert/strict";
+import { testData2D, testData3D } from "./testData.ts";
 import { RaysElement } from "../RaysElement.ts";
 
 test("RaysElement.parse", () => {
-    for (const scene of raysScenes) {
-        for (const raw of scene.data.data.filter((d: any) => RaysElement.match(d))) {
-            RaysElement.parse(raw);
-        }
+    for (const raw of [...testData2D, ...testData3D]) {
+        assert.ok(RaysElement.match(raw));
+        RaysElement.parse(raw);
     }
 });
