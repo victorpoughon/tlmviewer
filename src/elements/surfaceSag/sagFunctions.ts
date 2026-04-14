@@ -16,7 +16,7 @@ export function parseSagFunction(obj: any, tau: number): SagFunction {
     } else if (type === "xypolynomial") {
         return XYPolynomialSag.fromObj(obj, tau);
     } else {
-        throw Error(`Uknown surface sag type ${type}`);
+        throw Error(`Unknown surface sag type ${type}`);
     }
 }
 

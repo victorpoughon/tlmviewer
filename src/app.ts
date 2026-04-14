@@ -41,7 +41,7 @@ export class TLMViewerApp {
         } else if (camera === "XY") {
             [this.camera, this.controls] = this.setupXYCamera();
         } else {
-            throw new Error(`Uknown camera type '${camera}'`);
+            throw new Error(`Unknown camera type '${camera}'`);
         }
 
         // Title

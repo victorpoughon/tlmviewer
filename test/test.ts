@@ -1,4 +1,5 @@
 import tlmviewer from "../src/main.ts";
+import { builtinScenes } from "../src/elements/testScenes.ts";
 
 async function fetchManifest(): Promise<any> {
     return fetch("/testscenes.json")
@@ -8,7 +9,7 @@ async function fetchManifest(): Promise<any> {
         });
 }
 
-function loadMainViewer(test_file) {
+function loadMainViewer(test_file: string) {
     const viewerElement = document.getElementById("main-viewer") as HTMLElement;
     tlmviewer.load(viewerElement, test_file);
 }
@@ -20,6 +21,25 @@ window.onload = async () => {
     console.log(`loaded ${all_tests.length} json test files from manifest`);
 
     const ul = document.getElementById("tests-list") as HTMLElement;
+
+    // Add built-in test scenes
+    for (const { name, data } of builtinScenes) {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = "#";
+        a.textContent = `[builtin] ${name}`;
+        a.addEventListener("click", (event) => {
+            event.preventDefault();
+            const viewerElement = document.getElementById(
+                "main-viewer",
+            ) as HTMLElement;
+            tlmviewer.embed(viewerElement, JSON.stringify(data));
+        });
+        li.appendChild(a);
+        ul.appendChild(li);
+    }
+
+    // Add json test scenes
     for (const test_file of all_tests) {
         const li = document.createElement("li");
         const a = document.createElement("a");
