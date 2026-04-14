@@ -15,5 +15,5 @@ export type ViewerEvent =
           visible: boolean;
       }
     | { type: "setBcylVisible"; value: boolean }
-    | { type: "setBackground"; value: THREE.Color }
-    | { type: "resetView" };
+    | { type: "setBackground"; value: THREE.Color }  // TODO
+    | { type: "resetView" };  // TODO

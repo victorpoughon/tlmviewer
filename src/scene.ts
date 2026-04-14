@@ -8,17 +8,15 @@ import {
     ArrowsElement,
     BcylElement,
     Box3DElement,
-    ColorOption,
     PointsElement,
     RaysElement,
-    SurfaceBaseElement,
     SurfaceLatheElement,
     SurfacePlaneElement,
     SurfaceSagElement,
     SurfaceSphereRElement,
 } from "./elements/index.ts";
-import { makeLine2 } from "./lineUtils.ts";
 import { ViewerEvent } from "./viewerEvent.ts";
+import { SceneAxisElement } from "./elements/sceneAxis/SceneAxisElement.ts";
 
 // Extract available variables from the scene
 function extractVariables(root: any): string[] {
@@ -68,9 +66,6 @@ export class TLMScene {
     public ambientLight: THREE.Light;
     public directionalLight: THREE.Light;
 
-    public opticalAxis: THREE.Group;
-    public otherAxes: THREE.Group;
-
     public scene: THREE.Scene;
 
     public variables: string[];
@@ -87,25 +82,50 @@ export class TLMScene {
         this.sceneGraph = new THREE.Group();
         this.initSceneGraph(dim);
 
-        // Setup axes helper
-        this.otherAxes = new THREE.Group();
-        if (dim == 2) {
-            this.otherAxes.add(makeLine2([0, -500, 0], [0, 500, 0], "#e3e3e3"));
-        } else if (dim == 3) {
-            const axesHelper = new THREE.AxesHelper(5);
-            this.otherAxes.add(axesHelper);
-        }
-
         // Setup optical axis
-        this.opticalAxis = new THREE.Group();
-        this.opticalAxis.add(makeLine2([-500, 0, 0], [500, 0, 0], "#e3e3e3"));
+        const opticalAxis = new SceneAxisElement(
+            { axis: "x", length: 500, color: "#e3e3e3" },
+            dim,
+            container,
+            this.scene,
+        );
+        opticalAxis.group.userData = opticalAxis;
+        this.sceneGraph.add(opticalAxis.group);
+
+        // Other axes
+        if (dim == 2) {
+            const axisY = new SceneAxisElement(
+                { axis: "y", length: 500, color: "#e3e3e3" },
+                dim,
+                container,
+                this.scene,
+            );
+            axisY.group.userData = axisY; // TODO this could be automatic?
+            this.sceneGraph.add(axisY.group);
+        } else if (dim == 3) {
+            const axisY = new SceneAxisElement(
+                { axis: "y", length: 10, color: "#C80000" },
+                dim,
+                container,
+                this.scene,
+            );
+            axisY.group.userData = axisY; // TODO this could be automatic?
+            this.sceneGraph.add(axisY.group);
+
+            const axisZ = new SceneAxisElement(
+                { axis: "z", length: 10, color: "#00C800" },
+                dim,
+                container,
+                this.scene,
+            );
+            axisZ.group.userData = axisZ; // TODO this could be automatic?
+            this.sceneGraph.add(axisZ.group);
+        }
 
         // Title
         this.title = root.title ?? "";
 
         // Setup the actual THREE scene
-        this.scene.add(this.otherAxes);
-        this.scene.add(this.opticalAxis);
 
         this.scene.add(this.sceneGraph);
 
@@ -115,10 +135,6 @@ export class TLMScene {
         this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
         this.directionalLight.position.set(100, 100, 100);
         this.scene.add(this.directionalLight);
-
-        // Default for gui
-        this.opticalAxis.visible = false;
-        this.otherAxes.visible = false;
     }
 
     public initSceneGraph(dim: number) {

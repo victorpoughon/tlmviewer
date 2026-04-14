@@ -11,6 +11,22 @@ export function get_default(obj: any, key: string, options: string[]): string {
     return value;
 }
 
+// Get a required key that must have a value within a list of options
+export function getOption<T extends string>(
+    obj: any,
+    key: string,
+    options: readonly T[],
+): T {
+    if (!obj.hasOwnProperty(key)) {
+        throw new Error(`missing required key '${key}'`);
+    }
+    const value = obj[key];
+    if (options.indexOf(value) === -1) {
+        throw new Error(`${key} must be one of ${options}`);
+    }
+    return value as T;
+}
+
 // Get a required key
 export function getRequired<T>(obj: any, key: string): T {
     if (obj.hasOwnProperty(key)) {
