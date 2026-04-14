@@ -89,6 +89,9 @@ export class TLMGui {
             backgroundColor: { r: 0, g: 0, b: 0 },
             surfacesColor: { r: 0, g: 1, b: 1 },
 
+            showOpticalAxis: false,
+            showOtherAxes: false,
+
             showSurfaces: true,
             showKinematicJoints: false,
             showBcyl: false,
@@ -176,11 +179,18 @@ export class TLMGui {
                 this.scene.dispatch({type: "setSurfacesVisible", value: value});
             });
         const controllerVisibleOpticalAxis = folderShow
-            .add(this.scene.opticalAxis, "visible")
-            .name("Optical axis");
+            .add(this.controller, "showOpticalAxis")
+            .name("Optical axis")
+            .onChange((value: boolean) => {
+                this.scene.dispatch({type: "setAxisVisible", axis: "x", visible: value});
+            });
         const controllerVisibleOtherAxes = folderShow
-            .add(this.scene.otherAxes, "visible")
-            .name("Other axes");
+            .add(this.controller, "showOtherAxes")
+            .name("Other axes")
+            .onChange((value: boolean) => {
+                this.scene.dispatch({type: "setAxisVisible", axis: "y", visible: value});
+                this.scene.dispatch({type: "setAxisVisible", axis: "z", visible: value});
+            });
         const controllerVisibleKinematicJoints = folderShow
             .add(this.controller, "showKinematicJoints")
             .name("Kinematic joints");
@@ -188,7 +198,7 @@ export class TLMGui {
             .add(this.controller, "showBcyl")
             .name("Bounding Cylinders")
             .onChange((value: boolean) => {
-                this.scene.setBcylVisible(value);
+                this.scene.dispatch({type: "setBcylVisible", value: value});
             });
         folderShow.onChange((_: Object) => {
             this.updateCameraLayers();
@@ -231,7 +241,7 @@ export class TLMGui {
 
         this.updateCameraLayers();
 
-        this.scene.setBcylVisible(false);
+        this.scene.dispatch({type: "setBcylVisible", value: false});
 
         this.gui.open(false);
         this.folders.colors.open(true);

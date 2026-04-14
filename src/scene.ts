@@ -180,12 +180,6 @@ export class TLMScene {
         });
     }
 
-    public setBcylVisible(visible: boolean): void {
-        this.updateElements(BcylElement, (element: BcylElement) => {
-            element.setVisible(visible);
-        });
-    }
-
     public getBB(): THREE.Box3 {
         const bbox = new THREE.Box3();
         bbox.union(new THREE.Box3().setFromObject(this.sceneGraph));

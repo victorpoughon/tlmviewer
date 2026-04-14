@@ -11,7 +11,8 @@ export type ViewerEvent =
     | { type: "setSurfacesColor"; value: THREE.Color }
     | {
           type: "setAxisVisible";
-          value: { axis: "x" | "coordinate"; visible: boolean };
+          axis: "x" | "y" | "z";
+          visible: boolean;
       }
     | { type: "setBcylVisible"; value: boolean }
     | { type: "setBackground"; value: THREE.Color }

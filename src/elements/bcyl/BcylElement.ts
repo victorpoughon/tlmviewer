@@ -61,6 +61,10 @@ export class BcylElement extends AbstractSceneElement {
         super(dim, container, threeScene);
         this.data = data;
         this.group = this.makeGroup();
+
+        this.addEventListener("setBcylVisible", (e)=> {
+            this.group.visible = e.value;
+        })
     }
 
     // True if the given scene element data object matches this class
@@ -136,7 +140,5 @@ export class BcylElement extends AbstractSceneElement {
         return group;
     }
 
-    public setVisible(visible: boolean): void {
-        this.group.visible = visible;
-    }
+    
 }
