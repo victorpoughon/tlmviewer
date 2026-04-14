@@ -4,9 +4,7 @@ import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 
-import { CET_I2 } from "../../CET_I2.ts";
-import { colormap } from "../../color.ts";
-import { wavelengthToRgb } from "../../true_color.ts";
+import { CET_I2, colormap, wavelengthToRgb } from "../../color/index.ts";
 
 import { getRequired } from "../../utility.ts";
 
