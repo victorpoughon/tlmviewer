@@ -165,7 +165,7 @@ export class TLMGui {
             .name("Surfaces")
             .onChange((value: RGBColor) => {
                 const color = new THREE.Color(value.r, value.g, value.b);
-                this.scene.setSurfacesColor(color);
+                this.scene.dispatch({type: "setSurfacesColor", value: color});
             });
 
         const folderShow = this.gui.addFolder("Visible");

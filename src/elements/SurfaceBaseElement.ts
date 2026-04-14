@@ -108,6 +108,10 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
             this.group.visible = e.value;
         });
 
+        this.addEventListener("setSurfacesColor", e => {
+            this.setColor(e.value);
+        });
+
         return group;
     }
 

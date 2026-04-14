@@ -180,15 +180,6 @@ export class TLMScene {
         });
     }
 
-    public setSurfacesColor(color: THREE.Color): void {
-        this.updateElements(
-            SurfaceBaseElement,
-            (element: SurfaceBaseElement) => {
-                element.setColor(color);
-            },
-        );
-    }
-
     public setBcylVisible(visible: boolean): void {
         this.updateElements(BcylElement, (element: BcylElement) => {
             element.setVisible(visible);
