@@ -180,27 +180,6 @@ export class TLMScene {
         });
     }
 
-    public setupValidRays(color: ColorOption) {
-        this.setRaysColorOption(0, color);
-        this.setRaysColorOption(1, color);
-    }
-
-    public setupBlockedRays(color: ColorOption) {
-        this.setRaysColorOption(2, color);
-    }
-
-    public setupOutputRays(color: ColorOption) {
-        this.setRaysColorOption(3, color);
-    }
-
-    public setRaysColorOption(layer: number, color: ColorOption) {
-        this.updateElements(RaysElement, (element: RaysElement) => {
-            if (element.layer === layer) {
-                element.setColorOption(color);
-            }
-        });
-    }
-
     public setSurfacesColor(color: THREE.Color): void {
         this.updateElements(
             SurfaceBaseElement,

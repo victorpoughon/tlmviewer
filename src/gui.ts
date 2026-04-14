@@ -131,19 +131,19 @@ export class TLMGui {
             });
 
         controllerColorsValidRays.onChange((value: ColorOption) => {
-            this.scene.setupValidRays(value);
+            this.scene.dispatch({type: "setValidRaysColor", value});
             this.scene.dispatch({ type: "setRaysOpacity", value: controllerColorsOpacity.getValue() });
             this.scene.dispatch({ type: "setRaysThickness", value: controllerColorsThickness.getValue() });
         });
 
         controllerColorsBlockedRays.onChange((value: ColorOption) => {
-            this.scene.setupBlockedRays(value);
+            this.scene.dispatch({type: "setBlockedRaysColor", value});
             this.scene.dispatch({ type: "setRaysOpacity", value: controllerColorsOpacity.getValue() });
             this.scene.dispatch({ type: "setRaysThickness", value: controllerColorsThickness.getValue() });
         });
 
         controllerColorsOutputRays.onChange((value: ColorOption) => {
-            this.scene.setupOutputRays(value);
+            this.scene.dispatch({type: "setOutputRaysColor", value});
             this.scene.dispatch({ type: "setRaysOpacity", value: controllerColorsOpacity.getValue() });
             this.scene.dispatch({ type: "setRaysThickness", value: controllerColorsThickness.getValue() });
         });
@@ -225,9 +225,9 @@ export class TLMGui {
 
     public setDefaultGUIState() {
         // Set default GUI state
-        this.scene.setupValidRays(this.controller.validColor);
-        this.scene.setupBlockedRays(this.controller.blockedColor);
-        this.scene.setupOutputRays(this.controller.outputColor);
+        this.scene.dispatch({type: "setValidRaysColor", value: this.controller.validColor});
+        this.scene.dispatch({type: "setBlockedRaysColor", value: this.controller.validColor});
+        this.scene.dispatch({type: "setOutputRaysColor", value: this.controller.outputColor});
 
         this.updateCameraLayers();
 
