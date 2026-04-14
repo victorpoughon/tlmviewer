@@ -17,6 +17,7 @@ import {
 } from "./elements/index.ts";
 import { ViewerEvent } from "./viewerEvent.ts";
 import { SceneAxisElement } from "./elements/sceneAxis/SceneAxisElement.ts";
+import { defaultSceneElementsData } from "./elements/defaultSceneElements.ts";
 
 // Extract available variables from the scene
 function extractVariables(root: any): string[] {
@@ -83,7 +84,7 @@ export class TLMScene {
         this.sceneGraph = new THREE.Group();
         this.initSceneGraph(dim);
 
-        this.addDefaultSceneElements(dim, container);
+        this.addDefaultSceneElements(dim);
 
         // Title
         this.title = root.title ?? "";
@@ -99,45 +100,16 @@ export class TLMScene {
         this.scene.add(this.directionalLight);
     }
 
-    public addDefaultSceneElements(dim: number, container: HTMLElement) {
-        // Setup optical axis
-        const opticalAxis = new SceneAxisElement(
-            { axis: "x", length: 500, color: "#e3e3e3" },
-            dim,
-            container,
-            this.scene,
-        );
-        opticalAxis.group.userData = opticalAxis;
-        this.sceneGraph.add(opticalAxis.group);
-
-        // Other axes
-        if (dim == 2) {
-            const axisY = new SceneAxisElement(
-                { axis: "y", length: 500, color: "#e3e3e3" },
-                dim,
-                container,
-                this.scene,
-            );
-            axisY.group.userData = axisY; // TODO this could be automatic?
-            this.sceneGraph.add(axisY.group);
-        } else if (dim == 3) {
-            const axisY = new SceneAxisElement(
-                { axis: "y", length: 10, color: "#C80000" },
-                dim,
-                container,
-                this.scene,
-            );
-            axisY.group.userData = axisY; // TODO this could be automatic?
-            this.sceneGraph.add(axisY.group);
-
-            const axisZ = new SceneAxisElement(
-                { axis: "z", length: 10, color: "#00C800" },
-                dim,
-                container,
-                this.scene,
-            );
-            axisZ.group.userData = axisZ; // TODO this could be automatic?
-            this.sceneGraph.add(axisZ.group);
+    public addDefaultSceneElements(dim: number) {
+        for (const elementData of defaultSceneElementsData(dim)) {
+            for (const type of matchingElementTypes(elementData)) {
+                const data = (type as any).parse(elementData);
+                const instance = new type(data, dim, this.container, this.scene);
+                if (instance.group) {
+                    instance.group.userData = instance;
+                    this.sceneGraph.add(instance.group);
+                }
+            }
         }
     }
 
