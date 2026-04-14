@@ -1,0 +1,12 @@
+export { AbstractSceneElement } from "./AbstractSceneElement.ts";
+export { SurfaceBaseElement } from "./SurfaceBaseElement.ts";
+export { ArrowsElement } from "./arrows/ArrowsElement.ts";
+export { BcylElement } from "./bcyl/BcylElement.ts";
+export { Box3DElement } from "./box3D/Box3DElement.ts";
+export { PointsElement } from "./points/PointsElement.ts";
+export { RaysElement } from "./rays/RaysElement.ts";
+export type { ColorOption } from "./rays/RaysElement.ts";
+export { SurfaceLatheElement } from "./surfaceLathe/SurfaceLatheElement.ts";
+export { SurfacePlaneElement } from "./surfacePlane/SurfacePlaneElement.ts";
+export { SurfaceSphereRElement } from "./surfaceSphereR/SurfaceSphereRElement.ts";
+export { SurfaceSagElement } from "./surfaceSag/SurfaceSagElement.ts";

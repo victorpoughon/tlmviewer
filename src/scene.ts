@@ -3,18 +3,21 @@ import * as THREE from "three";
 import { getRequired } from "./utility.ts";
 
 // Scene elements
-import { AbstractSceneElement } from "./elements/AbstractSceneElement.ts";
-import { ArrowsElement } from "./elements/arrows/ArrowsElement.ts";
-import { PointsElement } from "./elements/points/PointsElement.ts";
-import { SurfaceBaseElement } from "./elements/SurfaceBaseElement.ts";
-import { SurfaceLatheElement } from "./elements/surfaceLathe/SurfaceLatheElement.ts";
-import { SurfacePlaneElement } from "./elements/surfacePlane/SurfacePlaneElement.ts";
-import { SurfaceSphereRElement } from "./elements/surfaceSphereR/SurfaceSphereRElement.ts";
-import { SurfaceSagElement } from "./elements/surfaceSag/SurfaceSagElement.ts";
-import { BcylElement } from "./elements/bcyl/BcylElement.ts";
-import { Box3DElement } from "./elements/box3D/Box3DElement.ts";
+import {
+    AbstractSceneElement,
+    ArrowsElement,
+    BcylElement,
+    Box3DElement,
+    ColorOption,
+    PointsElement,
+    RaysElement,
+    SurfaceBaseElement,
+    SurfaceLatheElement,
+    SurfacePlaneElement,
+    SurfaceSagElement,
+    SurfaceSphereRElement,
+} from "./elements/index.ts";
 import { makeLine2 } from "./lineUtils.ts";
-import { RaysElement, ColorOption } from "./elements/rays/RaysElement.ts";
 
 // Extract available variables from the scene
 function extractVariables(root: any): string[] {
