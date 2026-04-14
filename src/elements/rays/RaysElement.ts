@@ -11,6 +11,7 @@ import { getRequired } from "../../utility.ts";
 import { AbstractSceneElement } from "../AbstractSceneElement.ts";
 
 // Color option
+// TODO move to viewerEvent.ts?
 export type ColorOption = {
     show: boolean;
     colorDim: string | null;
@@ -154,6 +155,15 @@ export class RaysElement extends AbstractSceneElement {
         this.data = data;
         this.layer = data.layers[0];
         this.group = this.makeGroup();
+
+        // Register event handlers
+        this.addEventListener("setRaysOpacity", (e) =>
+            this.setOpacity(e.value),
+        );
+
+        this.addEventListener("setRaysThickness", (e) =>
+            this.setThickness(e.value),
+        );
     }
 
     public static match(elementData: any): boolean {

@@ -18,6 +18,7 @@ import {
     SurfaceSphereRElement,
 } from "./elements/index.ts";
 import { makeLine2 } from "./lineUtils.ts";
+import { ViewerEvent } from "./viewerEvent.ts";
 
 // Extract available variables from the scene
 function extractVariables(root: any): string[] {
@@ -149,7 +150,9 @@ export class TLMScene {
                     instance.group.userData = instance;
                     this.sceneGraph.add(instance.group);
                 } else {
-                    console.warn(`tlmviewer: Element did not create a scene group: ${JSON.stringify(elementData)}`);
+                    console.warn(
+                        `tlmviewer: Element did not create a scene group: ${JSON.stringify(elementData)}`,
+                    );
                 }
             }
         }
@@ -165,6 +168,14 @@ export class TLMScene {
             if (child.userData instanceof type) {
                 const element = child.userData as T;
                 f(element);
+            }
+        });
+    }
+
+    public dispatch(event: ViewerEvent): void {
+        this.sceneGraph.traverse((child: THREE.Object3D) => {
+            if (child.userData instanceof AbstractSceneElement) {
+                child.userData.onEvent(event);
             }
         });
     }
@@ -187,18 +198,6 @@ export class TLMScene {
             if (element.layer === layer) {
                 element.setColorOption(color);
             }
-        });
-    }
-
-    public setRaysOpacity(opacity: number): void {
-        this.updateElements(RaysElement, (element: RaysElement) => {
-            element.setOpacity(opacity);
-        });
-    }
-
-    public setRaysThickness(thickness: number): void {
-        this.updateElements(RaysElement, (element: RaysElement) => {
-            element.setThickness(thickness);
         });
     }
 

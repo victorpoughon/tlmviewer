@@ -195,19 +195,6 @@ this.addEventListener("setRaysThickness", (e) => {
 });
 ```
 
-Note: elements need access to their own group inside handlers. The simplest
-approach is to store the group reference returned by `makeGroup()`:
-
-```typescript
-public group!: THREE.Group;
-
-public makeGroup(): THREE.Group {
-    this.group = new THREE.Group();
-    // ... build geometry
-    return this.group;
-}
-```
-
 ### Step 3 — Add `dispatch` to `TLMScene`
 
 ```typescript

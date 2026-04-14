@@ -1,10 +1,12 @@
 import * as THREE from "three";
+import { ViewerEvent } from "../viewerEvent";
 
 export abstract class AbstractSceneElement {
     readonly dim: number;
     readonly container: HTMLElement;
     readonly threeScene: THREE.Scene;
     public group!: THREE.Group;
+    private eventHandlers = new Map<string, (event: any) => void>();
 
     constructor(dim: number, container: HTMLElement, threeScene: THREE.Scene) {
         this.dim = dim;
@@ -15,5 +17,16 @@ export abstract class AbstractSceneElement {
     // True if the given scene element data object matches this class
     public static match(_elementData: any): boolean {
         return false;
+    }
+
+    protected addEventListener<K extends ViewerEvent["type"]>(
+        type: K,
+        handler: (event: Extract<ViewerEvent, { type: K }>) => void,
+    ): void {
+        this.eventHandlers.set(type, handler);
+    }
+
+    public onEvent(event: ViewerEvent): void {
+        this.eventHandlers.get(event.type)?.(event);
     }
 }

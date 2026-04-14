@@ -120,32 +120,32 @@ export class TLMGui {
             .add(this.controller, "raysOpacity", 0, 1)
             .name("Opacity")
             .onFinishChange((value: number) => {
-                this.scene.setRaysOpacity(value);
+                this.scene.dispatch({ type: "setRaysOpacity", value: value });
             });
 
         const controllerColorsThickness = folderColors
             .add(this.controller, "raysThickness", 0.1, 10)
             .name("Thickness")
             .onFinishChange((value: number) => {
-                this.scene.setRaysThickness(value);
+                this.scene.dispatch({ type: "setRaysThickness", value: value });
             });
 
         controllerColorsValidRays.onChange((value: ColorOption) => {
             this.scene.setupValidRays(value);
-            this.scene.setRaysOpacity(controllerColorsOpacity.getValue());
-            this.scene.setRaysThickness(controllerColorsThickness.getValue());
+            this.scene.dispatch({ type: "setRaysOpacity", value: controllerColorsOpacity.getValue() });
+            this.scene.dispatch({ type: "setRaysThickness", value: controllerColorsThickness.getValue() });
         });
 
         controllerColorsBlockedRays.onChange((value: ColorOption) => {
             this.scene.setupBlockedRays(value);
-            this.scene.setRaysOpacity(controllerColorsOpacity.getValue());
-            this.scene.setRaysThickness(controllerColorsThickness.getValue());
+            this.scene.dispatch({ type: "setRaysOpacity", value: controllerColorsOpacity.getValue() });
+            this.scene.dispatch({ type: "setRaysThickness", value: controllerColorsThickness.getValue() });
         });
 
         controllerColorsOutputRays.onChange((value: ColorOption) => {
             this.scene.setupOutputRays(value);
-            this.scene.setRaysOpacity(controllerColorsOpacity.getValue());
-            this.scene.setRaysThickness(controllerColorsThickness.getValue());
+            this.scene.dispatch({ type: "setRaysOpacity", value: controllerColorsOpacity.getValue() });
+            this.scene.dispatch({ type: "setRaysThickness", value: controllerColorsThickness.getValue() });
         });
 
         const controllerColorsBackground = folderColors
