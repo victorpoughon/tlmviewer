@@ -9,15 +9,15 @@ import { testData2D as surfaceSphereRData2D, testData3D as surfaceSphereRData3D 
 import { testData2D as surfaceSagData2D, testData3D as surfaceSagData3D } from "./surfaceSag/tests/testData.ts";
 
 function buildScene(
-    name: string,
+    sceneName: string,
     mode: "2D" | "3D",
     elements: any[],
-): { name: string; data: object } {
+): { sceneName: string; data: object } {
     const camera = mode === "2D" ? "XY" : "orthographic";
-    return { name, data: { title: name, mode, camera, data: elements } };
+    return { sceneName: sceneName, data: { title: sceneName, mode, camera, data: elements, controls: {show_optical_axis: "true", show_bounding_cylinders: "true"} } };
 }
 
-export const builtinScenes: Array<{ name: string; data: object }> = [
+export const builtinScenes: Array<{ sceneName: string; data: object }> = [
     buildScene("arrows/2D", "2D", arrowsData2D),
     buildScene("arrows/3D", "3D", arrowsData3D),
     buildScene("bcyl/2D", "2D", bcylData2D),

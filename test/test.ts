@@ -23,11 +23,11 @@ window.onload = async () => {
     const ul = document.getElementById("tests-list") as HTMLElement;
 
     // Add built-in test scenes
-    for (const { name, data } of builtinScenes) {
+    for (const { sceneName, data } of builtinScenes) {
         const li = document.createElement("li");
         const a = document.createElement("a");
         a.href = "#";
-        a.textContent = `[builtin] ${name}`;
+        a.textContent = `[builtin] ${sceneName}`;
         a.addEventListener("click", (event) => {
             event.preventDefault();
             const viewerElement = document.getElementById(
