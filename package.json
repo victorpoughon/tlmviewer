@@ -24,6 +24,7 @@
     "test": "node --import tsx/esm --test **/*.test.ts"
   },
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "@types/three": "^0.175.0",
     "lil-gui": "^0.20.0",
     "three": "^0.175.0",
