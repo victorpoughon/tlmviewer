@@ -1,14 +1,14 @@
 import * as THREE from "three";
 
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../../utility.ts";
 
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 
-import { arrayToMatrix4, homogeneousMatrix3to4 } from "./SurfaceBaseElement.ts";
+import { arrayToMatrix4, homogeneousMatrix3to4 } from "../SurfaceBaseElement.ts";
 
-import { AbstractSceneElement } from "./AbstractSceneElement.ts";
+import { AbstractSceneElement } from "../AbstractSceneElement.ts";
 
 // Create a circle centered at (x, 0, 0) in the YZ plane with a LineSegmentsGeometry
 function circleGeometry(x: number, radius: number): LineSegmentsGeometry {

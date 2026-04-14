@@ -1,10 +1,10 @@
 import * as THREE from "three";
 
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../../utility.ts";
 
-import { arrayToMatrix4 } from "./SurfaceBaseElement.ts";
+import { arrayToMatrix4 } from "../SurfaceBaseElement.ts";
 
-import { AbstractSceneElement } from "./AbstractSceneElement.ts";
+import { AbstractSceneElement } from "../AbstractSceneElement.ts";
 
 // A 3D only box
 export class Box3DElement extends AbstractSceneElement {

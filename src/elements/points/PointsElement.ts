@@ -1,8 +1,8 @@
 import * as THREE from "three";
 
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../../utility.ts";
 
-import { AbstractSceneElement } from "./AbstractSceneElement.ts";
+import { AbstractSceneElement } from "../AbstractSceneElement.ts";
 
 function applyLayerGroup(obj: THREE.Object3D, layers: Array<number>) {
     obj.traverse((child) => {

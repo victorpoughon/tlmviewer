@@ -1,10 +1,10 @@
 import * as THREE from "three";
 
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
-import { SurfaceBaseElement, samples2DToPoints } from "./SurfaceBaseElement.ts";
+import { SurfaceBaseElement, samples2DToPoints } from "../SurfaceBaseElement.ts";
 
 export class SurfaceLatheElement extends SurfaceBaseElement {
     constructor(elementData: any, dim: number) {

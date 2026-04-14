@@ -1,8 +1,8 @@
 import * as THREE from "three";
 
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../../utility.ts";
 
-import { AbstractSceneElement } from "./AbstractSceneElement.ts";
+import { AbstractSceneElement } from "../AbstractSceneElement.ts";
 
 export class ArrowsElement extends AbstractSceneElement {
     constructor(elementData: any, dim: number) {

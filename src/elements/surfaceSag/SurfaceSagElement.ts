@@ -1,10 +1,10 @@
 import * as THREE from "three";
 
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
-import { SurfaceBaseElement } from "./SurfaceBaseElement.ts";
+import { SurfaceBaseElement } from "../SurfaceBaseElement.ts";
 
 // Generate line geometry by sampling a sag function in 2D
 function sagGeometry2D(

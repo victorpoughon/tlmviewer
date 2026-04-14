@@ -4,17 +4,17 @@ import { getRequired } from "./utility.ts";
 
 // Scene elements
 import { AbstractSceneElement } from "./elements/AbstractSceneElement.ts";
-import { ArrowsElement } from "./elements/ArrowsElement.ts";
-import { PointsElement } from "./elements/PointsElement.ts";
+import { ArrowsElement } from "./elements/arrows/ArrowsElement.ts";
+import { PointsElement } from "./elements/points/PointsElement.ts";
 import { SurfaceBaseElement } from "./elements/SurfaceBaseElement.ts";
-import { SurfaceLatheElement } from "./elements/SurfaceLatheElement.ts";
-import { SurfacePlaneElement } from "./elements/SurfacePlaneElement.ts";
-import { SurfaceSphereRElement } from "./elements/SurfaceSphereRElement.ts";
-import { SurfaceSagElement } from "./elements/SurfaceSagElement.ts";
-import { BcylElement } from "./elements/BcylElement.ts";
-import { Box3DElement } from "./elements/Box3DElement.ts";
+import { SurfaceLatheElement } from "./elements/surfaceLathe/SurfaceLatheElement.ts";
+import { SurfacePlaneElement } from "./elements/surfacePlane/SurfacePlaneElement.ts";
+import { SurfaceSphereRElement } from "./elements/surfaceSphereR/SurfaceSphereRElement.ts";
+import { SurfaceSagElement } from "./elements/surfaceSag/SurfaceSagElement.ts";
+import { BcylElement } from "./elements/bcyl/BcylElement.ts";
+import { Box3DElement } from "./elements/box3D/Box3DElement.ts";
 import { makeLine2 } from "./lineUtils.ts";
-import { RaysElement, ColorOption } from "./elements/RaysElement.ts";
+import { RaysElement, ColorOption } from "./elements/rays/RaysElement.ts";
 
 // Extract available variables from the scene
 function extractVariables(root: any): string[] {
