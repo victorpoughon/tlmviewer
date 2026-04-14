@@ -11,9 +11,11 @@ import { SurfacePlaneElement } from "./surfacePlane/SurfacePlaneElement.ts";
 import { SurfaceSphereRElement } from "./surfaceSphereR/SurfaceSphereRElement.ts";
 import { SurfaceSagElement } from "./surfaceSag/SurfaceSagElement.ts";
 import { SceneAxisElement } from "./sceneAxis/SceneAxisElement.ts";
+import { AmbientLight } from "./lights/AmbientLight.ts";
 
 export {
     AbstractSceneElement,
+    AmbientLight,
     ArrowsElement,
     BcylElement,
     Box3DElement,
@@ -29,6 +31,7 @@ export {
 };
 
 const _allSceneElementTypes = [
+    AmbientLight,
     ArrowsElement,
     BcylElement,
     Box3DElement,

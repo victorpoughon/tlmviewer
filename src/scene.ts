@@ -32,9 +32,6 @@ export class TLMScene {
     // Model
     public sceneGraph: THREE.Group;
 
-    public ambientLight: THREE.Light;
-    public directionalLight: THREE.Light;
-
     public scene: THREE.Scene;
 
     public variables: string[];
@@ -59,19 +56,30 @@ export class TLMScene {
         // Setup the actual THREE scene
         this.scene.add(this.sceneGraph);
 
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        this.scene.add(this.ambientLight);
-
-        this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        this.directionalLight.position.set(100, 100, 100);
-        this.scene.add(this.directionalLight);
+        // this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        // this.directionalLight.position.set(100, 100, 100);
+        // this.scene.add(this.directionalLight);
     }
 
     public addDefaultSceneElements(dim: number) {
         for (const elementData of defaultSceneElementsData(dim)) {
-            for (const type of matchingElementTypes(elementData)) {
+            const matches = matchingElementTypes(elementData);
+
+            // Emit a warning for unknown element types
+            if (matches.length === 0) {
+                console.warn(
+                    `tlmviewer: Unknown scene element ${JSON.stringify(elementData)}`,
+                );
+            }
+
+            for (const type of matches) {
                 const data = (type as any).parse(elementData);
-                const instance = new type(data, dim, this.container, this.scene);
+                const instance = new type(
+                    data,
+                    dim,
+                    this.container,
+                    this.scene,
+                );
                 if (instance.group) {
                     instance.group.userData = instance;
                     this.sceneGraph.add(instance.group);
