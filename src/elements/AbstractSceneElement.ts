@@ -1,12 +1,14 @@
 import * as THREE from "three";
 
 export abstract class AbstractSceneElement {
-    readonly elementData: any;
     readonly dim: number;
+    readonly container: HTMLElement;
+    readonly threeScene: THREE.Scene;
 
-    constructor(elementData: any, dim: number) {
-        this.elementData = elementData;
+    constructor(dim: number, container: HTMLElement, threeScene: THREE.Scene) {
         this.dim = dim;
+        this.container = container;
+        this.threeScene = threeScene;
     }
 
     // True if the given scene element data object matches this class

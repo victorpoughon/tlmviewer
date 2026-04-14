@@ -4,11 +4,35 @@ import { getRequired } from "../../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
-import { SurfaceBaseElement, samples2DToPoints } from "../SurfaceBaseElement.ts";
+import {
+    SurfaceBaseElement,
+    SurfaceBaseData,
+    parseSurfaceBaseData,
+    samples2DToPoints,
+} from "../SurfaceBaseElement.ts";
+
+interface SurfaceLatheData extends SurfaceBaseData {
+    samples: number[][];
+}
 
 export class SurfaceLatheElement extends SurfaceBaseElement {
-    constructor(elementData: any, dim: number) {
-        super(elementData, dim);
+    readonly data: SurfaceLatheData;
+
+    static parse(raw: any): SurfaceLatheData {
+        return {
+            ...parseSurfaceBaseData(raw),
+            samples: getRequired<number[][]>(raw, "samples"),
+        };
+    }
+
+    constructor(
+        data: SurfaceLatheData,
+        dim: number,
+        container: HTMLElement,
+        threeScene: THREE.Scene,
+    ) {
+        super(data, dim, container, threeScene);
+        this.data = data;
     }
 
     public static match(elementData: any): boolean {
@@ -20,8 +44,7 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
         LineGeometry, // geometry
         THREE.Matrix4, // transform
     ] {
-        const samples = getRequired<number[][]>(this.elementData, "samples");
-        const points = samples2DToPoints(samples);
+        const points = samples2DToPoints(this.data.samples);
 
         const geometry = new LineGeometry();
         geometry.setPositions(points);
@@ -35,10 +58,6 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
         string | null,
     ] {
         const userTransform = this.getTransform3D();
-        const samples: Array<Array<number>> = getRequired<number[][]>(
-            this.elementData,
-            "samples",
-        );
 
         const segments = 50;
         // threejs lathe surface makes a revolution around the Y axis
@@ -57,7 +76,9 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
         const transform = new THREE.Matrix4();
         transform.multiplyMatrices(userTransform, flip);
 
-        const tpoints = samples.map((p) => new THREE.Vector2(p[1], p[0]));
+        const tpoints = this.data.samples.map(
+            (p) => new THREE.Vector2(p[1], p[0]),
+        );
 
         const geometry = new THREE.LatheGeometry(tpoints, segments);
 

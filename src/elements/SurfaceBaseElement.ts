@@ -52,26 +52,42 @@ export function samples2DToPoints(samples: Array<Array<number>>) {
     return points;
 }
 
+export interface SurfaceBaseData {
+    matrix: number[][];
+    clipPlanes?: [number, number, number, number][];
+}
+
+export function parseSurfaceBaseData(raw: any): SurfaceBaseData {
+    return {
+        matrix: getRequired<number[][]>(raw, "matrix"),
+        clipPlanes: raw.clip_planes,
+    };
+}
+
 export abstract class SurfaceBaseElement extends AbstractSceneElement {
-    constructor(elementData: any, dim: number) {
-        super(elementData, dim);
+    private readonly baseData: SurfaceBaseData;
+
+    constructor(
+        baseData: SurfaceBaseData,
+        dim: number,
+        container: HTMLElement,
+        threeScene: THREE.Scene,
+    ) {
+        super(dim, container, threeScene);
+        this.baseData = baseData;
     }
 
     // Get the Matrix4 tranform from the element data
     // Expecting a 2D transform
     public getTransform2D(): THREE.Matrix4 {
-        const matrix3 = getRequired<number[][]>(this.elementData, "matrix");
-        // TODO more error checking on matrix3 array shape here
-        const matrix4 = homogeneousMatrix3to4(matrix3);
+        const matrix4 = homogeneousMatrix3to4(this.baseData.matrix);
         return arrayToMatrix4(matrix4);
     }
 
     // Get the Matrix4 tranform from the element data
     // Expecting a 3D transform
     public getTransform3D(): THREE.Matrix4 {
-        const matrix4 = getRequired<number[][]>(this.elementData, "matrix");
-        // TODO more error checking on matrix4 array shape here
-        return arrayToMatrix4(matrix4);
+        return arrayToMatrix4(this.baseData.matrix);
     }
 
     public abstract makeGeometry2D(): [
@@ -114,20 +130,16 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
 
     private makeSurface3D(): THREE.Group {
         const group = new THREE.Group();
-        const userTransform: THREE.Matrix4 = arrayToMatrix4(
-            getRequired<number[][]>(this.elementData, "matrix"),
-        );
+        const userTransform = this.getTransform3D();
 
         const [geometry, transform, vertexShader] = this.makeGeometry3D();
 
         // Clip planes are encoded as [x, y, z, c], where:
         //     [x, y, z] is the normal vector in surface local frame
         //     c is the constant in surface local frame
-        const clip_planes = this.elementData.clip_planes ?? [];
         const clipPlanes: THREE.Plane[] = [];
-        for (const plane of clip_planes) {
+        for (const plane of this.baseData.clipPlanes ?? []) {
             const v = new THREE.Vector3(plane[0], plane[1], plane[2]);
-
             const c = plane[3];
             const tplane = new THREE.Plane(v, c);
             tplane.applyMatrix4(userTransform);

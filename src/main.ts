@@ -14,7 +14,7 @@ function setupApp(container: HTMLElement, data: any): TLMViewerApp {
         "XY",
     ]);
 
-    const scene = new TLMScene(data, mode === "3D" ? 3 : 2);
+    const scene = new TLMScene(data, mode === "3D" ? 3 : 2, container);
 
     const app = new TLMViewerApp(container, scene, camera);
 

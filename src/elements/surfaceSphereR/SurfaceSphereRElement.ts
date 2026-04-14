@@ -4,7 +4,17 @@ import { getRequired } from "../../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
-import { SurfaceBaseElement, samples2DToPoints } from "../SurfaceBaseElement.ts";
+import {
+    SurfaceBaseElement,
+    SurfaceBaseData,
+    parseSurfaceBaseData,
+    samples2DToPoints,
+} from "../SurfaceBaseElement.ts";
+
+interface SurfaceSphereRData extends SurfaceBaseData {
+    R: number;
+    diameter: number;
+}
 
 /**
  * Angular sampling of a circular arc defined by radius.
@@ -37,8 +47,24 @@ function sphereSamplesAngular2(
 }
 
 export class SurfaceSphereRElement extends SurfaceBaseElement {
-    constructor(elementData: any, dim: number) {
-        super(elementData, dim);
+    readonly data: SurfaceSphereRData;
+
+    static parse(raw: any): SurfaceSphereRData {
+        return {
+            ...parseSurfaceBaseData(raw),
+            R: getRequired<number>(raw, "R"),
+            diameter: getRequired<number>(raw, "diameter"),
+        };
+    }
+
+    constructor(
+        data: SurfaceSphereRData,
+        dim: number,
+        container: HTMLElement,
+        threeScene: THREE.Scene,
+    ) {
+        super(data, dim, container, threeScene);
+        this.data = data;
     }
 
     public static match(elementData: any): boolean {
@@ -47,17 +73,13 @@ export class SurfaceSphereRElement extends SurfaceBaseElement {
     }
 
     public makeSamples2D(): Array<Array<number>> {
-        const arc_radius = getRequired<number>(this.elementData, "R");
-        const diameter = getRequired<number>(this.elementData, "diameter");
-
+        const { R: arc_radius, diameter } = this.data;
         const thetaMax = Math.asin(diameter / 2 / Math.abs(arc_radius));
         return sphereSamplesAngular2(arc_radius, -thetaMax, thetaMax, 101);
     }
 
     public makeHalfSamples2D(): Array<Array<number>> {
-        const arc_radius = getRequired<number>(this.elementData, "R");
-        const diameter = getRequired<number>(this.elementData, "diameter");
-
+        const { R: arc_radius, diameter } = this.data;
         const thetaMax = Math.asin(diameter / 2 / Math.abs(arc_radius));
         return sphereSamplesAngular2(arc_radius, 0.0, thetaMax, 101);
     }
@@ -67,7 +89,6 @@ export class SurfaceSphereRElement extends SurfaceBaseElement {
         THREE.Matrix4, // transform
     ] {
         const samples = this.makeSamples2D();
-
         const points = samples2DToPoints(samples);
 
         const geometry = new LineGeometry();
@@ -82,7 +103,7 @@ export class SurfaceSphereRElement extends SurfaceBaseElement {
         string | null,
     ] {
         const userTransform = this.getTransform3D();
-        const samples: Array<Array<number>> = this.makeHalfSamples2D();
+        const samples = this.makeHalfSamples2D();
 
         const segments = 50;
         // threejs lathe surface makes a revolution around the Y axis

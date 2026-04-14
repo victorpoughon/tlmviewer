@@ -4,9 +4,27 @@ import { getRequired } from "../../utility.ts";
 
 import { AbstractSceneElement } from "../AbstractSceneElement.ts";
 
+interface ArrowsData {
+    arrows: number[][];
+}
+
 export class ArrowsElement extends AbstractSceneElement {
-    constructor(elementData: any, dim: number) {
-        super(elementData, dim);
+    readonly data: ArrowsData;
+
+    static parse(raw: any): ArrowsData {
+        return {
+            arrows: getRequired<number[][]>(raw, "data"),
+        };
+    }
+
+    constructor(
+        data: ArrowsData,
+        dim: number,
+        container: HTMLElement,
+        threeScene: THREE.Scene,
+    ) {
+        super(dim, container, threeScene);
+        this.data = data;
     }
 
     // True if the given scene element data object matches this class
@@ -16,11 +34,9 @@ export class ArrowsElement extends AbstractSceneElement {
     }
 
     public makeGroup(): THREE.Group {
-        const arrows = getRequired<any[]>(this.elementData, "data");
-
         const group = new THREE.Group();
 
-        for (const arrow of arrows) {
+        for (const arrow of this.data.arrows) {
             var start, end, length;
             if (this.dim == 2) {
                 console.assert(arrow.length == 5);

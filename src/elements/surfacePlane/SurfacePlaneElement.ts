@@ -3,11 +3,36 @@ import * as THREE from "three";
 import { getRequired } from "../../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
-import { SurfaceBaseElement, samples2DToPoints } from "../SurfaceBaseElement.ts";
+
+import {
+    SurfaceBaseElement,
+    SurfaceBaseData,
+    parseSurfaceBaseData,
+    samples2DToPoints,
+} from "../SurfaceBaseElement.ts";
+
+interface SurfacePlaneData extends SurfaceBaseData {
+    radius: number;
+}
 
 export class SurfacePlaneElement extends SurfaceBaseElement {
-    constructor(elementData: any, dim: number) {
-        super(elementData, dim);
+    readonly data: SurfacePlaneData;
+
+    static parse(raw: any): SurfacePlaneData {
+        return {
+            ...parseSurfaceBaseData(raw),
+            radius: getRequired<number>(raw, "radius"),
+        };
+    }
+
+    constructor(
+        data: SurfacePlaneData,
+        dim: number,
+        container: HTMLElement,
+        threeScene: THREE.Scene,
+    ) {
+        super(data, dim, container, threeScene);
+        this.data = data;
     }
 
     public static match(elementData: any): boolean {
@@ -16,7 +41,7 @@ export class SurfacePlaneElement extends SurfaceBaseElement {
     }
 
     public makeGeometry2D(): [LineGeometry, THREE.Matrix4] {
-        const radius = getRequired<number>(this.elementData, "radius");
+        const { radius } = this.data;
         const samples = [
             [0, -radius],
             [0, radius],
@@ -43,8 +68,7 @@ export class SurfacePlaneElement extends SurfaceBaseElement {
         const transform = new THREE.Matrix4();
         transform.multiplyMatrices(userTransform, base);
 
-        const radius = getRequired<number>(this.elementData, "radius");
-        const geometry = new THREE.RingGeometry(0, radius, 128, 8);
+        const geometry = new THREE.RingGeometry(0, this.data.radius, 128, 8);
 
         return [geometry, transform, null];
     }

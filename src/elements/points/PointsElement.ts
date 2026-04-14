@@ -15,9 +15,33 @@ function applyLayerGroup(obj: THREE.Object3D, layers: Array<number>) {
     });
 }
 
+interface PointsData {
+    vertices: number[][];
+    color: string;
+    radius: number;
+    layers: number[];
+}
+
 export class PointsElement extends AbstractSceneElement {
-    constructor(elementData: any, dim: number) {
-        super(elementData, dim);
+    readonly data: PointsData;
+
+    static parse(raw: any): PointsData {
+        return {
+            vertices: getRequired<number[][]>(raw, "data"),
+            color: raw.color ?? "#ffffff",
+            radius: raw.radius ?? 0.1,
+            layers: raw.layers ?? [0],
+        };
+    }
+
+    constructor(
+        data: PointsData,
+        dim: number,
+        container: HTMLElement,
+        threeScene: THREE.Scene,
+    ) {
+        super(dim, container, threeScene);
+        this.data = data;
     }
 
     public static match(elementData: any): boolean {
@@ -26,9 +50,7 @@ export class PointsElement extends AbstractSceneElement {
     }
 
     public makeGroup(): THREE.Group {
-        const vertices = getRequired<number[][]>(this.elementData, "data");
-        const color = this.elementData.color ?? "#ffffff";
-        const radius = this.elementData.radius ?? 0.1;
+        const { vertices, color, radius, layers } = this.data;
 
         const group = new THREE.Group();
         for (const point of vertices) {
@@ -53,7 +75,7 @@ export class PointsElement extends AbstractSceneElement {
         }
 
         // Add layers
-        applyLayerGroup(group, this.elementData["layers"] ?? [0]);
+        applyLayerGroup(group, layers);
 
         return group;
     }

@@ -4,7 +4,11 @@ import { getRequired } from "../../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
-import { SurfaceBaseElement } from "../SurfaceBaseElement.ts";
+import {
+    SurfaceBaseElement,
+    SurfaceBaseData,
+    parseSurfaceBaseData,
+} from "../SurfaceBaseElement.ts";
 import { glslRender, parseSagFunction, SagFunction } from "./sagFunctions.ts";
 
 // Generate line geometry by sampling a sag function in 2D
@@ -31,9 +35,32 @@ function sagGeometry2D(
     return geometry;
 }
 
+interface SurfaceSagData extends SurfaceBaseData {
+    diameter: number;
+    sagFunctionData: any;
+    bcyl?: [number, number, number];
+}
+
 export class SurfaceSagElement extends SurfaceBaseElement {
-    constructor(elementData: any, dim: number) {
-        super(elementData, dim);
+    readonly data: SurfaceSagData;
+
+    static parse(raw: any): SurfaceSagData {
+        return {
+            ...parseSurfaceBaseData(raw),
+            diameter: getRequired<number>(raw, "diameter"),
+            sagFunctionData: getRequired<any>(raw, "sag-function"),
+            bcyl: raw.bcyl,
+        };
+    }
+
+    constructor(
+        data: SurfaceSagData,
+        dim: number,
+        container: HTMLElement,
+        threeScene: THREE.Scene,
+    ) {
+        super(data, dim, container, threeScene);
+        this.data = data;
     }
 
     public static match(elementData: any): boolean {
@@ -42,7 +69,7 @@ export class SurfaceSagElement extends SurfaceBaseElement {
     }
 
     public makeGeometry2D(): [LineGeometry, THREE.Matrix4] {
-        const diameter = getRequired<number>(this.elementData, "diameter");
+        const { diameter } = this.data;
         const tau = diameter / 2;
         const sag = this.sagType(tau).sagFunction2D(tau);
 
@@ -67,7 +94,7 @@ export class SurfaceSagElement extends SurfaceBaseElement {
         // We use ring geometry as the base geometry
         // But could consider using a custom geometry
         // for better distribution of vertices over the disk
-        const diameter = getRequired<number>(this.elementData, "diameter");
+        const { diameter } = this.data;
         const geometry = new THREE.RingGeometry(
             0,
             diameter / 2,
@@ -87,10 +114,6 @@ export class SurfaceSagElement extends SurfaceBaseElement {
     }
 
     public sagType(tau: number): SagFunction {
-        const sagFunction = getRequired<string>(
-            this.elementData,
-            "sag-function",
-        );
-        return parseSagFunction(sagFunction, tau);
+        return parseSagFunction(this.data.sagFunctionData, tau);
     }
 }

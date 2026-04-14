@@ -17,15 +17,20 @@ export type ColorOption = {
     trueColor: boolean;
 };
 
+interface RaysData {
+    points: number[][];
+    color: string;
+    variables: Record<string, number[]>;
+    domain: Record<string, [number, number]>;
+    layers: number[];
+}
+
 function makeRays(
-    element: any,
+    data: RaysData,
     dim: number,
     colorOption: ColorOption,
 ): THREE.Group {
-    const points = getRequired<number[][]>(element, "points");
-    const default_color = element.color ?? "#ffa724";
-    const variables = element.variables ?? {};
-    const domain = element.domain ?? {};
+    const { points, color: default_color, variables, domain } = data;
     const expectedLength = 2 * dim;
 
     const group = new THREE.Group();
@@ -60,7 +65,6 @@ function makeRays(
 
     // Default color
     if (colorOption.colorDim == null) {
-        // || !variables.hasOwnProperty(colorOption.colorDim
         use_default_color = true;
     }
     // Color from variable data
@@ -128,11 +132,27 @@ function makeRays(
 
 export class RaysElement extends AbstractSceneElement {
     readonly layer: number;
-    constructor(elementData: any, dim: number) {
-        super(elementData, dim);
+    readonly data: RaysData;
 
-        // TODO replace layer system by categories declared in the data
-        this.layer = (elementData["layers"] ?? [0])[0];
+    static parse(raw: any): RaysData {
+        return {
+            points: getRequired<number[][]>(raw, "points"),
+            color: raw.color ?? "#ffa724",
+            variables: raw.variables ?? {},
+            domain: raw.domain ?? {},
+            layers: raw.layers ?? [0],
+        };
+    }
+
+    constructor(
+        data: RaysData,
+        dim: number,
+        container: HTMLElement,
+        threeScene: THREE.Scene,
+    ) {
+        super(dim, container, threeScene);
+        this.data = data;
+        this.layer = data.layers[0];
     }
 
     public static match(elementData: any): boolean {
@@ -148,7 +168,7 @@ export class RaysElement extends AbstractSceneElement {
 
     public setColorOption(group: THREE.Group, color: ColorOption): void {
         group.clear();
-        group.add(makeRays(this.elementData, this.dim, color));
+        group.add(makeRays(this.data, this.dim, color));
     }
 
     public setOpacity(group: THREE.Group, opacity: number): void {

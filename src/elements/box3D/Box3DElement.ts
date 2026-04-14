@@ -6,10 +6,30 @@ import { arrayToMatrix4 } from "../SurfaceBaseElement.ts";
 
 import { AbstractSceneElement } from "../AbstractSceneElement.ts";
 
+interface Box3DData {
+    size: [number, number, number];
+    matrix: number[][];
+}
+
 // A 3D only box
 export class Box3DElement extends AbstractSceneElement {
-    constructor(elementData: any, dim: number) {
-        super(elementData, dim);
+    readonly data: Box3DData;
+
+    static parse(raw: any): Box3DData {
+        return {
+            size: getRequired<[number, number, number]>(raw, "size"),
+            matrix: getRequired<number[][]>(raw, "matrix"),
+        };
+    }
+
+    constructor(
+        data: Box3DData,
+        dim: number,
+        container: HTMLElement,
+        threeScene: THREE.Scene,
+    ) {
+        super(dim, container, threeScene);
+        this.data = data;
     }
 
     // True if the given scene element data object matches this class
@@ -18,22 +38,8 @@ export class Box3DElement extends AbstractSceneElement {
         return type == "box3D";
     }
 
-    // Get the Matrix4 tranform from the element data
-    // Expecting a 2D transform
-    public getTransform2D(): THREE.Matrix4 {
-        throw Error("Box3D element only works in 3D scenes");
-    }
-
-    // Get the Matrix4 tranform from the element data
-    // Expecting a 3D transform
-    public getTransform3D(): THREE.Matrix4 {
-        const matrix4 = getRequired<number[][]>(this.elementData, "matrix");
-        // TODO more error checking on matrix4 array shape here
-        return arrayToMatrix4(matrix4);
-    }
-
     public makeGroup(): THREE.Group {
-        const size = getRequired<number[]>(this.elementData, "size");
+        const { size } = this.data;
 
         const group = new THREE.Group();
 
@@ -56,7 +62,7 @@ export class Box3DElement extends AbstractSceneElement {
         const cube = new THREE.Mesh(geometry, material);
         group.add(cube);
 
-        const userTransform = this.getTransform3D();
+        const userTransform = arrayToMatrix4(this.data.matrix);
         group.applyMatrix4(userTransform);
 
         return group;

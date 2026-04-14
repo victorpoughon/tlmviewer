@@ -59,6 +59,7 @@ function matchingElementTypes(elementData: any) {
 
 export class TLMScene {
     private root: any;
+    private container: HTMLElement;
 
     // Model
     public sceneGraph: THREE.Group;
@@ -74,8 +75,9 @@ export class TLMScene {
     public variables: string[];
     public title: string;
 
-    constructor(root: any, dim: number) {
+    constructor(root: any, dim: number, container: HTMLElement) {
         this.root = root;
+        this.container = container;
         this.scene = new THREE.Scene();
 
         this.variables = extractVariables(root);
@@ -136,7 +138,8 @@ export class TLMScene {
             for (const type of matches) {
                 // Create the threeJS group that represents the element
                 // and store the Element object in its userData
-                const instance = new type(elementData, dim);
+                const data = (type as any).parse(elementData);
+                const instance = new type(data, dim, this.container, this.scene);
                 const obj = instance.makeGroup();
                 obj.userData = instance;
                 this.sceneGraph.add(obj);
@@ -212,7 +215,7 @@ export class TLMScene {
     public setSurfacesVisible(visible: boolean): void {
         this.updateElements(
             SurfaceBaseElement,
-            (group: THREE.Group, element: BcylElement) => {
+            (group: THREE.Group, element: SurfaceBaseElement) => {
                 element.setVisible(group, visible);
             },
         );

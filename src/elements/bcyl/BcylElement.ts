@@ -33,10 +33,30 @@ function circleGeometry(x: number, radius: number): LineSegmentsGeometry {
     return geometry;
 }
 
+interface BcylData {
+    matrix: number[][];
+    bcyl: [number, number, number];
+}
+
 // Bounding Cylinder
 export class BcylElement extends AbstractSceneElement {
-    constructor(elementData: any, dim: number) {
-        super(elementData, dim);
+    readonly data: BcylData;
+
+    static parse(raw: any): BcylData {
+        return {
+            matrix: getRequired<number[][]>(raw, "matrix"),
+            bcyl: getRequired<[number, number, number]>(raw, "bcyl"),
+        };
+    }
+
+    constructor(
+        data: BcylData,
+        dim: number,
+        container: HTMLElement,
+        threeScene: THREE.Scene,
+    ) {
+        super(dim, container, threeScene);
+        this.data = data;
     }
 
     // True if the given scene element data object matches this class
@@ -45,28 +65,8 @@ export class BcylElement extends AbstractSceneElement {
         return type.startsWith("surface") && "bcyl" in elementData;
     }
 
-    // Get the Matrix4 tranform from the element data
-    // Expecting a 2D transform
-    public getTransform2D(): THREE.Matrix4 {
-        const matrix3 = getRequired<number[][]>(this.elementData, "matrix");
-        // TODO more error checking on matrix3 array shape here
-        const matrix4 = homogeneousMatrix3to4(matrix3);
-        return arrayToMatrix4(matrix4);
-    }
-
-    // Get the Matrix4 tranform from the element data
-    // Expecting a 3D transform
-    public getTransform3D(): THREE.Matrix4 {
-        const matrix4 = getRequired<number[][]>(this.elementData, "matrix");
-        // TODO more error checking on matrix4 array shape here
-        return arrayToMatrix4(matrix4);
-    }
-
     public makeGroup(): THREE.Group {
-        const [xmin, xmax, radius] = getRequired<number[]>(
-            this.elementData,
-            "bcyl",
-        );
+        const [xmin, xmax, radius] = this.data.bcyl;
 
         const group = new THREE.Group();
 
@@ -101,7 +101,9 @@ export class BcylElement extends AbstractSceneElement {
             const lines = new LineSegments2(geometry, lineMaterial);
             group.add(lines);
 
-            const userTransform = this.getTransform2D();
+            const userTransform = arrayToMatrix4(
+                homogeneousMatrix3to4(this.data.matrix),
+            );
             group.applyMatrix4(userTransform);
         } else {
             const height = xmax - xmin;
@@ -123,7 +125,7 @@ export class BcylElement extends AbstractSceneElement {
             group.add(new LineSegments2(circlemax, lineMaterial));
             group.add(new THREE.Mesh(cylinder, surfaceMaterial));
 
-            const userTransform = this.getTransform3D();
+            const userTransform = arrayToMatrix4(this.data.matrix);
             group.applyMatrix4(userTransform);
         }
 
