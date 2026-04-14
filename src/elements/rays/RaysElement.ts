@@ -183,8 +183,10 @@ export class RaysElement extends AbstractSceneElement {
         this.setRaysColorOption(3, color);
     }
 
-    public setRaysColorOption(_: number, color: ColorOption) {
-        this.setColorOption(color);
+    public setRaysColorOption(layer: number, color: ColorOption) {
+        if (this.layer === layer) {
+                this.setColorOption(color);
+            }
     }
 
     public static match(elementData: any): boolean {
