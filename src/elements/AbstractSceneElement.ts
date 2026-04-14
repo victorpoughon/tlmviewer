@@ -23,6 +23,10 @@ export abstract class AbstractSceneElement {
         return false;
     }
 
+    public static parse(_raw: any): any {
+        throw new Error("parse() not implemented");
+    }
+
     protected addEventListener<K extends ViewerEvent["type"]>(
         type: K,
         handler: (event: Extract<ViewerEvent, { type: K }>) => void,

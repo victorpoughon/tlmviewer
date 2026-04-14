@@ -5,18 +5,9 @@ import { getRequired } from "./utility.ts";
 // Scene elements
 import {
     AbstractSceneElement,
-    ArrowsElement,
-    BcylElement,
-    Box3DElement,
-    PointsElement,
-    RaysElement,
-    SurfaceLatheElement,
-    SurfacePlaneElement,
-    SurfaceSagElement,
-    SurfaceSphereRElement,
+    matchingElementTypes,
 } from "./elements/index.ts";
 import { ViewerEvent } from "./viewerEvent.ts";
-import { SceneAxisElement } from "./elements/sceneAxis/SceneAxisElement.ts";
 import { defaultSceneElementsData } from "./elements/defaultSceneElements.ts";
 
 // Extract available variables from the scene
@@ -32,30 +23,6 @@ function extractVariables(root: any): string[] {
     }
 
     return Array.from(variables);
-}
-
-// Return the list of matching elemnt types for a given json object
-function matchingElementTypes(elementData: any) {
-    const sceneElementTypes = [
-        PointsElement,
-        ArrowsElement,
-        SurfaceLatheElement,
-        SurfacePlaneElement,
-        SurfaceSphereRElement,
-        SurfaceSagElement,
-        RaysElement,
-        BcylElement,
-        Box3DElement,
-        SceneAxisElement,
-    ];
-
-    const matches = [];
-    for (const type of sceneElementTypes) {
-        if (type.match(elementData)) {
-            matches.push(type);
-        }
-    }
-    return matches;
 }
 
 export class TLMScene {
