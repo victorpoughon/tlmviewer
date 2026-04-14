@@ -31,6 +31,9 @@ export class SceneAxisElement extends AbstractSceneElement {
         this.data = data;
         this.group = this.makeGroup();
 
+        this.includeInDefaultCamera = false;
+
+
         this.addEventListener("setAxisVisible", (e) => {
             console.log("HANDLER SET AXIS VISIBLE", this.data.axis, e);
             if (e.axis == this.data.axis) {

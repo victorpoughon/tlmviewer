@@ -8,6 +8,10 @@ export abstract class AbstractSceneElement {
     public group!: THREE.Group;
     private eventHandlers = new Map<string, (event: any) => void>();
 
+    // If True, this element's group counts when computing the bounding box for
+    // the default camera view
+    public includeInDefaultCamera = true;
+
     constructor(dim: number, container: HTMLElement, threeScene: THREE.Scene) {
         this.dim = dim;
         this.container = container;

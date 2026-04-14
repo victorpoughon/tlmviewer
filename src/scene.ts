@@ -196,9 +196,18 @@ export class TLMScene {
         });
     }
 
+    // Get bounding box of the scene for the default camera view
     public getBB(): THREE.Box3 {
         const bbox = new THREE.Box3();
-        bbox.union(new THREE.Box3().setFromObject(this.sceneGraph));
+        for (const child of this.sceneGraph.children) {
+            const element = child.userData;
+            const include =
+                element instanceof AbstractSceneElement &&
+                element.includeInDefaultCamera;
+            if (include) {
+                bbox.union(new THREE.Box3().setFromObject(child));
+            }
+        }
 
         if (bbox.isEmpty()) {
             // make sure axes are visible in default empty view
