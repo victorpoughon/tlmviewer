@@ -83,6 +83,23 @@ export class TLMScene {
         this.sceneGraph = new THREE.Group();
         this.initSceneGraph(dim);
 
+        this.addDefaultSceneElements(dim, container);
+
+        // Title
+        this.title = root.title ?? "";
+
+        // Setup the actual THREE scene
+        this.scene.add(this.sceneGraph);
+
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        this.scene.add(this.ambientLight);
+
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        this.directionalLight.position.set(100, 100, 100);
+        this.scene.add(this.directionalLight);
+    }
+
+    public addDefaultSceneElements(dim: number, container: HTMLElement) {
         // Setup optical axis
         const opticalAxis = new SceneAxisElement(
             { axis: "x", length: 500, color: "#e3e3e3" },
@@ -122,20 +139,6 @@ export class TLMScene {
             axisZ.group.userData = axisZ; // TODO this could be automatic?
             this.sceneGraph.add(axisZ.group);
         }
-
-        // Title
-        this.title = root.title ?? "";
-
-        // Setup the actual THREE scene
-
-        this.scene.add(this.sceneGraph);
-
-        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        this.scene.add(this.ambientLight);
-
-        this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        this.directionalLight.position.set(100, 100, 100);
-        this.scene.add(this.directionalLight);
     }
 
     public initSceneGraph(dim: number) {
