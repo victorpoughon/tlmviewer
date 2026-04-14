@@ -123,7 +123,7 @@ export class TLMViewerApp {
             10,
             -10,
             -10000,
-            10000
+            10000,
         );
 
         if (this.camera) {
@@ -132,7 +132,7 @@ export class TLMViewerApp {
 
         const newControls = new OrbitControls(
             newCamera,
-            this.renderer.domElement
+            this.renderer.domElement,
         );
 
         newControls.enableRotate = false;
@@ -152,7 +152,7 @@ export class TLMViewerApp {
 
     private setupOrthographicCamera(): [
         THREE.OrthographicCamera,
-        OrbitControls
+        OrbitControls,
     ] {
         const rect = this.viewport.getBoundingClientRect();
         const aspect = rect.width / rect.height;
@@ -162,7 +162,7 @@ export class TLMViewerApp {
             10,
             -10,
             -10000,
-            10000
+            10000,
         );
 
         newCamera.position.set(10, 10, 10);
@@ -174,7 +174,7 @@ export class TLMViewerApp {
 
         const newControls = new OrbitControls(
             newCamera,
-            this.renderer.domElement
+            this.renderer.domElement,
         );
 
         return [newCamera, newControls];
@@ -194,7 +194,7 @@ export class TLMViewerApp {
 
         const newControls = new OrbitControls(
             newCamera,
-            this.renderer.domElement
+            this.renderer.domElement,
         );
 
         return [newCamera, newControls];

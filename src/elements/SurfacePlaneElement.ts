@@ -3,10 +3,7 @@ import * as THREE from "three";
 import { getRequired } from "../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
-import {
-    SurfaceBaseElement,
-    samples2DToPoints,
-} from "./SurfaceBaseElement.ts";
+import { SurfaceBaseElement, samples2DToPoints } from "./SurfaceBaseElement.ts";
 
 export class SurfacePlaneElement extends SurfaceBaseElement {
     constructor(elementData: any, dim: number) {
@@ -19,7 +16,6 @@ export class SurfacePlaneElement extends SurfaceBaseElement {
     }
 
     public makeGeometry2D(): [LineGeometry, THREE.Matrix4] {
-
         const radius = getRequired<number>(this.elementData, "radius");
         const samples = [
             [0, -radius],
@@ -37,7 +33,7 @@ export class SurfacePlaneElement extends SurfaceBaseElement {
     public makeGeometry3D(): [
         THREE.BufferGeometry,
         THREE.Matrix4,
-        string | null
+        string | null,
     ] {
         const userTransform = this.getTransform3D();
 

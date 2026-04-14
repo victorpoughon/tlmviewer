@@ -40,7 +40,7 @@ export class PointsElement extends AbstractSceneElement {
 
             if (point.length != this.dim) {
                 throw new Error(
-                    `point array length is ${point.length} (expected ${this.dim})`
+                    `point array length is ${point.length} (expected ${this.dim})`,
                 );
             }
             if (this.dim == 2) {

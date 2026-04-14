@@ -43,7 +43,7 @@ export class ArrowsElement extends AbstractSceneElement {
                 dir,
                 origin,
                 length,
-                color
+                color,
             );
             group.add(arrowHelper);
         }

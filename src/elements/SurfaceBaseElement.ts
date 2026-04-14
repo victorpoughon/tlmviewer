@@ -19,7 +19,7 @@ export function arrayToMatrix4(array: Array<Array<number>>): THREE.Matrix4 {
 
     // Transpose the array (convert from row-major to column-major)
     const transposedArray = array[0].map((_, colIndex) =>
-        array.map((row) => row[colIndex])
+        array.map((row) => row[colIndex]),
     );
 
     // Flatten the transposed array and create the Matrix4
@@ -76,13 +76,13 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
 
     public abstract makeGeometry2D(): [
         LineGeometry, // geometry
-        THREE.Matrix4 // transform
+        THREE.Matrix4, // transform
     ];
 
     public abstract makeGeometry3D(): [
         THREE.BufferGeometry, // geometry
         THREE.Matrix4, // transform
-        string | null // optional vertex shader
+        string | null, // optional vertex shader
     ];
 
     public makeGroup(): THREE.Group {
@@ -115,7 +115,7 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
     private makeSurface3D(): THREE.Group {
         const group = new THREE.Group();
         const userTransform: THREE.Matrix4 = arrayToMatrix4(
-            getRequired<number[][]>(this.elementData, "matrix")
+            getRequired<number[][]>(this.elementData, "matrix"),
         );
 
         const [geometry, transform, vertexShader] = this.makeGeometry3D();
@@ -176,7 +176,7 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
         });
     }
 
-    public setVisible(group: THREE.Group, visible: boolean) : void {
+    public setVisible(group: THREE.Group, visible: boolean): void {
         group.visible = visible;
     }
 }

@@ -37,7 +37,14 @@ export class Box3DElement extends AbstractSceneElement {
 
         const group = new THREE.Group();
 
-        const geometry = new THREE.BoxGeometry(size[0], size[1], size[2], 10, 10, 10);
+        const geometry = new THREE.BoxGeometry(
+            size[0],
+            size[1],
+            size[2],
+            10,
+            10,
+            10,
+        );
         const material = new THREE.MeshBasicMaterial({
             color: "lightgreen",
             transparent: true,

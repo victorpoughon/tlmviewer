@@ -19,8 +19,9 @@ export class WIPVertexShaderElement extends AbstractSceneElement {
     public makeGroup(): THREE.Group {
         const group = new THREE.Group();
 
-        const geometry = new THREE.RingGeometry(0, 5, 256, 256).rotateY(Math.PI /2);
-
+        const geometry = new THREE.RingGeometry(0, 5, 256, 256).rotateY(
+            Math.PI / 2,
+        );
 
         const vertexShader: string = /* glsl */ `
             varying vec3 vPosition;
@@ -38,17 +39,16 @@ export class WIPVertexShaderElement extends AbstractSceneElement {
                 csm_Position = pos;
                 }
                 `;
-            
-            const material = new CustomShaderMaterial({
-                baseMaterial: THREE.MeshNormalMaterial,
-                vertexShader: vertexShader,
-                
-                // Base material properties
-                flatShading: true,
-                //color: 0x00FFFF,
-                side: THREE.DoubleSide,
-          });
 
+        const material = new CustomShaderMaterial({
+            baseMaterial: THREE.MeshNormalMaterial,
+            vertexShader: vertexShader,
+
+            // Base material properties
+            flatShading: true,
+            //color: 0x00FFFF,
+            side: THREE.DoubleSide,
+        });
 
         const mesh = new THREE.Mesh(geometry, material);
         group.add(mesh);

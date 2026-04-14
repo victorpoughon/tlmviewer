@@ -12,7 +12,7 @@ function sagGeometry2D(
     start: number,
     end: number,
     N: number,
-    const_z: number
+    const_z: number,
 ): LineGeometry {
     const geometry = new LineGeometry();
 
@@ -50,7 +50,7 @@ export class SurfaceSagElement extends SurfaceBaseElement {
             -diameter / 2,
             diameter / 2,
             100,
-            1.0
+            1.0,
         );
 
         return [geometry, this.getTransform2D()];
@@ -59,7 +59,7 @@ export class SurfaceSagElement extends SurfaceBaseElement {
     public makeGeometry3D(): [
         THREE.BufferGeometry,
         THREE.Matrix4,
-        string | null
+        string | null,
     ] {
         const userTransform = this.getTransform3D();
 
@@ -71,7 +71,7 @@ export class SurfaceSagElement extends SurfaceBaseElement {
             0,
             diameter / 2,
             256,
-            256
+            256,
         ).rotateY(Math.PI / 2);
 
         const tau = diameter / 2;
@@ -79,7 +79,7 @@ export class SurfaceSagElement extends SurfaceBaseElement {
         const vertexShader = glslRender(
             sag.shaderG(tau),
             sag.shaderGgrad(tau),
-            sag.name
+            sag.name,
         );
 
         return [geometry, userTransform, vertexShader];
@@ -88,7 +88,7 @@ export class SurfaceSagElement extends SurfaceBaseElement {
     public sagType(tau: number): SagFunction {
         const sagFunction = getRequired<string>(
             this.elementData,
-            "sag-function"
+            "sag-function",
         );
         return parseSagFunction(sagFunction, tau);
     }
@@ -220,7 +220,7 @@ class ParabolicSag extends SagFunction {
                 `
                 ${glslFloat("A", A)}
                 x = A * r2;
-                `
+                `,
             ),
         ];
     }
@@ -233,7 +233,7 @@ class ParabolicSag extends SagFunction {
                 ${glslFloat("A", A)}
                 Gy = 2.0 * A * y;
                 Gz = 2.0 * A * z;
-                `
+                `,
             ),
         ];
     }
@@ -290,7 +290,7 @@ class SphericalSag extends SagFunction {
                 float num = C * r2;
                 float denom = 1.0 + sqrt(1.0 - r2 * C2);
                 x = num / denom;
-                `
+                `,
             ),
         ];
     }
@@ -306,7 +306,7 @@ class SphericalSag extends SagFunction {
                 float denom = sqrt(1.0 - r2 * C2);
                 Gy = (y * C) / denom;
                 Gz = (z * C) / denom;
-                `
+                `,
             ),
         ];
     }
@@ -374,7 +374,7 @@ class ConicalSag extends SagFunction {
                 float C2 = pow(C, 2.0);
                 
                 x = (C * r2) / (1.0 + sqrt(1.0 - (1.0+K) * r2 * C2));
-                `
+                `,
             ),
         ];
     }
@@ -391,7 +391,7 @@ class ConicalSag extends SagFunction {
                 float denom = sqrt(1.0 - (1.0 + K) * r2 * C2);
                 Gy = (y * C) / denom;
                 Gz = (z * C) / denom;
-                `
+                `,
             ),
         ];
     }
@@ -432,7 +432,7 @@ class AsphericSag extends SagFunction {
     public unnorm(tau: number): Array<number> {
         if (this.normalize) {
             return this.coefficients.map(
-                (c: number, i: number) => c / Math.pow(tau, 3 + 2 * i)
+                (c: number, i: number) => c / Math.pow(tau, 3 + 2 * i),
             );
         } else {
             return this.coefficients;
@@ -455,7 +455,7 @@ class AsphericSag extends SagFunction {
                 for (int i = 0; i < ${M}; i++) {
                     x += coefficients[i] * pow(r2, 2.0 + float(i));
                 }
-                `
+                `,
             ),
         ];
     }
@@ -481,7 +481,7 @@ class AsphericSag extends SagFunction {
 
                 Gy = y * sumterm;
                 Gz = z * sumterm;
-                `
+                `,
             ),
         ];
     }
@@ -532,7 +532,7 @@ class SagSum extends SagFunction {
 
         // Make the sum function and add it the the list of functions
         const sumFunction = this.glslFunctionG(
-            "x = " + names.map((n) => `${n}_G(y, z, r2)`).join(" + ") + ";"
+            "x = " + names.map((n) => `${n}_G(y, z, r2)`).join(" + ") + ";",
         );
         funcs.push(sumFunction);
         return funcs;
@@ -576,7 +576,7 @@ class SagSum extends SagFunction {
 // Like Array.map but for a 2D array
 function map2d<T>(
     array: number[][],
-    f: (value: number, p: number, q: number) => T
+    f: (value: number, p: number, q: number) => T,
 ): T[][] {
     return array.map((row, p) => row.map((value, q) => f(value, p, q)));
 }
@@ -607,7 +607,7 @@ class XYPolynomialSag extends SagFunction {
             return map2d(
                 this.coefficients,
                 (c: number, p: number, q: number): number =>
-                    (c * tau) / (Math.pow(tau, p) * Math.pow(tau, q))
+                    (c * tau) / (Math.pow(tau, p) * Math.pow(tau, q)),
             );
         } else {
             return this.coefficients;
@@ -628,8 +628,10 @@ class XYPolynomialSag extends SagFunction {
             for (var q = 0; q < Q; q++) {
                 if (alphas[p][q] !== 0.0) {
                     const cstr = alphas[p][q].toFixed(8);
-                    const powy = p > 0 ? ` * ${Array(p).fill("y").join('*')}` : ``;
-                    const powz = q > 0 ? ` * ${Array(q).fill("z").join('*')}` : ``;
+                    const powy =
+                        p > 0 ? ` * ${Array(p).fill("y").join("*")}` : ``;
+                    const powz =
+                        q > 0 ? ` * ${Array(q).fill("z").join("*")}` : ``;
                     code += `
                 x += ${cstr}${powy}${powz};`;
                 }
@@ -655,10 +657,22 @@ class XYPolynomialSag extends SagFunction {
                     const cstr = ` * ${alphas[p][q].toFixed(8)}`;
                     const pstr = p.toFixed(1);
                     const qstr = q.toFixed(1);
-                    const powy = p > 0 ? ` * ${Array(p).fill("y").join('*')}` : ``;
-                    const powym = p > 1 ? ` * ${Array(p-1).fill("y").join('*')}` : ``;
-                    const powz = q > 0 ? ` * ${Array(q).fill("z").join('*')}` : ``;
-                    const powzm = q > 1 ? ` * ${Array(q-1).fill("z").join('*')}` : ``;
+                    const powy =
+                        p > 0 ? ` * ${Array(p).fill("y").join("*")}` : ``;
+                    const powym =
+                        p > 1
+                            ? ` * ${Array(p - 1)
+                                  .fill("y")
+                                  .join("*")}`
+                            : ``;
+                    const powz =
+                        q > 0 ? ` * ${Array(q).fill("z").join("*")}` : ``;
+                    const powzm =
+                        q > 1
+                            ? ` * ${Array(q - 1)
+                                  .fill("z")
+                                  .join("*")}`
+                            : ``;
 
                     if (p > 0) {
                         code += `

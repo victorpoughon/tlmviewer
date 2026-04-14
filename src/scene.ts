@@ -32,9 +32,7 @@ function extractVariables(root: any): string[] {
 }
 
 // Return the list of matching elemnt types for a given json object
-function matchingElementTypes(
-    elementData: any
-) {
+function matchingElementTypes(elementData: any) {
     const sceneElementTypes = [
         PointsElement,
         ArrowsElement,
@@ -128,7 +126,7 @@ export class TLMScene {
             // Emit a warning for unknown element types
             if (matches.length === 0) {
                 console.warn(
-                    `tlmviewer: Unknown scene element ${JSON.stringify(elementData)}`
+                    `tlmviewer: Unknown scene element ${JSON.stringify(elementData)}`,
                 );
             }
 
@@ -147,7 +145,7 @@ export class TLMScene {
     // subtype of AbstractSceneElement
     public updateElements<T extends AbstractSceneElement>(
         type: Function & { prototype: T },
-        f: (group: THREE.Group, element: T) => void
+        f: (group: THREE.Group, element: T) => void,
     ): void {
         this.sceneGraph.traverse((child: THREE.Object3D) => {
             if (child.userData instanceof type) {
@@ -177,7 +175,7 @@ export class TLMScene {
                 if (element.layer === layer) {
                     element.setColorOption(group, color);
                 }
-            }
+            },
         );
     }
 
@@ -186,7 +184,7 @@ export class TLMScene {
             RaysElement,
             (group: THREE.Group, element: RaysElement) => {
                 element.setOpacity(group, opacity);
-            }
+            },
         );
     }
 
@@ -195,7 +193,7 @@ export class TLMScene {
             RaysElement,
             (group: THREE.Group, element: RaysElement) => {
                 element.setThickness(group, thickness);
-            }
+            },
         );
     }
 
@@ -204,25 +202,25 @@ export class TLMScene {
             SurfaceBaseElement,
             (group: THREE.Group, element: SurfaceBaseElement) => {
                 element.setColor(group, color);
-            }
+            },
         );
     }
 
-    public setSurfacesVisible(visible: boolean) : void {
+    public setSurfacesVisible(visible: boolean): void {
         this.updateElements(
             SurfaceBaseElement,
             (group: THREE.Group, element: BcylElement) => {
                 element.setVisible(group, visible);
-            }
+            },
         );
     }
 
-    public setBcylVisible(visible: boolean) : void {
+    public setBcylVisible(visible: boolean): void {
         this.updateElements(
             BcylElement,
             (group: THREE.Group, element: BcylElement) => {
                 element.setVisible(group, visible);
-            }
+            },
         );
     }
 

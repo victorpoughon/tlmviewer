@@ -4,10 +4,7 @@ import { getRequired } from "../utility.ts";
 
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
-import {
-    SurfaceBaseElement,
-    samples2DToPoints,
-} from "./SurfaceBaseElement.ts";
+import { SurfaceBaseElement, samples2DToPoints } from "./SurfaceBaseElement.ts";
 
 /**
  * Angular sampling of a circular arc defined by radius.
@@ -17,21 +14,27 @@ function sphereSamplesAngular2(
     radius: number,
     start: number,
     end: number,
-    N: number
-  ): Array<[number, number]> {
-  
+    N: number,
+): Array<[number, number]> {
     // Generate theta values based on the radius sign
-    const theta = radius > 0
-      ? Array.from({ length: N }, (_, i) => Math.PI - end + (i * (end - start)) / (N - 1))
-      : Array.from({ length: N }, (_, i) => start + (i * (end - start)) / (N - 1));
-  
+    const theta =
+        radius > 0
+            ? Array.from(
+                  { length: N },
+                  (_, i) => Math.PI - end + (i * (end - start)) / (N - 1),
+              )
+            : Array.from(
+                  { length: N },
+                  (_, i) => start + (i * (end - start)) / (N - 1),
+              );
+
     // Compute X and Y coordinates
-    const X = theta.map(t => Math.abs(radius) * Math.cos(t) + radius);
-    const Y = theta.map(t => Math.abs(radius) * Math.sin(t));
-  
+    const X = theta.map((t) => Math.abs(radius) * Math.cos(t) + radius);
+    const Y = theta.map((t) => Math.abs(radius) * Math.sin(t));
+
     // Combine X and Y into pairs
     return X.map((x, i) => [x, Y[i]]);
-  }
+}
 
 export class SurfaceSphereRElement extends SurfaceBaseElement {
     constructor(elementData: any, dim: number) {
@@ -62,7 +65,7 @@ export class SurfaceSphereRElement extends SurfaceBaseElement {
     public makeGeometry2D(): [
         LineGeometry, // geometry
         THREE.Matrix4, // transform
-    ] {        
+    ] {
         const samples = this.makeSamples2D();
 
         const points = samples2DToPoints(samples);
@@ -76,7 +79,7 @@ export class SurfaceSphereRElement extends SurfaceBaseElement {
     public makeGeometry3D(): [
         THREE.BufferGeometry,
         THREE.Matrix4,
-        string | null
+        string | null,
     ] {
         const userTransform = this.getTransform3D();
         const samples: Array<Array<number>> = this.makeHalfSamples2D();

@@ -25,14 +25,13 @@ window.onload = async () => {
         const a = document.createElement("a");
         a.href = "#";
         a.textContent = test_file;
-        a.addEventListener('click', (event) => {
+        a.addEventListener("click", (event) => {
             event.preventDefault();
             loadMainViewer(test_file);
-          });
+        });
         li.appendChild(a);
         ul.appendChild(li);
     }
-
 
     tlmviewer.loadAll();
 };

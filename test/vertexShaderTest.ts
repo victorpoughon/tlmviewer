@@ -51,7 +51,11 @@ const str = `{
 const tau = 1.0;
 const sag = parseSagFunction(JSON.parse(str), tau);
 
-const vertexShader = glslRender(sag.shaderG(tau), sag.shaderGgrad(tau), sag.name);
+const vertexShader = glslRender(
+    sag.shaderG(tau),
+    sag.shaderGgrad(tau),
+    sag.name,
+);
 
 console.log(vertexShader);
 

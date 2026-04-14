@@ -65,7 +65,7 @@ export class BcylElement extends AbstractSceneElement {
     public makeGroup(): THREE.Group {
         const [xmin, xmax, radius] = getRequired<number[]>(
             this.elementData,
-            "bcyl"
+            "bcyl",
         );
 
         const group = new THREE.Group();
@@ -114,7 +114,7 @@ export class BcylElement extends AbstractSceneElement {
                 radius,
                 radius,
                 height,
-                64
+                64,
             );
             cylinder.rotateZ(Math.PI / 2);
             cylinder.translate(center, 0.0, 0.0);
@@ -122,15 +122,15 @@ export class BcylElement extends AbstractSceneElement {
             group.add(new LineSegments2(circlemin, lineMaterial));
             group.add(new LineSegments2(circlemax, lineMaterial));
             group.add(new THREE.Mesh(cylinder, surfaceMaterial));
-            
+
             const userTransform = this.getTransform3D();
             group.applyMatrix4(userTransform);
         }
-        
+
         return group;
     }
 
-    public setVisible(group: THREE.Group, visible: boolean) : void {
+    public setVisible(group: THREE.Group, visible: boolean): void {
         group.visible = visible;
     }
 }

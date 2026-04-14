@@ -32,12 +32,12 @@ export class SurfaceLatheElement extends SurfaceBaseElement {
     public makeGeometry3D(): [
         THREE.BufferGeometry,
         THREE.Matrix4,
-        string | null
+        string | null,
     ] {
         const userTransform = this.getTransform3D();
         const samples: Array<Array<number>> = getRequired<number[][]>(
             this.elementData,
-            "samples"
+            "samples",
         );
 
         const segments = 50;

@@ -1,10 +1,8 @@
-declare module "*?raw"
-{
+declare module "*?raw" {
     const content: string;
     export default content;
 }
-declare module "*.css"
-{
+declare module "*.css" {
     const content: string;
     export default content;
 }

@@ -6,7 +6,6 @@ import { get_default } from "./utility.ts";
 import viewerTemplate from "./viewer.html?raw";
 import "./viewer.css";
 
-
 function setupApp(container: HTMLElement, data: any): TLMViewerApp {
     const mode = get_default(data, "mode", ["3D", "2D"]);
     const camera = get_default(data, "camera", [
