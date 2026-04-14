@@ -13,7 +13,8 @@ import { SurfaceSphereRElement } from "./elements/SurfaceSphereRElement.ts";
 import { SurfaceSagElement } from "./elements/SurfaceSagElement.ts";
 import { BcylElement } from "./elements/BcylElement.ts";
 import { Box3DElement } from "./elements/Box3DElement.ts";
-import { RaysElement, makeLine2, ColorOption } from "./elements/RaysElement.ts";
+import { makeLine2 } from "./lineUtils.ts";
+import { RaysElement, ColorOption } from "./elements/RaysElement.ts";
 
 // Extract available variables from the scene
 function extractVariables(root: any): string[] {
