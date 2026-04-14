@@ -1,12 +1,40 @@
-import { testData2D as arrowsData2D, testData3D as arrowsData3D } from "./arrows/tests/testData.ts";
-import { testData2D as bcylData2D, testData3D as bcylData3D } from "./bcyl/tests/testData.ts";
+import {
+    testData2D as arrowsData2D,
+    testData3D as arrowsData3D,
+} from "./arrows/tests/testData.ts";
+import {
+    testData2D as bcylData2D,
+    testData3D as bcylData3D,
+} from "./bcyl/tests/testData.ts";
 import { testData3D as box3DData3D } from "./box3D/tests/testData.ts";
-import { testData2D as pointsData2D, testData3D as pointsData3D } from "./points/tests/testData.ts";
-import { testData2D as raysData2D, testData3D as raysData3D } from "./rays/tests/testData.ts";
-import { testData2D as surfaceLatheData2D, testData3D as surfaceLatheData3D } from "./surfaceLathe/tests/testData.ts";
-import { testData2D as surfacePlaneData2D, testData3D as surfacePlaneData3D } from "./surfacePlane/tests/testData.ts";
-import { testData2D as surfaceSphereRData2D, testData3D as surfaceSphereRData3D } from "./surfaceSphereR/tests/testData.ts";
-import { testData2D as surfaceSagData2D, testData3D as surfaceSagData3D } from "./surfaceSag/tests/testData.ts";
+import {
+    testData2D as pointsData2D,
+    testData3D as pointsData3D,
+} from "./points/tests/testData.ts";
+import {
+    testData2D as raysData2D,
+    testData3D as raysData3D,
+} from "./rays/tests/testData.ts";
+import {
+    testData2D as surfaceLatheData2D,
+    testData3D as surfaceLatheData3D,
+} from "./surfaceLathe/tests/testData.ts";
+import {
+    testData2D as surfacePlaneData2D,
+    testData3D as surfacePlaneData3D,
+} from "./surfacePlane/tests/testData.ts";
+import {
+    testData2D as surfaceSphereRData2D,
+    testData3D as surfaceSphereRData3D,
+} from "./surfaceSphereR/tests/testData.ts";
+import {
+    testData2D as surfaceSagData2D,
+    testData3D as surfaceSagData3D,
+} from "./surfaceSag/tests/testData.ts";
+import {
+    testData2D as sceneAxisData2D,
+    testData3D as sceneAxisData3D,
+} from "./sceneAxis/tests/testData.ts";
 
 function buildScene(
     sceneName: string,
@@ -14,7 +42,20 @@ function buildScene(
     elements: any[],
 ): { sceneName: string; data: object } {
     const camera = mode === "2D" ? "XY" : "orthographic";
-    return { sceneName: sceneName, data: { title: sceneName, mode, camera, data: elements, controls: {show_optical_axis: "true", show_bounding_cylinders: "true"} } };
+    return {
+        sceneName: sceneName,
+        data: {
+            title: sceneName,
+            mode,
+            camera,
+            data: elements,
+            controls: {
+                show_optical_axis: "true",
+                show_other_axes: "true",
+                show_bounding_cylinders: "true",
+            },
+        },
+    };
 }
 
 export const builtinScenes: Array<{ sceneName: string; data: object }> = [
@@ -35,4 +76,6 @@ export const builtinScenes: Array<{ sceneName: string; data: object }> = [
     buildScene("surfaceSphereR/3D", "3D", surfaceSphereRData3D),
     buildScene("surfaceSag/2D", "2D", surfaceSagData2D),
     buildScene("surfaceSag/3D", "3D", surfaceSagData3D),
+    buildScene("sceneAxisData/2D", "2D", sceneAxisData2D),
+    buildScene("sceneAxisData/3D", "3D", sceneAxisData3D),
 ];

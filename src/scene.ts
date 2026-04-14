@@ -45,6 +45,7 @@ function matchingElementTypes(elementData: any) {
         RaysElement,
         BcylElement,
         Box3DElement,
+        SceneAxisElement,
     ];
 
     const matches = [];
