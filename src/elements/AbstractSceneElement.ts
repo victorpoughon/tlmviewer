@@ -4,6 +4,7 @@ export abstract class AbstractSceneElement {
     readonly dim: number;
     readonly container: HTMLElement;
     readonly threeScene: THREE.Scene;
+    public group!: THREE.Group;
 
     constructor(dim: number, container: HTMLElement, threeScene: THREE.Scene) {
         this.dim = dim;
@@ -15,6 +16,4 @@ export abstract class AbstractSceneElement {
     public static match(_elementData: any): boolean {
         return false;
     }
-
-    public abstract makeGroup(): THREE.Group;
 }

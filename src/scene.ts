@@ -145,9 +145,12 @@ export class TLMScene {
                     this.container,
                     this.scene,
                 );
-                const obj = instance.makeGroup();
-                obj.userData = instance;
-                this.sceneGraph.add(obj);
+                if (instance.group) {
+                    instance.group.userData = instance;
+                    this.sceneGraph.add(instance.group);
+                } else {
+                    console.warn(`tlmviewer: Element did not create a scene group: ${JSON.stringify(elementData)}`);
+                }
             }
         }
     }
@@ -156,12 +159,12 @@ export class TLMScene {
     // subtype of AbstractSceneElement
     public updateElements<T extends AbstractSceneElement>(
         type: Function & { prototype: T },
-        f: (group: THREE.Group, element: T) => void,
+        f: (element: T) => void,
     ): void {
         this.sceneGraph.traverse((child: THREE.Object3D) => {
             if (child.userData instanceof type) {
                 const element = child.userData as T;
-                f(child as THREE.Group, element);
+                f(element);
             }
         });
     }
@@ -180,39 +183,30 @@ export class TLMScene {
     }
 
     public setRaysColorOption(layer: number, color: ColorOption) {
-        this.updateElements(
-            RaysElement,
-            (group: THREE.Group, element: RaysElement) => {
-                if (element.layer === layer) {
-                    element.setColorOption(group, color);
-                }
-            },
-        );
+        this.updateElements(RaysElement, (element: RaysElement) => {
+            if (element.layer === layer) {
+                element.setColorOption(color);
+            }
+        });
     }
 
     public setRaysOpacity(opacity: number): void {
-        this.updateElements(
-            RaysElement,
-            (group: THREE.Group, element: RaysElement) => {
-                element.setOpacity(group, opacity);
-            },
-        );
+        this.updateElements(RaysElement, (element: RaysElement) => {
+            element.setOpacity(opacity);
+        });
     }
 
     public setRaysThickness(thickness: number): void {
-        this.updateElements(
-            RaysElement,
-            (group: THREE.Group, element: RaysElement) => {
-                element.setThickness(group, thickness);
-            },
-        );
+        this.updateElements(RaysElement, (element: RaysElement) => {
+            element.setThickness(thickness);
+        });
     }
 
     public setSurfacesColor(color: THREE.Color): void {
         this.updateElements(
             SurfaceBaseElement,
-            (group: THREE.Group, element: SurfaceBaseElement) => {
-                element.setColor(group, color);
+            (element: SurfaceBaseElement) => {
+                element.setColor(color);
             },
         );
     }
@@ -220,19 +214,16 @@ export class TLMScene {
     public setSurfacesVisible(visible: boolean): void {
         this.updateElements(
             SurfaceBaseElement,
-            (group: THREE.Group, element: SurfaceBaseElement) => {
-                element.setVisible(group, visible);
+            (element: SurfaceBaseElement) => {
+                element.setVisible(visible);
             },
         );
     }
 
     public setBcylVisible(visible: boolean): void {
-        this.updateElements(
-            BcylElement,
-            (group: THREE.Group, element: BcylElement) => {
-                element.setVisible(group, visible);
-            },
-        );
+        this.updateElements(BcylElement, (element: BcylElement) => {
+            element.setVisible(visible);
+        });
     }
 
     public getBB(): THREE.Box3 {

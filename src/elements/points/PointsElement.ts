@@ -42,6 +42,7 @@ export class PointsElement extends AbstractSceneElement {
     ) {
         super(dim, container, threeScene);
         this.data = data;
+        this.group = this.makeGroup();
     }
 
     public static match(elementData: any): boolean {
@@ -49,7 +50,7 @@ export class PointsElement extends AbstractSceneElement {
         return type === "points";
     }
 
-    public makeGroup(): THREE.Group {
+    protected makeGroup(): THREE.Group {
         const { vertices, color, radius, layers } = this.data;
 
         const group = new THREE.Group();

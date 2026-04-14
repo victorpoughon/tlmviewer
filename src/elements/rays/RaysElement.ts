@@ -153,6 +153,7 @@ export class RaysElement extends AbstractSceneElement {
         super(dim, container, threeScene);
         this.data = data;
         this.layer = data.layers[0];
+        this.group = this.makeGroup();
     }
 
     public static match(elementData: any): boolean {
@@ -160,19 +161,19 @@ export class RaysElement extends AbstractSceneElement {
         return type === "rays";
     }
 
-    public makeGroup(): THREE.Group {
+    protected makeGroup(): THREE.Group {
         // Can't initially make the group from the element data
         // because we need the initial color options from the gui
         return new THREE.Group();
     }
 
-    public setColorOption(group: THREE.Group, color: ColorOption): void {
-        group.clear();
-        group.add(makeRays(this.data, this.dim, color));
+    public setColorOption(color: ColorOption): void {
+        this.group.clear();
+        this.group.add(makeRays(this.data, this.dim, color));
     }
 
-    public setOpacity(group: THREE.Group, opacity: number): void {
-        group.traverse((child: THREE.Object3D) => {
+    public setOpacity(opacity: number): void {
+        this.group.traverse((child: THREE.Object3D) => {
             if (
                 child instanceof THREE.Mesh &&
                 child.material instanceof LineMaterial
@@ -182,8 +183,8 @@ export class RaysElement extends AbstractSceneElement {
         });
     }
 
-    public setThickness(group: THREE.Group, thickness: number): void {
-        group.traverse((child: THREE.Object3D) => {
+    public setThickness(thickness: number): void {
+        this.group.traverse((child: THREE.Object3D) => {
             if (
                 child instanceof THREE.Mesh &&
                 child.material instanceof LineMaterial

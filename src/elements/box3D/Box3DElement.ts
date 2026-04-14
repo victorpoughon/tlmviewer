@@ -30,6 +30,7 @@ export class Box3DElement extends AbstractSceneElement {
     ) {
         super(dim, container, threeScene);
         this.data = data;
+        this.group = this.makeGroup();
     }
 
     // True if the given scene element data object matches this class
@@ -38,7 +39,7 @@ export class Box3DElement extends AbstractSceneElement {
         return type == "box3D";
     }
 
-    public makeGroup(): THREE.Group {
+    protected makeGroup(): THREE.Group {
         const { size } = this.data;
 
         const group = new THREE.Group();
@@ -68,7 +69,7 @@ export class Box3DElement extends AbstractSceneElement {
         return group;
     }
 
-    public setVisible(group: THREE.Group, visible: boolean): void {
-        group.visible = visible;
+    public setVisible(visible: boolean): void {
+        this.group.visible = visible;
     }
 }

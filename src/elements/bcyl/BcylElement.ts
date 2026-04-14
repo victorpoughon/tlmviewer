@@ -60,6 +60,7 @@ export class BcylElement extends AbstractSceneElement {
     ) {
         super(dim, container, threeScene);
         this.data = data;
+        this.group = this.makeGroup();
     }
 
     // True if the given scene element data object matches this class
@@ -68,7 +69,7 @@ export class BcylElement extends AbstractSceneElement {
         return type.startsWith("surface") && "bcyl" in elementData;
     }
 
-    public makeGroup(): THREE.Group {
+    protected makeGroup(): THREE.Group {
         const [xmin, xmax, radius] = this.data.bcyl;
 
         const group = new THREE.Group();
@@ -135,7 +136,7 @@ export class BcylElement extends AbstractSceneElement {
         return group;
     }
 
-    public setVisible(group: THREE.Group, visible: boolean): void {
-        group.visible = visible;
+    public setVisible(visible: boolean): void {
+        this.group.visible = visible;
     }
 }

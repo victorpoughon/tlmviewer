@@ -33,6 +33,7 @@ export class SurfacePlaneElement extends SurfaceBaseElement {
     ) {
         super(data, dim, container, threeScene);
         this.data = data;
+        this.group = this.makeGroup();
     }
 
     public static match(elementData: any): boolean {

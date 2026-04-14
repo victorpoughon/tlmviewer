@@ -25,6 +25,7 @@ export class ArrowsElement extends AbstractSceneElement {
     ) {
         super(dim, container, threeScene);
         this.data = data;
+        this.group = this.makeGroup();
     }
 
     // True if the given scene element data object matches this class
@@ -33,7 +34,7 @@ export class ArrowsElement extends AbstractSceneElement {
         return type === "arrows";
     }
 
-    public makeGroup(): THREE.Group {
+    protected makeGroup(): THREE.Group {
         const group = new THREE.Group();
 
         for (const arrow of this.data.arrows) {

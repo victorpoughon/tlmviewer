@@ -101,7 +101,7 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
         string | null, // optional vertex shader
     ];
 
-    public makeGroup(): THREE.Group {
+    protected makeGroup(): THREE.Group {
         if (this.dim == 2) {
             return this.makeSurface2D();
         } else {
@@ -171,8 +171,8 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
         return group;
     }
 
-    public setColor(group: THREE.Group, color: THREE.Color): void {
-        group.traverse((child: THREE.Object3D) => {
+    public setColor(color: THREE.Color): void {
+        this.group.traverse((child: THREE.Object3D) => {
             if (
                 child instanceof THREE.Mesh &&
                 child.material instanceof THREE.Material
@@ -188,7 +188,7 @@ export abstract class SurfaceBaseElement extends AbstractSceneElement {
         });
     }
 
-    public setVisible(group: THREE.Group, visible: boolean): void {
-        group.visible = visible;
+    public setVisible(visible: boolean): void {
+        this.group.visible = visible;
     }
 }
