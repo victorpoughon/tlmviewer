@@ -55,10 +55,6 @@ export class TLMScene {
 
         // Setup the actual THREE scene
         this.scene.add(this.sceneGraph);
-
-        // this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        // this.directionalLight.position.set(100, 100, 100);
-        // this.scene.add(this.directionalLight);
     }
 
     public addDefaultSceneElements(dim: number) {

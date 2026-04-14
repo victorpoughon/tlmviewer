@@ -12,6 +12,7 @@ import { SurfaceSphereRElement } from "./surfaceSphereR/SurfaceSphereRElement.ts
 import { SurfaceSagElement } from "./surfaceSag/SurfaceSagElement.ts";
 import { SceneAxisElement } from "./sceneAxis/SceneAxisElement.ts";
 import { AmbientLight } from "./lights/AmbientLight.ts";
+import { DirectionalLight } from "./lights/DirectionalLight.ts";
 
 export {
     AbstractSceneElement,
@@ -20,6 +21,7 @@ export {
     BcylElement,
     Box3DElement,
     ColorOption,
+    DirectionalLight,
     PointsElement,
     RaysElement,
     SceneAxisElement,
@@ -35,6 +37,7 @@ const _allSceneElementTypes = [
     ArrowsElement,
     BcylElement,
     Box3DElement,
+    DirectionalLight,
     PointsElement,
     RaysElement,
     SceneAxisElement,
