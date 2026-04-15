@@ -134,12 +134,9 @@ export function defaultSurfaceEvents<
 >(): ElementEventRecord<T> {
     return {
         setCategoryVisibility: (_, object, event) => {
-            if (event.category == "surface") {
+            if (event.category === "surface") {
                 object.visible = event.visible;
             }
-        },
-        setSurfacesVisible: (_, object, event) => {
-            object.visible = event.value;
         },
         setSurfacesColor: (_, object, event) => {
             setColor(object, event.value);
