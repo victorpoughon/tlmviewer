@@ -31,6 +31,9 @@ export class TLMGui {
             surfaces: Controller;
         };
         visible: {
+            validRays: Controller;
+            blockedRays: Controller;
+            outputRays: Controller;
             surfaces: Controller;
             opticalAxis: Controller;
             otherAxes: Controller;
@@ -52,25 +55,21 @@ export class TLMGui {
 
         // Build this.colorOptions from the data
         this.colorOptions = {
-            default: { show: true, colorDim: null, trueColor: false },
-            hide: { show: false, colorDim: null, trueColor: false },
+            default: { colorDim: null, trueColor: false },
         };
 
         for (const varName of this.scene.variables) {
             if (varName === "wavelength") {
                 this.colorOptions["wavelength"] = {
-                    show: true,
                     colorDim: "wavelength",
                     trueColor: false,
                 };
                 this.colorOptions["wavelength (true color)"] = {
-                    show: true,
                     colorDim: "wavelength",
                     trueColor: true,
                 };
             } else {
                 this.colorOptions[varName] = {
-                    show: true,
                     colorDim: varName,
                     trueColor: false,
                 };
@@ -79,7 +78,7 @@ export class TLMGui {
 
         this.controller = {
             validColor: this.colorOptions.default,
-            blockedColor: this.colorOptions.hide,
+            blockedColor: this.colorOptions.default,
             outputColor: this.colorOptions.default,
             raysOpacity: 1.0,
             raysThickness: 1.0,
@@ -92,6 +91,9 @@ export class TLMGui {
             showOpticalAxis: false,
             showOtherAxes: false,
 
+            showValidRays: true,
+            showBlockedRays: false,
+            showOutputRays: true,
             showSurfaces: true,
             showKinematicJoints: false,
             showBcyl: false,
@@ -190,6 +192,36 @@ export class TLMGui {
             });
 
         const folderShow = this.gui.addFolder("Visible");
+        const controllerVisibleValidRays = folderShow
+            .add(this.controller, "showValidRays")
+            .name("Valid rays")
+            .onChange((value: boolean) => {
+                this.scene.dispatch({
+                    type: "setCategoryVisibility",
+                    category: "rays-valid",
+                    visible: value,
+                });
+            });
+        const controllerVisibleBlockedRays = folderShow
+            .add(this.controller, "showBlockedRays")
+            .name("Blocked rays")
+            .onChange((value: boolean) => {
+                this.scene.dispatch({
+                    type: "setCategoryVisibility",
+                    category: "rays-blocked",
+                    visible: value,
+                });
+            });
+        const controllerVisibleOutputRays = folderShow
+            .add(this.controller, "showOutputRays")
+            .name("Output rays")
+            .onChange((value: boolean) => {
+                this.scene.dispatch({
+                    type: "setCategoryVisibility",
+                    category: "rays-output",
+                    visible: value,
+                });
+            });
         const controllerVisibleSurfaces = folderShow
             .add(this.controller, "showSurfaces")
             .name("Surfaces")
@@ -250,6 +282,9 @@ export class TLMGui {
                 surfaces: controllerColorsSurfaces,
             },
             visible: {
+                validRays: controllerVisibleValidRays,
+                blockedRays: controllerVisibleBlockedRays,
+                outputRays: controllerVisibleOutputRays,
                 surfaces: controllerVisibleSurfaces,
                 opticalAxis: controllerVisibleOpticalAxis,
                 otherAxes: controllerVisibleOtherAxes,
@@ -284,6 +319,9 @@ export class TLMGui {
 
         this.updateCameraLayers();
 
+        this.scene.dispatch({ type: "setCategoryVisibility", category: "rays-valid", visible: true });
+        this.scene.dispatch({ type: "setCategoryVisibility", category: "rays-blocked", visible: false });
+        this.scene.dispatch({ type: "setCategoryVisibility", category: "rays-output", visible: true });
         this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-x", visible: false });
         this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-y", visible: false });
         this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-z", visible: false });
@@ -321,6 +359,15 @@ export class TLMGui {
         });
         set("thickness", (v: number) => {
             self.controllers.colors.thickness.load(v);
+        });
+        set("show_valid_rays", (v: boolean) => {
+            self.controllers.visible.validRays.load(v);
+        });
+        set("show_blocked_rays", (v: boolean) => {
+            self.controllers.visible.blockedRays.load(v);
+        });
+        set("show_output_rays", (v: boolean) => {
+            self.controllers.visible.outputRays.load(v);
         });
         set("show_surfaces", (v: boolean) => {
             self.controllers.visible.surfaces.load(v);

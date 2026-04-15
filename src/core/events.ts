@@ -1,7 +1,6 @@
 import * as THREE from "three";
 
 export type ColorOption = {
-    show: boolean;
     colorDim: string | null;
     trueColor: boolean;
 };

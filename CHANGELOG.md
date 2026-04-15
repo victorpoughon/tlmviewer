@@ -32,3 +32,25 @@ New format:
 ```json
 { "mode": "2D", "data": [..., { "type": "scene-title", "title": "My Scene" }] }
 ```
+
+- Rays visibility is now controlled via `categories` instead of the `"hide"` color option.
+
+Rays elements must include a `"categories"` field to be togglable in the GUI. The `"hide"` color option has been removed.
+
+Old format:
+
+```json
+{ "type": "rays", "points": [...], "layers": [0] }
+```
+
+With controls: `{ "blocked_rays": "hide" }`
+
+New format:
+
+```json
+{ "type": "rays", "points": [...], "layers": [0], "categories": ["rays-valid"] }
+```
+
+With controls: `{ "show_blocked_rays": false }`
+
+Valid category values for rays: `"rays-valid"`, `"rays-blocked"`, `"rays-output"`.

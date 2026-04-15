@@ -17,13 +17,13 @@ export type RaysData = BaseElementData & {
     domain: Record<string, [number, number]>;
     layers: number[];
     dim: 2 | 3;
-    categories: string[];
+    categories: string;
 };
 
 function parse(raw: any, dim: number): RaysData {
     return {
         type: "rays",
-        categories: raw.categories ?? [],
+        categories: raw.categories ?? "rays-valid",
         points: getRequired<number[][]>(raw, "points"),
         color: raw.color ?? "#ffa724",
         variables: raw.variables ?? {},
@@ -38,10 +38,6 @@ function makeRays(data: RaysData, colorOption: ColorOption): THREE.Group {
     const expectedLength = 2 * dim;
 
     const group = new THREE.Group();
-
-    if (colorOption.show == false) {
-        return group;
-    }
 
     if (!(Symbol.iterator in Object(points))) {
         throw new Error("points field of ray is not iterable");
@@ -144,7 +140,7 @@ function render(_data: RaysData, _dim: number): THREE.Object3D {
     return new THREE.Group();
 }
 
-const testData2D = [
+const testData2D: any[] = [
     {
         type: "rays",
         points: [
@@ -159,9 +155,9 @@ const testData2D = [
         domain: { field: [-2, 2] },
         layers: [0],
     },
-] as unknown as RaysData[];
+];
 
-const testData3D = [
+const testData3D: any[] = [
     {
         type: "rays",
         points: [
@@ -176,7 +172,7 @@ const testData3D = [
         domain: {},
         layers: [0],
     },
-] as unknown as RaysData[];
+];
 
 export const raysDescriptor: ElementDescriptor<RaysData> = {
     type: "rays",
@@ -184,6 +180,11 @@ export const raysDescriptor: ElementDescriptor<RaysData> = {
     parse,
     render,
     events: {
+        setCategoryVisibility: (data, object, event) => {
+            if (data.categories === event.category) {
+                object.visible = event.visible;
+            }
+        },
         setValidRaysColor: (data, object, event) => {
             setRaysColorOption(object, data, 0, event.value);
             setRaysColorOption(object, data, 1, event.value);
