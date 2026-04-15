@@ -204,8 +204,8 @@ export class TLMGui {
             .name("Optical axis")
             .onChange((value: boolean) => {
                 this.scene.dispatch({
-                    type: "setAxisVisible",
-                    axis: "x",
+                    type: "setCategoryVisibility",
+                    category: "axis-x",
                     visible: value,
                 });
             });
@@ -214,13 +214,13 @@ export class TLMGui {
             .name("Other axes")
             .onChange((value: boolean) => {
                 this.scene.dispatch({
-                    type: "setAxisVisible",
-                    axis: "y",
+                    type: "setCategoryVisibility",
+                    category: "axis-y",
                     visible: value,
                 });
                 this.scene.dispatch({
-                    type: "setAxisVisible",
-                    axis: "z",
+                    type: "setCategoryVisibility",
+                    category: "axis-z",
                     visible: value,
                 });
             });
@@ -283,6 +283,9 @@ export class TLMGui {
 
         this.updateCameraLayers();
 
+        this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-x", visible: false });
+        this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-y", visible: false });
+        this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-z", visible: false });
         this.scene.dispatch({ type: "setBcylVisible", value: false });
 
         this.gui.open(false);

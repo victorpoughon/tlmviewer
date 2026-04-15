@@ -32,8 +32,6 @@ function render(data: SceneAxisData, _dim: number): THREE.Object3D {
         group.add(makeLine2([0, 0, -length], [0, 0, length], color));
     }
 
-    group.visible = false;
-
     return group;
 }
 
@@ -52,8 +50,12 @@ export const sceneAxisDescriptor: ElementDescriptor<SceneAxisData> = {
     parse,
     render,
     events: {
-        setAxisVisible: (data, object, event) => {
-            if (event.axis == data.axis) {
+        setCategoryVisibility: (data, object, event) => {
+            if (event.category === "axis-x" && data.axis === "x") {
+                object.visible = event.visible;
+            } else if (event.category === "axis-y" && data.axis === "y") {
+                object.visible = event.visible;
+            } else if (event.category === "axis-z" && data.axis === "z") {
                 object.visible = event.visible;
             }
         },
