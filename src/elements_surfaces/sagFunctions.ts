@@ -1,4 +1,4 @@
-import { getRequired, map2d } from "../utility";
+import { getRequired, map2d } from "../core/utility";
 
 export function parseSagFunction(obj: any, tau: number): SagFunction {
     const type = getRequired<string>(obj, "sag-type");

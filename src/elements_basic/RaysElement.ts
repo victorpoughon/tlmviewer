@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { BaseElementData, ElementDescriptor } from "../core/types.ts";
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../core/utility.ts";
 
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";

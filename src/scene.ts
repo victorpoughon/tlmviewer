@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-import { getRequired } from "./utility.ts";
+import { getRequired } from "./core/utility.ts";
 
 import { defaultSceneElementsData } from "./defaultSceneElements.ts";
 import { getMaybeDescriptor } from "./elements_registry/registry.ts";
@@ -44,7 +44,7 @@ export class TLMScene {
 
         // Setup scene graph
         this.sceneGraph = new THREE.Group();
-        this.initSceneGraph2(dim);
+        this.initSceneGraph(dim);
 
         this.addDefaultSceneElements(dim);
 
@@ -75,8 +75,7 @@ export class TLMScene {
         }
     }
 
-
-    public initSceneGraph2(dim: number) {
+    public initSceneGraph(dim: number) {
         const elements = getRequired<any[]>(this.root, "data");
         for (const elementData of elements) {
             const descriptor = getMaybeDescriptor(elementData.type);
@@ -84,7 +83,7 @@ export class TLMScene {
             // Emit a warning for unknown element types
             if (descriptor === undefined) {
                 console.warn(
-                    `tlmviewer: (initSceneGraph2) Unknown scene element ${elementData.type}`,
+                    `tlmviewer: Unknown scene element ${elementData.type}`,
                 );
                 continue;
             }
@@ -99,7 +98,6 @@ export class TLMScene {
 
     public dispatch<K extends SceneEventType>(event: SceneEvent<K>): void {
         this.sceneGraph.traverse((child: THREE.Object3D) => {
-           
             if (child.userData instanceof SceneEntry) {
                 child.userData.onEvent(event);
             }

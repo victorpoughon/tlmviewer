@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
 import { ElementDescriptor } from "../core/types.ts";
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../core/utility.ts";
 
 import {
     SurfaceBaseData,
@@ -73,12 +73,9 @@ function makeGeometry3D(
     // But could consider using a custom geometry
     // for better distribution of vertices over the disk
     const { diameter } = data;
-    const geometry = new THREE.RingGeometry(
-        0,
-        diameter / 2,
-        256,
-        256,
-    ).rotateY(Math.PI / 2);
+    const geometry = new THREE.RingGeometry(0, diameter / 2, 256, 256).rotateY(
+        Math.PI / 2,
+    );
 
     const tau = diameter / 2;
     const sag = parseSagFunction(data.sagFunctionData, tau);
@@ -196,7 +193,7 @@ const testData3D = [
             "sag-type": "aspheric",
             C: 0.1,
             K: 0,
-            coefficients: [0, 0, 1e-4],
+            coefficients: [5e-3, -3e-5, 0],
         },
         matrix: [
             [1, 0, 0, 45],

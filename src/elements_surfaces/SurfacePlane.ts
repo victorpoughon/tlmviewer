@@ -4,7 +4,7 @@ import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 
 import { ElementDescriptor } from "../core/types.ts";
 import { samples2DToPoints } from "../core/geometry.ts";
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../core/utility.ts";
 
 import {
     SurfaceBaseData,

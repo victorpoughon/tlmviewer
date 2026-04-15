@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { BaseElementData, ElementDescriptor } from "../core/types.ts";
 import { arrayToMatrix4 } from "../core/geometry.ts";
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../core/utility.ts";
 
 export type Box3DData = BaseElementData & {
     type: "box3D";

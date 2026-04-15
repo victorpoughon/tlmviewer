@@ -1,7 +1,7 @@
 import { TLMScene } from "./scene.ts";
 import { TLMViewerApp } from "./app.ts";
 
-import { get_default } from "./utility.ts";
+import { get_default } from "./core/utility.ts";
 
 import viewerTemplate from "./viewer.html?raw";
 import "./viewer.css";

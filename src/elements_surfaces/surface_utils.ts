@@ -12,7 +12,7 @@ import {
     getTransform2D,
     getTransform3D,
 } from "../core/geometry.ts";
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../core/utility.ts";
 
 // Base data type shared by all surface elements
 export type SurfaceBaseData = BaseElementData & {

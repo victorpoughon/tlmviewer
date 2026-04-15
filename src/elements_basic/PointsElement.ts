@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { BaseElementData, ElementDescriptor } from "../core/types.ts";
-import { getRequired } from "../utility.ts";
+import { getRequired } from "../core/utility.ts";
 
 export type PointsData = BaseElementData & {
     type: "points";
