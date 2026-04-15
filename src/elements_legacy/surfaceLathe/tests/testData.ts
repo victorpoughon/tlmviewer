@@ -7,7 +7,11 @@ function sphericalSamples(R: number, diameter: number, N: number): number[][] {
     });
 }
 
-function sphericalHalfSamples(R: number, diameter: number, N: number): number[][] {
+function sphericalHalfSamples(
+    R: number,
+    diameter: number,
+    N: number,
+): number[][] {
     const yMax = diameter / 2;
     return Array.from({ length: N }, (_, i) => {
         const y = (i * yMax) / (N - 1);

@@ -94,8 +94,12 @@ function render(data: CylinderData, _dim: number): THREE.Object3D {
         cylinder.rotateZ(Math.PI / 2);
         cylinder.translate(center, 0.0, 0.0);
 
-        group.add(new LineSegments2(circleGeometry(xmin, radius), lineMaterial));
-        group.add(new LineSegments2(circleGeometry(xmax, radius), lineMaterial));
+        group.add(
+            new LineSegments2(circleGeometry(xmin, radius), lineMaterial),
+        );
+        group.add(
+            new LineSegments2(circleGeometry(xmax, radius), lineMaterial),
+        );
         group.add(new THREE.Mesh(cylinder, surfaceMaterial));
 
         const userTransform = arrayToMatrix4(matrix);
