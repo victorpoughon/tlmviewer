@@ -8,8 +8,8 @@ import {
     SurfaceBaseElement,
     SurfaceBaseData,
     parseSurfaceBaseData,
-    samples2DToPoints,
 } from "../SurfaceBaseElement.ts";
+import { samples2DToPoints } from "../../core/geometry.ts";
 
 interface SurfacePlaneData extends SurfaceBaseData {
     radius: number;
