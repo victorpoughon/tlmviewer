@@ -17,6 +17,10 @@ import {
     ArrowsData,
 } from "../elements_basic/ArrowsElement.ts";
 import { box3DDescriptor, Box3DData } from "../elements_basic/Box3D.ts";
+import {
+    pointsDescriptor,
+    PointsData,
+} from "../elements_basic/PointsElement.ts";
 
 // Union of all scene elements data types
 export type SceneElementData =
@@ -24,7 +28,8 @@ export type SceneElementData =
     | DirectionalLightData
     | SceneAxisData
     | ArrowsData
-    | Box3DData;
+    | Box3DData
+    | PointsData;
 
 // List of all scene elements descriptors
 export const allDescriptors = [
@@ -33,6 +38,7 @@ export const allDescriptors = [
     sceneAxisDescriptor,
     arrowsDescriptor,
     box3DDescriptor,
+    pointsDescriptor,
 ] as const;
 
 const descriptorMap = new Map<string, ElementDescriptor<any>>(

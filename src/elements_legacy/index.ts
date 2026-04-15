@@ -1,7 +1,6 @@
 import { AbstractSceneElement } from "./AbstractSceneElement.ts";
 import { SurfaceBaseElement } from "./SurfaceBaseElement.ts";
 import { BcylElement } from "./bcyl/BcylElement.ts";
-import { PointsElement } from "./points/PointsElement.ts";
 import { RaysElement } from "./rays/RaysElement.ts";
 import type { ColorOption } from "./rays/RaysElement.ts";
 import { SurfaceLatheElement } from "./surfaceLathe/SurfaceLatheElement.ts";
@@ -13,7 +12,6 @@ export {
     AbstractSceneElement,
     BcylElement,
     ColorOption,
-    PointsElement,
     RaysElement,
     SurfaceBaseElement,
     SurfaceLatheElement,
@@ -24,7 +22,6 @@ export {
 
 const _allSceneElementTypes = [
     BcylElement,
-    PointsElement,
     RaysElement,
     SurfaceLatheElement,
     SurfacePlaneElement,
