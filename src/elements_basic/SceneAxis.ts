@@ -19,7 +19,7 @@ function parse(raw: any, _dim: number): SceneAxisData {
     };
 }
 
-function render(data: SceneAxisData): THREE.Object3D {
+function render(data: SceneAxisData, _dim: number): THREE.Object3D {
     const group = new THREE.Group();
 
     const { axis, length, color } = data;

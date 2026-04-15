@@ -51,7 +51,7 @@ function circleGeometry(x: number, radius: number): LineSegmentsGeometry {
     return geometry;
 }
 
-function render(data: CylinderData): THREE.Object3D {
+function render(data: CylinderData, _dim: number): THREE.Object3D {
     const { matrix, xmin, xmax, radius } = data;
 
     const group = new THREE.Group();

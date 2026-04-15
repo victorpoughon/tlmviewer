@@ -19,7 +19,7 @@ function parse(raw: any, _dim: number): DirectionalLightData {
     };
 }
 
-function render(data: DirectionalLightData): THREE.Object3D {
+function render(data: DirectionalLightData, _dim: number): THREE.Object3D {
     const group = new THREE.Group();
     const light = new THREE.DirectionalLight(data.color, data.intensity);
     light.position.set(data.position[0], data.position[1], data.position[2]);

@@ -16,7 +16,7 @@ function parse(raw: any, _dim: number): AmbientLightData {
     };
 }
 
-function render(data: AmbientLightData): THREE.Object3D {
+function render(data: AmbientLightData, _dim: number): THREE.Object3D {
     const group = new THREE.Group();
     group.add(new THREE.AmbientLight(data.color, data.intensity));
     return group;

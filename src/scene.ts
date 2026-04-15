@@ -73,7 +73,7 @@ export class TLMScene {
             }
 
             const data: BaseElementData = descriptor.parse(elementData, dim);
-            const object3d: THREE.Object3D = descriptor.render(data);
+            const object3d: THREE.Object3D = descriptor.render(data, dim);
             const entry = new SceneEntry(object3d, data, descriptor);
             object3d.userData = entry;
             this.sceneGraph.add(object3d);
@@ -131,7 +131,7 @@ export class TLMScene {
             }
 
             const data: BaseElementData = descriptor.parse(elementData, dim);
-            const object3d: THREE.Object3D = descriptor.render(data);
+            const object3d: THREE.Object3D = descriptor.render(data, dim);
             const entry = new SceneEntry(object3d, data, descriptor);
             object3d.userData = entry;
             this.sceneGraph.add(object3d);

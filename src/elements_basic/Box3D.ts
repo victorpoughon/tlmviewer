@@ -17,7 +17,7 @@ function parse(raw: any, _dim: number): Box3DData {
     };
 }
 
-function render(data: Box3DData): THREE.Object3D {
+function render(data: Box3DData, _dim: number): THREE.Object3D {
     const { size } = data;
 
     const group = new THREE.Group();

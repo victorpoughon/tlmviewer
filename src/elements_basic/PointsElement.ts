@@ -31,7 +31,7 @@ function parse(raw: any, _dim: number): PointsData {
     };
 }
 
-function render(data: PointsData): THREE.Object3D {
+function render(data: PointsData, _dim: number): THREE.Object3D {
     const { vertices, color, radius, layers } = data;
 
     const group = new THREE.Group();

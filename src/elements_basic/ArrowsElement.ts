@@ -20,7 +20,7 @@ function parse(raw: any, dim: number): ArrowsData {
     return { type: "arrows", arrows };
 }
 
-function render(data: ArrowsData): THREE.Object3D {
+function render(data: ArrowsData, _dim: number): THREE.Object3D {
     const group = new THREE.Group();
 
     for (const arrow of data.arrows) {
