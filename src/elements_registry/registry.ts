@@ -26,6 +26,10 @@ import {
     CylinderData,
 } from "../elements_basic/Cylinder.ts";
 import { raysDescriptor, RaysData } from "../elements_basic/RaysElement.ts";
+import {
+    surfacePlaneDescriptor,
+    SurfacePlaneData,
+} from "../elements_surfaces/SurfacePlane.ts";
 
 // Union of all scene elements data types
 export type SceneElementData =
@@ -36,7 +40,8 @@ export type SceneElementData =
     | Box3DData
     | PointsData
     | CylinderData
-    | RaysData;
+    | RaysData
+    | SurfacePlaneData;
 
 // List of all scene elements descriptors
 export const allDescriptors = [
@@ -48,6 +53,7 @@ export const allDescriptors = [
     pointsDescriptor,
     cylinderDescriptor,
     raysDescriptor,
+    surfacePlaneDescriptor,
 ] as const;
 
 const descriptorMap = new Map<string, ElementDescriptor<any>>(
