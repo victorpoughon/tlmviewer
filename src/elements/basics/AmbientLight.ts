@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import { ElementDescriptor } from "../types.ts";
+import { BaseElementData, ElementDescriptor } from "../types.ts";
 import { getRequired } from "../../utility.ts";
 
-export type AmbientLightData = {
+export type AmbientLightData = BaseElementData & {
     type: "ambient-light";
     color: string;
     intensity: number;
@@ -32,6 +32,7 @@ const testData: AmbientLightData[] = [
 
 export const ambientLightDescriptor: ElementDescriptor<AmbientLightData> = {
     type: "ambient-light",
+    includeInDefaultCamera: false,
     parse,
     render,
     testData2D: testData,

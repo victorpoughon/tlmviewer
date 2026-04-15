@@ -18,6 +18,7 @@ export type ElementEventRecord<T extends BaseElementData> = {
 
 export type ElementDescriptor<T extends BaseElementData> = {
     type: T["type"];
+    includeInDefaultCamera: boolean;
     parse: (raw: unknown, dim: number) => T;
     render: (data: T) => THREE.Object3D; // TODO add DOM element, physical "dim", other stuff needed at init
     events?: ElementEventRecord<T>;
@@ -29,20 +30,26 @@ export type ElementDescriptor<T extends BaseElementData> = {
 export class SceneEntry {
     public object: THREE.Object3D;
     readonly data: BaseElementData;
-    readonly events: ElementEventRecord<BaseElementData>;
+    readonly descriptor: ElementDescriptor<BaseElementData>;
 
     constructor(
         object: THREE.Object3D,
         data: BaseElementData,
-        events?: ElementEventRecord<BaseElementData>,
+        descriptor: ElementDescriptor<BaseElementData>,
     ) {
         this.object = object;
         this.data = data;
-        this.events = events ?? {};
+        this.descriptor = descriptor;
     }
 
     public onEvent<K extends SceneEventType>(event: SceneEvent<K>): void {
-        const handler = this.events[event.type];
+        if (
+            this.descriptor.events === undefined ||
+            this.descriptor.events === null
+        )
+            return;
+
+        const handler = this.descriptor.events[event.type];
         if (handler) {
             handler(this.data, this.object, event);
         }

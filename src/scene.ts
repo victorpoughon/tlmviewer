@@ -63,7 +63,7 @@ export class TLMScene {
     public addDefaultSceneElements(dim: number) {
         for (const elementData of defaultSceneElementsData(dim)) {
             const descriptor = getMaybeDescriptor(elementData.type);
-            
+
             // Emit a warning for unknown element types
             if (descriptor === undefined) {
                 console.warn(
@@ -74,7 +74,7 @@ export class TLMScene {
 
             const data: BaseElementData = descriptor.parse(elementData, dim);
             const object3d: THREE.Object3D = descriptor.render(data);
-            const entry = new SceneEntry(object3d, data, descriptor.events);
+            const entry = new SceneEntry(object3d, data, descriptor);
             object3d.userData = entry;
             this.sceneGraph.add(object3d);
         }
@@ -132,7 +132,7 @@ export class TLMScene {
 
             const data: BaseElementData = descriptor.parse(elementData, dim);
             const object3d: THREE.Object3D = descriptor.render(data);
-            const entry = new SceneEntry(object3d, data, descriptor.events);
+            const entry = new SceneEntry(object3d, data, descriptor);
             object3d.userData = entry;
             this.sceneGraph.add(object3d);
         }
@@ -168,10 +168,13 @@ export class TLMScene {
         const bbox = new THREE.Box3();
         for (const child of this.sceneGraph.children) {
             const element = child.userData;
-            const include =
+            const include_legacy =
                 element instanceof AbstractSceneElement &&
                 element.includeInDefaultCamera;
-            if (include) {
+            const include_new =
+                element instanceof SceneEntry &&
+                element.descriptor.includeInDefaultCamera;
+            if (include_legacy || include_new) {
                 bbox.union(new THREE.Box3().setFromObject(child));
             }
         }

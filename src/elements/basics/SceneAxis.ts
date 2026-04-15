@@ -1,9 +1,9 @@
 import * as THREE from "three";
-import { ElementDescriptor } from "../types.ts";
+import { BaseElementData, ElementDescriptor } from "../types.ts";
 import { getOption, getRequired } from "../../utility.ts";
 import { makeLine2 } from "../../lineUtils.ts";
 
-export type SceneAxisData = {
+export type SceneAxisData = BaseElementData & {
     type: "scene-axis";
     axis: "x" | "y" | "z";
     length: number;
@@ -48,6 +48,7 @@ const testData: SceneAxisData[] = [
 
 export const sceneAxisDescriptor: ElementDescriptor<SceneAxisData> = {
     type: "scene-axis",
+    includeInDefaultCamera: false,
     parse,
     render,
     events: {
