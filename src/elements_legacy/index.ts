@@ -1,6 +1,5 @@
 import { AbstractSceneElement } from "./AbstractSceneElement.ts";
 import { SurfaceBaseElement } from "./SurfaceBaseElement.ts";
-import { RaysElement } from "./rays/RaysElement.ts";
 import type { ColorOption } from "../core/events.ts";
 import { SurfaceLatheElement } from "./surfaceLathe/SurfaceLatheElement.ts";
 import { SurfacePlaneElement } from "./surfacePlane/SurfacePlaneElement.ts";
@@ -10,7 +9,6 @@ import { SurfaceSagElement } from "./surfaceSag/SurfaceSagElement.ts";
 export {
     AbstractSceneElement,
     ColorOption,
-    RaysElement,
     SurfaceBaseElement,
     SurfaceLatheElement,
     SurfacePlaneElement,
@@ -19,7 +17,6 @@ export {
 };
 
 const _allSceneElementTypes = [
-    RaysElement,
     SurfaceLatheElement,
     SurfacePlaneElement,
     SurfaceSagElement,
