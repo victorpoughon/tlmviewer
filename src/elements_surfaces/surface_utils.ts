@@ -133,6 +133,11 @@ export function defaultSurfaceEvents<
     T extends SurfaceBaseData,
 >(): ElementEventRecord<T> {
     return {
+        setCategoryVisibility: (_, object, event) => {
+            if (event.category == "surface") {
+                object.visible = event.visible;
+            }
+        },
         setSurfacesVisible: (_, object, event) => {
             object.visible = event.value;
         },

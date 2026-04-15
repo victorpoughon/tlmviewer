@@ -37,7 +37,7 @@ function render(data: SceneAxisData, _dim: number): THREE.Object3D {
     return group;
 }
 
-const testData: SceneAxisData[] = [
+const testData: any[] = [
     {
         type: "scene-axis",
         axis: "x",

@@ -16,6 +16,7 @@ export type SceneEventMap = {
     setSurfacesColor: { value: THREE.Color };
     setAxisVisible: { axis: "x" | "y" | "z"; visible: boolean };
     setBcylVisible: { value: boolean };
+    setCategoryVisibility: { category: string; visible: boolean };
     setBackground: { value: THREE.Color }; // TODO
     resetView: {}; // TODO
 };

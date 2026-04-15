@@ -17,11 +17,13 @@ export type RaysData = BaseElementData & {
     domain: Record<string, [number, number]>;
     layers: number[];
     dim: 2 | 3;
+    categories: string[];
 };
 
 function parse(raw: any, dim: number): RaysData {
     return {
         type: "rays",
+        categories: raw.categories ?? [],
         points: getRequired<number[][]>(raw, "points"),
         color: raw.color ?? "#ffa724",
         variables: raw.variables ?? {},

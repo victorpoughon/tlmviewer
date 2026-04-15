@@ -27,7 +27,7 @@ function render(data: DirectionalLightData, _dim: number): THREE.Object3D {
     return group;
 }
 
-const testData: DirectionalLightData[] = [
+const testData: any[] = [
     {
         type: "directional-light",
         color: "#ffffff",

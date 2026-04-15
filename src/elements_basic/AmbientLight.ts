@@ -22,7 +22,7 @@ function render(data: AmbientLightData, _dim: number): THREE.Object3D {
     return group;
 }
 
-const testData: AmbientLightData[] = [
+const testData: any[] = [
     {
         type: "ambient-light",
         color: "#ffffff",

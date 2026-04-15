@@ -14,7 +14,7 @@ function parse(raw: any, _dim: number): SceneTitleData {
     };
 }
 
-const testData: any = [
+const testData: any[] = [
     {
         type: "scene-title",
         title: "Hello world!",

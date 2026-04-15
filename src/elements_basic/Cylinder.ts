@@ -140,6 +140,11 @@ export const cylinderDescriptor: ElementDescriptor<CylinderData> = {
     parse,
     render,
     events: {
+        setCategoryVisibility: (_, object, event) => {
+            if (event.category == "bcyl") {
+                object.visible = event.visible;
+            }
+        },
         setBcylVisible: (_, object, event) => {
             object.visible = event.value;
         },

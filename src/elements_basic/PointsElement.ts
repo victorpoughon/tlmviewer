@@ -8,6 +8,7 @@ export type PointsData = BaseElementData & {
     color: string;
     radius: number;
     layers: number[];
+    categories: string[];
 };
 
 function applyLayerGroup(obj: THREE.Object3D, layers: Array<number>) {
@@ -24,6 +25,7 @@ function applyLayerGroup(obj: THREE.Object3D, layers: Array<number>) {
 function parse(raw: any, _dim: number): PointsData {
     return {
         type: "points",
+        categories: raw.categories ?? [],
         vertices: getRequired<number[][]>(raw, "data"),
         color: raw.color ?? "#ffffff",
         radius: raw.radius ?? 0.1,
@@ -86,6 +88,13 @@ export const pointsDescriptor: ElementDescriptor<PointsData> = {
     includeInDefaultCamera: true,
     parse,
     render,
+    events: {
+        setCategoryVisibility: (data, object, event) => {
+            if (data.categories.includes(event.category)) {
+                object.visible = event.visible;
+            }
+        }
+    },
     testData2D,
     testData3D,
 };

@@ -47,7 +47,7 @@ function render(data: Box3DData, _dim: number): THREE.Object3D {
     return group;
 }
 
-const testData3D: Box3DData[] = [
+const testData3D: any[] = [
     {
         type: "box3D",
         size: [10, 10, 10],
