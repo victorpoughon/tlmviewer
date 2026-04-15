@@ -1,6 +1,5 @@
 import { AbstractSceneElement } from "./AbstractSceneElement.ts";
 import { SurfaceBaseElement } from "./SurfaceBaseElement.ts";
-import { BcylElement } from "./bcyl/BcylElement.ts";
 import { RaysElement } from "./rays/RaysElement.ts";
 import type { ColorOption } from "../core/events.ts";
 import { SurfaceLatheElement } from "./surfaceLathe/SurfaceLatheElement.ts";
@@ -10,7 +9,6 @@ import { SurfaceSagElement } from "./surfaceSag/SurfaceSagElement.ts";
 
 export {
     AbstractSceneElement,
-    BcylElement,
     ColorOption,
     RaysElement,
     SurfaceBaseElement,
@@ -21,7 +19,6 @@ export {
 };
 
 const _allSceneElementTypes = [
-    BcylElement,
     RaysElement,
     SurfaceLatheElement,
     SurfacePlaneElement,
