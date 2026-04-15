@@ -29,13 +29,22 @@ export type ElementDescriptor<T extends BaseElementData> = {
 export class SceneEntry {
     public object: THREE.Object3D;
     readonly data: BaseElementData;
-    // TODO store event handlers
+    readonly events: ElementEventRecord<BaseElementData>;
 
-    constructor(object: THREE.Object3D, data: BaseElementData) {
+    constructor(
+        object: THREE.Object3D,
+        data: BaseElementData,
+        events?: ElementEventRecord<BaseElementData>,
+    ) {
         this.object = object;
         this.data = data;
+        this.events = events ?? {};
     }
 
-    // TODO
-    // public onEvent(...)
+    public onEvent<K extends SceneEventType>(event: SceneEvent<K>): void {
+        const handler = this.events[event.type];
+        if (handler) {
+            handler(this.data, this.object, event);
+        }
+    }
 }
