@@ -41,3 +41,13 @@ export function samples2DToPoints(samples: Array<Array<number>>) {
     }
     return points;
 }
+
+// Derive a THREE.Matrix4 from a 3x3 homogeneous (2D) surface matrix
+export function getTransform2D(matrix: number[][]): THREE.Matrix4 {
+    return arrayToMatrix4(homogeneousMatrix3to4(matrix));
+}
+
+// Derive a THREE.Matrix4 from a 4x4 (3D) surface matrix
+export function getTransform3D(matrix: number[][]): THREE.Matrix4 {
+    return arrayToMatrix4(matrix);
+}
