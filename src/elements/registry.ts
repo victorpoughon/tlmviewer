@@ -9,18 +9,21 @@ import {
     DirectionalLightData,
 } from "./basics/DirectionalLight.ts";
 import { sceneAxisDescriptor, SceneAxisData } from "./basics/SceneAxis.ts";
+import { arrowsDescriptor, ArrowsData } from "./basics/ArrowsElement.ts";
 
 // Union of all scene elements data types
 export type SceneElementData =
     | AmbientLightData
     | DirectionalLightData
-    | SceneAxisData;
+    | SceneAxisData
+    | ArrowsData;
 
 // List of all scene elements descriptors
 export const allDescriptors = [
     ambientLightDescriptor,
     directionalLightDescriptor,
     sceneAxisDescriptor,
+    arrowsDescriptor,
 ] as const;
 
 const descriptorMap = new Map<string, ElementDescriptor<any>>(

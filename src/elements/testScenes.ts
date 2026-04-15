@@ -1,8 +1,4 @@
 import {
-    testData2D as arrowsData2D,
-    testData3D as arrowsData3D,
-} from "./arrows/tests/testData.ts";
-import {
     testData2D as bcylData2D,
     testData3D as bcylData3D,
 } from "./bcyl/tests/testData.ts";
@@ -72,23 +68,21 @@ for (const descriptor of allDescriptors) {
 
 // Old-style element test scenes (not yet migrated to the new registry)
 const legacyScenes: Array<{ sceneName: string; data: object }> = [
-    buildScene("arrows/2D", "2D", arrowsData2D),
-    buildScene("arrows/3D", "3D", arrowsData3D),
-    buildScene("bcyl/2D", "2D", bcylData2D),
-    buildScene("bcyl/3D", "3D", bcylData3D),
-    buildScene("box3D/3D", "3D", box3DData3D),
-    buildScene("points/2D", "2D", pointsData2D),
-    buildScene("points/3D", "3D", pointsData3D),
-    buildScene("rays/2D", "2D", raysData2D),
-    buildScene("rays/3D", "3D", raysData3D),
-    buildScene("surfaceLathe/2D", "2D", surfaceLatheData2D),
-    buildScene("surfaceLathe/3D", "3D", surfaceLatheData3D),
-    buildScene("surfacePlane/2D", "2D", surfacePlaneData2D),
-    buildScene("surfacePlane/3D", "3D", surfacePlaneData3D),
-    buildScene("surfaceSphereR/2D", "2D", surfaceSphereRData2D),
-    buildScene("surfaceSphereR/3D", "3D", surfaceSphereRData3D),
-    buildScene("surfaceSag/2D", "2D", surfaceSagData2D),
-    buildScene("surfaceSag/3D", "3D", surfaceSagData3D),
+    buildScene("(legacy) bcyl/2D", "2D", bcylData2D),
+    buildScene("(legacy) bcyl/3D", "3D", bcylData3D),
+    buildScene("(legacy) box3D/3D", "3D", box3DData3D),
+    buildScene("(legacy) points/2D", "2D", pointsData2D),
+    buildScene("(legacy) points/3D", "3D", pointsData3D),
+    buildScene("(legacy) rays/2D", "2D", raysData2D),
+    buildScene("(legacy) rays/3D", "3D", raysData3D),
+    buildScene("(legacy) surfaceLathe/2D", "2D", surfaceLatheData2D),
+    buildScene("(legacy) surfaceLathe/3D", "3D", surfaceLatheData3D),
+    buildScene("(legacy) surfacePlane/2D", "2D", surfacePlaneData2D),
+    buildScene("(legacy) surfacePlane/3D", "3D", surfacePlaneData3D),
+    buildScene("(legacy) surfaceSphereR/2D", "2D", surfaceSphereRData2D),
+    buildScene("(legacy) surfaceSphereR/3D", "3D", surfaceSphereRData3D),
+    buildScene("(legacy) surfaceSag/2D", "2D", surfaceSagData2D),
+    buildScene("(legacy) surfaceSag/3D", "3D", surfaceSagData3D),
 ];
 
 export const builtinScenes: Array<{ sceneName: string; data: object }> = [
