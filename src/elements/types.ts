@@ -18,7 +18,7 @@ export type ElementEventRecord<T extends BaseElementData> = {
 
 export type ElementDescriptor<T extends BaseElementData> = {
     type: T["type"];
-    parse: (raw: unknown) => T;
+    parse: (raw: unknown, dim: number) => T;
     render: (data: T) => THREE.Object3D; // TODO add DOM element, physical "dim", other stuff needed at init
     events?: ElementEventRecord<T>;
     testData2D: T[];

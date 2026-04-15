@@ -8,7 +8,7 @@ export type AmbientLightData = {
     intensity: number;
 };
 
-function parse(raw: any): AmbientLightData {
+function parse(raw: any, _dim: number): AmbientLightData {
     return {
         type: "ambient-light",
         color: getRequired<string>(raw, "color"),
