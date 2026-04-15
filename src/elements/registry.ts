@@ -3,15 +3,12 @@ import { ElementDescriptor } from "./types.ts";
 import {
     ambientLightDescriptor,
     AmbientLightData,
-} from "../elements/AmbientLight.ts";
+} from "./basics/AmbientLight.ts";
 import {
     directionalLightDescriptor,
     DirectionalLightData,
-} from "../elements/DirectionalLight.ts";
-import {
-    sceneAxisDescriptor,
-    SceneAxisData,
-} from "../elements/SceneAxis.ts";
+} from "./basics/DirectionalLight.ts";
+import { sceneAxisDescriptor, SceneAxisData } from "./basics/SceneAxis.ts";
 
 // Union of all scene elements data types
 export type SceneElementData =

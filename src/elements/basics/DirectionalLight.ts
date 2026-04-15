@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { ElementDescriptor } from "./types.ts";
-import { getRequired } from "../utility.ts";
+import { ElementDescriptor } from "../types.ts";
+import { getRequired } from "../../utility.ts";
 
 export type DirectionalLightData = {
     type: "directional-light";
@@ -36,10 +36,11 @@ const testData: DirectionalLightData[] = [
     },
 ];
 
-export const directionalLightDescriptor: ElementDescriptor<DirectionalLightData> = {
-    type: "directional-light",
-    parse,
-    render,
-    testData2D: testData,
-    testData3D: testData,
-};
+export const directionalLightDescriptor: ElementDescriptor<DirectionalLightData> =
+    {
+        type: "directional-light",
+        parse,
+        render,
+        testData2D: testData,
+        testData3D: testData,
+    };
