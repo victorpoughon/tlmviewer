@@ -31,6 +31,7 @@ import {
     testData2D as surfaceSagData2D,
     testData3D as surfaceSagData3D,
 } from "./surfaceSag/tests/testData.ts";
+import { allDescriptors } from "./registry.ts";
 
 function buildScene(
     sceneName: string,
@@ -54,7 +55,23 @@ function buildScene(
     };
 }
 
-export const builtinScenes: Array<{ sceneName: string; data: object }> = [
+// Generate test scenes from the new registry
+const registryScenes: Array<{ sceneName: string; data: object }> = [];
+for (const descriptor of allDescriptors) {
+    if (descriptor.testData2D.length > 0) {
+        registryScenes.push(
+            buildScene(`${descriptor.type}/2D`, "2D", descriptor.testData2D),
+        );
+    }
+    if (descriptor.testData3D.length > 0) {
+        registryScenes.push(
+            buildScene(`${descriptor.type}/3D`, "3D", descriptor.testData3D),
+        );
+    }
+}
+
+// Old-style element test scenes (not yet migrated to the new registry)
+const legacyScenes: Array<{ sceneName: string; data: object }> = [
     buildScene("arrows/2D", "2D", arrowsData2D),
     buildScene("arrows/3D", "3D", arrowsData3D),
     buildScene("bcyl/2D", "2D", bcylData2D),
@@ -72,4 +89,9 @@ export const builtinScenes: Array<{ sceneName: string; data: object }> = [
     buildScene("surfaceSphereR/3D", "3D", surfaceSphereRData3D),
     buildScene("surfaceSag/2D", "2D", surfaceSagData2D),
     buildScene("surfaceSag/3D", "3D", surfaceSagData3D),
+];
+
+export const builtinScenes: Array<{ sceneName: string; data: object }> = [
+    ...registryScenes,
+    ...legacyScenes,
 ];
