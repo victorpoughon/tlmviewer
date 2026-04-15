@@ -58,7 +58,6 @@ Defined now so the GUI has a typed key and future camera-aware elements can subs
 
 ## 5. Update `TLMGui` — `src/gui.ts` (edit)
 
-- `app.camera` → `app.rig.camera` for layer toggling.
 - "Reset Camera" button continues calling `app.resetView()`.
 - Camera selector dropdown can be added later using `setCamera`.
 

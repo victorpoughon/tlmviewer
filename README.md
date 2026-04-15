@@ -59,7 +59,6 @@ A scene is a JSON object with the following top-level fields:
 | `mode` | `"2D"` \| `"3D"` | yes | Rendering mode |
 | `camera` | `"XY"` \| `"orthographic"` \| `"perspective"` | yes | Camera type |
 | `data` | array | yes | List of scene elements |
-| `title` | string | no | Title displayed in the viewer |
 | `controls` | object | no | Initial state of GUI controls |
 
 **Camera types:**
@@ -79,13 +78,17 @@ The `controls` object sets the initial state of the viewer GUI. All fields are o
 | `output_rays` | string | Color option for output rays |
 | `opacity` | number (0–1) | Ray opacity |
 | `thickness` | number (0.1–10) | Ray line width |
+| `show_valid_rays` | boolean | Show/hide valid rays |
+| `show_blocked_rays` | boolean | Show/hide blocked rays |
+| `show_output_rays` | boolean | Show/hide output rays |
 | `show_surfaces` | boolean | Show/hide optical surfaces |
 | `show_optical_axis` | boolean | Show/hide the optical axis line |
 | `show_other_axes` | boolean | Show/hide the coordinate axes helper |
+| `show_kinematic_joints` | boolean | Show/hide kinematic joint points |
 | `show_bounding_cylinders` | boolean | Show/hide bounding cylinders |
 | `show_controls` | boolean | Show/hide the GUI controls panel |
 
-Color option strings are one of: `"default"`, `"hide"`, `"wavelength"`, `"wavelength (true color)"`, or any variable name present in the ray data.
+Color option strings are one of: `"default"`, `"wavelength"`, `"wavelength (true color)"`, or any variable name present in the ray data.
 
 ---
 
@@ -111,7 +114,6 @@ A rotationally symmetric optical surface defined by a sag function. Rendered in 
 | `diameter` | yes | Aperture diameter |
 | `sag-function` | yes | Sag function definition (see below) |
 | `matrix` | yes | 3×3 (2D) or 4×4 (3D) homogeneous transform matrix |
-| `bcyl` | no | Bounding cylinder as `[xmin, xmax, radius]` |
 | `clip_planes` | no | List of clipping planes as `[nx, ny, nz, c]` in surface local frame |
 
 **Sag function types:**
@@ -198,7 +200,7 @@ A set of ray segments with optional per-ray scalar variables for color mapping. 
     "color": "#ffa724",
     "variables": { "field": [0.5, -0.5] },
     "domain": { "field": [-1, 1] },
-    "layers": [0]
+    "categories": "rays-valid"
 }
 ```
 
@@ -208,7 +210,7 @@ A set of ray segments with optional per-ray scalar variables for color mapping. 
 | `color` | no | Default ray color as a CSS color string (default: `"#ffa724"`) |
 | `variables` | no | Map of variable name → array of per-ray scalar values |
 | `domain` | no | Map of variable name → `[min, max]` for color normalization |
-| `layers` | no | Layer index list: `[0]` = valid, `[2]` = blocked, `[3]` = output |
+| `categories` | no | Visibility category string: `"rays-valid"` (default), `"rays-blocked"`, or `"rays-output"` |
 
 ---
 
@@ -228,6 +230,7 @@ A set of points rendered as small spheres. Rendered in both 2D and 3D.
 |---|---|---|
 | `data` | yes | Array of `[x, y]` (2D) or `[x, y, z]` (3D) positions |
 | `color` | no | Point color as a CSS color string (default: `"#ffffff"`) |
+| `categories` | no | Array of visibility category strings (default: `[]`). Use `["kinematic-joint"]` for kinematic joint points |
 
 ---
 
@@ -264,6 +267,107 @@ A wireframe box. 3D only.
 |---|---|---|
 | `size` | yes | Box dimensions as `[width, height, depth]` |
 | `matrix` | yes | 4×4 homogeneous transform matrix |
+
+---
+
+### `cylinder`
+
+A wireframe bounding cylinder. Rendered in both 2D (as a rectangle) and 3D.
+
+```json
+{
+    "type": "cylinder",
+    "xmin": -1,
+    "xmax": 1.27,
+    "radius": 5,
+    "matrix": [[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]]
+}
+```
+
+| Field | Required | Description |
+|---|---|---|
+| `xmin` | yes | Minimum X extent |
+| `xmax` | yes | Maximum X extent |
+| `radius` | yes | Cylinder radius |
+| `matrix` | yes | 3×3 (2D) or 4×4 (3D) homogeneous transform matrix |
+
+---
+
+### `scene-axis`
+
+An axis line through the origin. Rendered in both 2D and 3D. Hidden by default; visibility is controlled by the `axis-x`, `axis-y`, and `axis-z` categories.
+
+```json
+{
+    "type": "scene-axis",
+    "axis": "x",
+    "length": 10,
+    "color": "#e3e3e3"
+}
+```
+
+| Field | Required | Description |
+|---|---|---|
+| `axis` | yes | Axis direction: `"x"`, `"y"`, or `"z"` |
+| `length` | yes | Half-length of the axis line |
+| `color` | no | Line color as a CSS color string (default: `"#e3e3e3"`) |
+
+---
+
+### `scene-title`
+
+Sets the scene title displayed in the viewer overlay. Does not render any 3D geometry.
+
+```json
+{
+    "type": "scene-title",
+    "title": "My Scene"
+}
+```
+
+| Field | Required | Description |
+|---|---|---|
+| `title` | yes | Title text to display |
+
+---
+
+### `ambient-light`
+
+An ambient light source. Rendered in both 2D and 3D.
+
+```json
+{
+    "type": "ambient-light",
+    "color": "#ffffff",
+    "intensity": 0.5
+}
+```
+
+| Field | Required | Description |
+|---|---|---|
+| `color` | yes | Light color as a CSS color string |
+| `intensity` | yes | Light intensity |
+
+---
+
+### `directional-light`
+
+A directional light source. Rendered in both 2D and 3D.
+
+```json
+{
+    "type": "directional-light",
+    "color": "#ffffff",
+    "intensity": 0.8,
+    "position": [1, 2, 3]
+}
+```
+
+| Field | Required | Description |
+|---|---|---|
+| `color` | yes | Light color as a CSS color string |
+| `intensity` | yes | Light intensity |
+| `position` | yes | Light position as `[x, y, z]` |
 
 ---
 
