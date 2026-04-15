@@ -96,4 +96,4 @@ If the old element has interactive behavior (responds to mouse events, animation
 - [ ] Added to `src/elements/registry.ts` (import, union type, allDescriptors)
 - [ ] Removed from `src/elements/index.ts` (import, export, _allSceneElementTypes)
 - [ ] Old class file deleted
-- [ ] `npm run test` passes
+- [ ] `npm run test && npm run build` passes
