@@ -6,6 +6,7 @@ import type { CameraRig } from "./cameras/CameraRig.ts";
 import { createCamera2D } from "./cameras/Camera2D.ts";
 import { createOrthographicCamera } from "./cameras/OrthographicCamera.ts";
 import { createPerspectiveCamera } from "./cameras/PerspectiveCamera.ts";
+import { createAxialCamera } from "./cameras/AxialCamera.ts";
 
 import "./viewer.css";
 
@@ -53,6 +54,8 @@ export class TLMViewerApp {
             return createOrthographicCamera(domElement);
         } else if (cameraType === "perspective") {
             return createPerspectiveCamera(domElement);
+        } else if (cameraType === "axial") {
+            return createAxialCamera(domElement);
         } else {
             throw new Error(`Unknown camera type '${cameraType}'`);
         }
