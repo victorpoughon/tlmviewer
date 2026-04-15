@@ -85,8 +85,10 @@ function renderSurface3D<T extends SurfaceBaseData>(
 ): THREE.Group {
     const group = new THREE.Group();
 
-    // Clip planes are defined in surface local frame and must be transformed
-    // into world space using the user matrix.
+    // Clip planes are encoded as [x, y, z, c], where:
+    //     [x, y, z] is the normal vector in surface local frame
+    //     c is the constant in surface local frame
+    // they must be transformed into world space using the user matrix.
     const userTransform = arrayToMatrix4(data.matrix);
     const clipPlanes: THREE.Plane[] = [];
     for (const plane of data.clipPlanes) {
@@ -103,12 +105,20 @@ function renderSurface3D<T extends SurfaceBaseData>(
 
     const material = new CustomShaderMaterial({
         baseMaterial: THREE.MeshNormalMaterial,
+        // baseMaterial: THREE.MeshLambertMaterial,
+        // baseMaterial: THREE.MeshPhongMaterial,
         vertexShader: vertexShader ?? undefined,
+
+        // Base material properties
+        // color: 0x049ef4,
         side: THREE.DoubleSide,
         clippingPlanes: clipPlanes,
         clipIntersection: false,
         transparent: false,
         opacity: 0.8,
+        // shininess: 50,
+        // specular: 0x5e5e5e,
+        // wireframe: true,
     });
 
     const mesh = new THREE.Mesh(geometry, material);
