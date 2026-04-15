@@ -1,0 +1,45 @@
+import * as THREE from "three";
+import { ElementDescriptor } from "./types.ts";
+import { getRequired } from "../utility.ts";
+
+export type DirectionalLightData = {
+    type: "directional-light";
+    color: string;
+    intensity: number;
+    position: [number, number, number];
+};
+
+function parse(raw: any, _dim: number): DirectionalLightData {
+    const position = getRequired<number[]>(raw, "position");
+    return {
+        type: "directional-light",
+        color: getRequired<string>(raw, "color"),
+        intensity: getRequired<number>(raw, "intensity"),
+        position: position as [number, number, number],
+    };
+}
+
+function render(data: DirectionalLightData): THREE.Object3D {
+    const group = new THREE.Group();
+    const light = new THREE.DirectionalLight(data.color, data.intensity);
+    light.position.set(data.position[0], data.position[1], data.position[2]);
+    group.add(light);
+    return group;
+}
+
+const testData: DirectionalLightData[] = [
+    {
+        type: "directional-light",
+        color: "#ffffff",
+        intensity: 0.8,
+        position: [1, 2, 3],
+    },
+];
+
+export const directionalLightDescriptor: ElementDescriptor<DirectionalLightData> = {
+    type: "directional-light",
+    parse,
+    render,
+    testData2D: testData,
+    testData3D: testData,
+};
