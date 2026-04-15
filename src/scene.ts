@@ -9,6 +9,8 @@ import {
 } from "./elements/index.ts";
 import { ViewerEvent } from "./viewerEvent.ts";
 import { defaultSceneElementsData } from "./elements/defaultSceneElements.ts";
+import { getMaybeDescriptor } from "./elements/registry.ts";
+import { BaseElementData, SceneEntry } from "./elements/types.ts";
 
 // Extract available variables from the scene
 function extractVariables(root: any): string[] {
@@ -47,6 +49,7 @@ export class TLMScene {
         // Setup scene graph
         this.sceneGraph = new THREE.Group();
         this.initSceneGraph(dim);
+        this.initSceneGraph2(dim);
 
         this.addDefaultSceneElements(dim);
 
@@ -59,28 +62,21 @@ export class TLMScene {
 
     public addDefaultSceneElements(dim: number) {
         for (const elementData of defaultSceneElementsData(dim)) {
-            const matches = matchingElementTypes(elementData);
-
+            const descriptor = getMaybeDescriptor(elementData.type);
+            
             // Emit a warning for unknown element types
-            if (matches.length === 0) {
+            if (descriptor === undefined) {
                 console.warn(
-                    `tlmviewer: Unknown scene element ${JSON.stringify(elementData)}`,
+                    `tlmviewer: (default elements) Unknown scene element ${elementData.type}`,
                 );
+                continue;
             }
 
-            for (const type of matches) {
-                const data = (type as any).parse(elementData);
-                const instance = new type(
-                    data,
-                    dim,
-                    this.container,
-                    this.scene,
-                );
-                if (instance.group) {
-                    instance.group.userData = instance;
-                    this.sceneGraph.add(instance.group);
-                }
-            }
+            const data: BaseElementData = descriptor.parse(elementData);
+            const object3d: THREE.Object3D = descriptor.render(data);
+            const entry: SceneEntry = { object: object3d, data: data };
+            object3d.userData = entry;
+            this.sceneGraph.add(object3d);
         }
     }
 
@@ -95,7 +91,7 @@ export class TLMScene {
             // Emit a warning for unknown element types
             if (matches.length === 0) {
                 console.warn(
-                    `tlmviewer: Unknown scene element ${JSON.stringify(elementData)}`,
+                    `tlmviewer: Unknown scene element ${elementData.type}`,
                 );
             }
 
@@ -118,6 +114,27 @@ export class TLMScene {
                     );
                 }
             }
+        }
+    }
+
+    public initSceneGraph2(_dim: number) {
+        const elements = getRequired<any[]>(this.root, "data");
+        for (const elementData of elements) {
+            const descriptor = getMaybeDescriptor(elementData.type);
+
+            // Emit a warning for unknown element types
+            if (descriptor === undefined) {
+                console.warn(
+                    `tlmviewer: (initSceneGraph2) Unknown scene element ${JSON.stringify(elementData)}`,
+                );
+                continue;
+            }
+
+            const data: BaseElementData = descriptor.parse(elementData);
+            const object3d: THREE.Object3D = descriptor.render(data);
+            const entry: SceneEntry = { object: object3d, data: data };
+            object3d.userData = entry;
+            this.sceneGraph.add(object3d);
         }
     }
 
