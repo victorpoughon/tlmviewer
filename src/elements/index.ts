@@ -10,7 +10,6 @@ import { SurfaceLatheElement } from "./surfaceLathe/SurfaceLatheElement.ts";
 import { SurfacePlaneElement } from "./surfacePlane/SurfacePlaneElement.ts";
 import { SurfaceSphereRElement } from "./surfaceSphereR/SurfaceSphereRElement.ts";
 import { SurfaceSagElement } from "./surfaceSag/SurfaceSagElement.ts";
-import { SceneAxisElement } from "./sceneAxis/SceneAxisElement.ts";
 
 export {
     AbstractSceneElement,
@@ -20,7 +19,6 @@ export {
     ColorOption,
     PointsElement,
     RaysElement,
-    SceneAxisElement,
     SurfaceBaseElement,
     SurfaceLatheElement,
     SurfacePlaneElement,
@@ -34,7 +32,6 @@ const _allSceneElementTypes = [
     Box3DElement,
     PointsElement,
     RaysElement,
-    SceneAxisElement,
     SurfaceLatheElement,
     SurfacePlaneElement,
     SurfaceSagElement,

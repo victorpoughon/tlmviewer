@@ -25,8 +25,17 @@ export type ElementDescriptor<T extends BaseElementData> = {
     testData3D: T[];
 };
 
-export type SceneEntry = {
-    object: THREE.Object3D;
-    data: BaseElementData;
-    // event handlers
-};
+// This object type is used as the user data of the three js object
+export class SceneEntry {
+    public object: THREE.Object3D;
+    readonly data: BaseElementData;
+    // TODO store event handlers
+
+    constructor(object: THREE.Object3D, data: BaseElementData) {
+        this.object = object;
+        this.data = data;
+    }
+
+    // TODO
+    // public onEvent(...)
+}

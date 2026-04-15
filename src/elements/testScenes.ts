@@ -31,10 +31,6 @@ import {
     testData2D as surfaceSagData2D,
     testData3D as surfaceSagData3D,
 } from "./surfaceSag/tests/testData.ts";
-import {
-    testData2D as sceneAxisData2D,
-    testData3D as sceneAxisData3D,
-} from "./sceneAxis/tests/testData.ts";
 
 function buildScene(
     sceneName: string,
@@ -76,6 +72,4 @@ export const builtinScenes: Array<{ sceneName: string; data: object }> = [
     buildScene("surfaceSphereR/3D", "3D", surfaceSphereRData3D),
     buildScene("surfaceSag/2D", "2D", surfaceSagData2D),
     buildScene("surfaceSag/3D", "3D", surfaceSagData3D),
-    buildScene("sceneAxisData/2D", "2D", sceneAxisData2D),
-    buildScene("sceneAxisData/3D", "3D", sceneAxisData3D),
 ];
