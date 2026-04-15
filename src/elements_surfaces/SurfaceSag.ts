@@ -1,4 +1,97 @@
-export const testData2D: any[] = [
+import * as THREE from "three";
+
+import { LineGeometry } from "three/addons/lines/LineGeometry.js";
+
+import { ElementDescriptor } from "../core/types.ts";
+import { getRequired } from "../utility.ts";
+
+import {
+    SurfaceBaseData,
+    parseSurfaceBaseData,
+    makeSurfaceRender,
+    defaultSurfaceEvents,
+} from "./surface_utils.ts";
+import { parseSagFunction, glslRender } from "./sagFunctions.ts";
+
+export type SurfaceSagData = SurfaceBaseData & {
+    type: "surface-sag";
+    diameter: number;
+    sagFunctionData: any;
+};
+
+function parse(raw: any, _dim: number): SurfaceSagData {
+    return {
+        ...parseSurfaceBaseData(raw),
+        type: "surface-sag",
+        diameter: getRequired<number>(raw, "diameter"),
+        sagFunctionData: getRequired<any>(raw, "sag-function"),
+    };
+}
+
+// Generate line geometry by sampling a sag function in 2D
+function sagGeometry2D(
+    sag: (r: number) => number,
+    start: number,
+    end: number,
+    N: number,
+    const_z: number,
+): LineGeometry {
+    const geometry = new LineGeometry();
+
+    const step = (end - start) / (N - 1);
+    const points: number[] = [];
+
+    for (let i = 0; i < N; i++) {
+        const y = start + i * step;
+        const x = sag(y);
+
+        points.push(x, y, const_z);
+    }
+
+    geometry.setPositions(points);
+    return geometry;
+}
+
+function makeGeometry2D(
+    data: SurfaceSagData,
+    tf: THREE.Matrix4,
+): [LineGeometry, THREE.Matrix4] {
+    const { diameter } = data;
+    const tau = diameter / 2;
+    const sag = parseSagFunction(data.sagFunctionData, tau).sagFunction2D(tau);
+
+    const geometry = sagGeometry2D(sag, -diameter / 2, diameter / 2, 100, 1.0);
+
+    return [geometry, tf];
+}
+
+function makeGeometry3D(
+    data: SurfaceSagData,
+    tf: THREE.Matrix4,
+): [THREE.BufferGeometry, THREE.Matrix4, string | null] {
+    // We use ring geometry as the base geometry
+    // But could consider using a custom geometry
+    // for better distribution of vertices over the disk
+    const { diameter } = data;
+    const geometry = new THREE.RingGeometry(
+        0,
+        diameter / 2,
+        256,
+        256,
+    ).rotateY(Math.PI / 2);
+
+    const tau = diameter / 2;
+    const sag = parseSagFunction(data.sagFunctionData, tau);
+    const vertexShader = glslRender(
+        sag.shaderG(tau),
+        sag.shaderGgrad(tau),
+        sag.name,
+    );
+
+    return [geometry, tf, vertexShader];
+}
+
+const testData2D = [
     {
         type: "surface-sag",
         diameter: 10,
@@ -62,7 +155,7 @@ export const testData2D: any[] = [
     },
 ];
 
-export const testData3D: any[] = [
+const testData3D = [
     {
         type: "surface-sag",
         diameter: 10,
@@ -131,3 +224,13 @@ export const testData3D: any[] = [
         ],
     },
 ];
+
+export const surfaceSagDescriptor: ElementDescriptor<SurfaceSagData> = {
+    type: "surface-sag",
+    includeInDefaultCamera: true,
+    parse,
+    render: makeSurfaceRender(makeGeometry2D, makeGeometry3D),
+    events: defaultSurfaceEvents(),
+    testData2D,
+    testData3D,
+};

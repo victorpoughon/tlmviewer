@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { GUI, Controller } from "lil-gui";
 
-import { ColorOption } from "./elements_legacy/index.ts";
+import { ColorOption } from "./core/events.ts";
 import { TLMScene } from "./scene.ts";
 import { TLMViewerApp } from "./app.ts";
 

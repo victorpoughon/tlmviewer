@@ -2,15 +2,10 @@ import * as THREE from "three";
 
 import { getRequired } from "./utility.ts";
 
-// Scene elements
-import {
-    AbstractSceneElement,
-    matchingElementTypes,
-} from "./elements_legacy/index.ts";
-import { ViewerEvent } from "./viewerEvent.ts";
 import { defaultSceneElementsData } from "./defaultSceneElements.ts";
 import { getMaybeDescriptor } from "./elements_registry/registry.ts";
 import { BaseElementData, SceneEntry } from "./core/types.ts";
+import { SceneEvent, SceneEventType } from "./core/events.ts";
 
 // Extract available variables from the scene
 function extractVariables(root: any): string[] {
@@ -29,6 +24,7 @@ function extractVariables(root: any): string[] {
 
 export class TLMScene {
     private root: any;
+    // @ts-ignore
     private container: HTMLElement;
 
     // Model
@@ -48,7 +44,6 @@ export class TLMScene {
 
         // Setup scene graph
         this.sceneGraph = new THREE.Group();
-        this.initSceneGraph(dim);
         this.initSceneGraph2(dim);
 
         this.addDefaultSceneElements(dim);
@@ -80,42 +75,6 @@ export class TLMScene {
         }
     }
 
-    public initSceneGraph(dim: number) {
-        // For any element type that matches with the element data
-        // Use it to make a threejs group add add it to the scene
-
-        const elements = getRequired<any[]>(this.root, "data");
-        for (const elementData of elements) {
-            const matches = matchingElementTypes(elementData);
-
-            // Emit a warning for unknown element types
-            if (matches.length === 0) {
-                console.warn(
-                    `tlmviewer: Unknown (legacy) scene element ${elementData.type}`,
-                );
-            }
-
-            for (const type of matches) {
-                // Create the threeJS group that represents the element
-                // and store the Element object in its userData
-                const data = (type as any).parse(elementData);
-                const instance = new type(
-                    data,
-                    dim,
-                    this.container,
-                    this.scene,
-                );
-                if (instance.group) {
-                    instance.group.userData = instance;
-                    this.sceneGraph.add(instance.group);
-                } else {
-                    console.warn(
-                        `tlmviewer: Element did not create a scene group: ${JSON.stringify(elementData)}`,
-                    );
-                }
-            }
-        }
-    }
 
     public initSceneGraph2(dim: number) {
         const elements = getRequired<any[]>(this.root, "data");
@@ -138,25 +97,9 @@ export class TLMScene {
         }
     }
 
-    // Call a function on all elements of the scene graph matching a given
-    // subtype of AbstractSceneElement
-    public updateElements<T extends AbstractSceneElement>(
-        type: Function & { prototype: T },
-        f: (element: T) => void,
-    ): void {
+    public dispatch<K extends SceneEventType>(event: SceneEvent<K>): void {
         this.sceneGraph.traverse((child: THREE.Object3D) => {
-            if (child.userData instanceof type) {
-                const element = child.userData as T;
-                f(element);
-            }
-        });
-    }
-
-    public dispatch(event: ViewerEvent): void {
-        this.sceneGraph.traverse((child: THREE.Object3D) => {
-            if (child.userData instanceof AbstractSceneElement) {
-                child.userData.onEvent(event);
-            }
+           
             if (child.userData instanceof SceneEntry) {
                 child.userData.onEvent(event);
             }
@@ -168,13 +111,10 @@ export class TLMScene {
         const bbox = new THREE.Box3();
         for (const child of this.sceneGraph.children) {
             const element = child.userData;
-            const include_legacy =
-                element instanceof AbstractSceneElement &&
-                element.includeInDefaultCamera;
-            const include_new =
+            const include =
                 element instanceof SceneEntry &&
                 element.descriptor.includeInDefaultCamera;
-            if (include_legacy || include_new) {
+            if (include) {
                 bbox.union(new THREE.Box3().setFromObject(child));
             }
         }

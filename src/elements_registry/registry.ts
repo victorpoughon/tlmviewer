@@ -30,6 +30,18 @@ import {
     surfacePlaneDescriptor,
     SurfacePlaneData,
 } from "../elements_surfaces/SurfacePlane.ts";
+import {
+    surfaceLatheDescriptor,
+    SurfaceLatheData,
+} from "../elements_surfaces/SurfaceLathe.ts";
+import {
+    surfaceSphereRDescriptor,
+    SurfaceSphereRData,
+} from "../elements_surfaces/SurfaceSphereR.ts";
+import {
+    surfaceSagDescriptor,
+    SurfaceSagData,
+} from "../elements_surfaces/SurfaceSag.ts";
 
 // Union of all scene elements data types
 export type SceneElementData =
@@ -41,7 +53,10 @@ export type SceneElementData =
     | PointsData
     | CylinderData
     | RaysData
-    | SurfacePlaneData;
+    | SurfacePlaneData
+    | SurfaceLatheData
+    | SurfaceSphereRData
+    | SurfaceSagData;
 
 // List of all scene elements descriptors
 export const allDescriptors = [
@@ -54,6 +69,9 @@ export const allDescriptors = [
     cylinderDescriptor,
     raysDescriptor,
     surfacePlaneDescriptor,
+    surfaceLatheDescriptor,
+    surfaceSphereRDescriptor,
+    surfaceSagDescriptor,
 ] as const;
 
 const descriptorMap = new Map<string, ElementDescriptor<any>>(
