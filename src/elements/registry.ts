@@ -9,7 +9,7 @@ import {
 export type SceneElementData = AmbientLightData;
 
 // List of all scene elements descriptors
-const allDescriptors = [ambientLightDescriptor] as const;
+export const allDescriptors = [ambientLightDescriptor] as const;
 
 const descriptorMap = new Map<string, ElementDescriptor<any>>(
     allDescriptors.map((d) => [d.type, d]),

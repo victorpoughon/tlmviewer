@@ -22,8 +22,18 @@ function render(data: AmbientLightData): THREE.Object3D {
     return group;
 }
 
+const testData: AmbientLightData[] = [
+    {
+        type: "ambient-light",
+        color: "#ffffff",
+        intensity: 0.5,
+    },
+];
+
 export const ambientLightDescriptor: ElementDescriptor<AmbientLightData> = {
     type: "ambient-light",
     parse,
     render,
+    testData2D: testData,
+    testData3D: testData,
 };

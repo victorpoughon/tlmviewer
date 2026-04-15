@@ -21,6 +21,8 @@ export type ElementDescriptor<T extends BaseElementData> = {
     parse: (raw: unknown) => T;
     render: (data: T) => THREE.Object3D; // TODO add DOM element, physical "dim", other stuff needed at init
     events?: ElementEventRecord<T>;
+    testData2D: T[];
+    testData3D: T[];
 };
 
 export type SceneEntry = {
