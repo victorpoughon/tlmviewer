@@ -42,36 +42,42 @@ import {
     surfaceSagDescriptor,
     SurfaceSagData,
 } from "../elements_surfaces/SurfaceSag.ts";
+import {
+    SceneTitleData,
+    sceneTitleDescriptor,
+} from "../elements_basic/SceneTitle.ts";
 
 // Union of all scene elements data types
 export type SceneElementData =
     | AmbientLightData
-    | DirectionalLightData
-    | SceneAxisData
     | ArrowsData
     | Box3DData
-    | PointsData
     | CylinderData
+    | DirectionalLightData
+    | PointsData
     | RaysData
-    | SurfacePlaneData
+    | SceneAxisData
+    | SceneTitleData
     | SurfaceLatheData
-    | SurfaceSphereRData
-    | SurfaceSagData;
+    | SurfacePlaneData
+    | SurfaceSagData
+    | SurfaceSphereRData;
 
 // List of all scene elements descriptors
 export const allDescriptors = [
     ambientLightDescriptor,
-    directionalLightDescriptor,
-    sceneAxisDescriptor,
     arrowsDescriptor,
     box3DDescriptor,
-    pointsDescriptor,
     cylinderDescriptor,
+    directionalLightDescriptor,
+    pointsDescriptor,
     raysDescriptor,
-    surfacePlaneDescriptor,
+    sceneAxisDescriptor,
+    sceneTitleDescriptor,
     surfaceLatheDescriptor,
-    surfaceSphereRDescriptor,
+    surfacePlaneDescriptor,
     surfaceSagDescriptor,
+    surfaceSphereRDescriptor,
 ] as const;
 
 const descriptorMap = new Map<string, ElementDescriptor<any>>(

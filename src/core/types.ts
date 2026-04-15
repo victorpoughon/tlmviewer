@@ -21,6 +21,7 @@ export type ElementDescriptor<T extends BaseElementData> = {
     includeInDefaultCamera: boolean;
     parse: (raw: unknown, dim: number) => T;
     render: (data: T, dim: number) => THREE.Object3D;
+    initHTML?: (data: T, dim: number, container: Element) => void;
     events?: ElementEventRecord<T>;
     testData2D: any[];
     testData3D: any[];

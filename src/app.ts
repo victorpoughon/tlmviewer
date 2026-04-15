@@ -44,10 +44,6 @@ export class TLMViewerApp {
             throw new Error(`Unknown camera type '${camera}'`);
         }
 
-        // Title
-        const titleDiv = container.getElementsByClassName("tlmviewer-title")[0];
-        titleDiv.innerHTML = scene.title;
-
         // LIL GUI
         this.gui = new TLMGui(this, container, this.scene);
         this.gui.updateCameraLayers();

@@ -6,13 +6,16 @@ function buildScene(
     elements: any[],
 ): { sceneName: string; data: object } {
     const camera = mode === "2D" ? "XY" : "orthographic";
+
+    // Add title
+    const title = { type: "scene-title", title: sceneName };
+
     return {
         sceneName: sceneName,
         data: {
-            title: sceneName,
             mode,
             camera,
-            data: elements,
+            data: [...elements, title],
             controls: {
                 show_optical_axis: "true",
                 show_other_axes: "true",

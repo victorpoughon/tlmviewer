@@ -24,7 +24,6 @@ function extractVariables(root: any): string[] {
 
 export class TLMScene {
     private root: any;
-    // @ts-ignore
     private container: HTMLElement;
 
     // Model
@@ -33,7 +32,6 @@ export class TLMScene {
     public scene: THREE.Scene;
 
     public variables: string[];
-    public title: string;
 
     constructor(root: any, dim: number, container: HTMLElement) {
         this.root = root;
@@ -48,51 +46,42 @@ export class TLMScene {
 
         this.addDefaultSceneElements(dim);
 
-        // Title
-        this.title = root.title ?? "";
-
         // Setup the actual THREE scene
         this.scene.add(this.sceneGraph);
     }
 
+    public addSceneElement(dim: number, elementData: any) {
+        const descriptor = getMaybeDescriptor(elementData.type);
+
+        // Emit a warning for unknown element types
+        if (descriptor === undefined) {
+            console.warn(
+                `tlmviewer: Unknown scene element ${elementData.type}`,
+            );
+            return;
+        }
+
+        const data: BaseElementData = descriptor.parse(elementData, dim);
+        const object3d: THREE.Object3D = descriptor.render(data, dim);
+        const entry = new SceneEntry(object3d, data, descriptor);
+        object3d.userData = entry;
+        this.sceneGraph.add(object3d);
+
+        if (descriptor.initHTML) {
+            descriptor.initHTML(data, dim, this.container);
+        }
+    }
+
     public addDefaultSceneElements(dim: number) {
         for (const elementData of defaultSceneElementsData(dim)) {
-            const descriptor = getMaybeDescriptor(elementData.type);
-
-            // Emit a warning for unknown element types
-            if (descriptor === undefined) {
-                console.warn(
-                    `tlmviewer: (default elements) Unknown scene element ${elementData.type}`,
-                );
-                continue;
-            }
-
-            const data: BaseElementData = descriptor.parse(elementData, dim);
-            const object3d: THREE.Object3D = descriptor.render(data, dim);
-            const entry = new SceneEntry(object3d, data, descriptor);
-            object3d.userData = entry;
-            this.sceneGraph.add(object3d);
+            this.addSceneElement(dim, elementData);
         }
     }
 
     public initSceneGraph(dim: number) {
         const elements = getRequired<any[]>(this.root, "data");
         for (const elementData of elements) {
-            const descriptor = getMaybeDescriptor(elementData.type);
-
-            // Emit a warning for unknown element types
-            if (descriptor === undefined) {
-                console.warn(
-                    `tlmviewer: Unknown scene element ${elementData.type}`,
-                );
-                continue;
-            }
-
-            const data: BaseElementData = descriptor.parse(elementData, dim);
-            const object3d: THREE.Object3D = descriptor.render(data, dim);
-            const entry = new SceneEntry(object3d, data, descriptor);
-            object3d.userData = entry;
-            this.sceneGraph.add(object3d);
+            this.addSceneElement(dim, elementData);
         }
     }
 
