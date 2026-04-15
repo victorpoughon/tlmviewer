@@ -2,7 +2,7 @@ import { test, describe } from "node:test";
 import assert from "node:assert/strict";
 import { allDescriptors } from "../registry.ts";
 
-describe("elements parse()", () => {
+describe("registry elements parse()", () => {
     for (const descriptor of allDescriptors) {
         test(`[${descriptor.type}] parse(testData2D)`, () => {
             for (const data of descriptor.testData2D) {
