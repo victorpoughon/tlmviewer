@@ -2,7 +2,6 @@ import {
     testData2D as bcylData2D,
     testData3D as bcylData3D,
 } from "./bcyl/tests/testData.ts";
-import { testData3D as box3DData3D } from "./box3D/tests/testData.ts";
 import {
     testData2D as pointsData2D,
     testData3D as pointsData3D,
@@ -70,7 +69,6 @@ for (const descriptor of allDescriptors) {
 const legacyScenes: Array<{ sceneName: string; data: object }> = [
     buildScene("(legacy) bcyl/2D", "2D", bcylData2D),
     buildScene("(legacy) bcyl/3D", "3D", bcylData3D),
-    buildScene("(legacy) box3D/3D", "3D", box3DData3D),
     buildScene("(legacy) points/2D", "2D", pointsData2D),
     buildScene("(legacy) points/3D", "3D", pointsData3D),
     buildScene("(legacy) rays/2D", "2D", raysData2D),
