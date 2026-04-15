@@ -83,6 +83,7 @@ export class TLMGui {
             outputColor: this.colorOptions.default,
             raysOpacity: 1.0,
             raysThickness: 1.0,
+            camera: app.cameraType,
             resetView() {
                 app.resetView();
             },
@@ -107,6 +108,13 @@ export class TLMGui {
         }
 
         this.gui.add(this.controller, "resetView").name("Reset Camera");
+
+        this.gui
+            .add(this.controller, "camera", ["2D", "orthographic", "perspective"])
+            .name("Camera")
+            .onChange((value: string) => {
+                app.setCamera(value);
+            });
 
         const folderColors = this.gui.addFolder("Colors");
 

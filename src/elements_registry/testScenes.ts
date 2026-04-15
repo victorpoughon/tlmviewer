@@ -5,7 +5,7 @@ function buildScene(
     mode: "2D" | "3D",
     elements: any[],
 ): { sceneName: string; data: object } {
-    const camera = mode === "2D" ? "XY" : "orthographic";
+    const camera = mode === "2D" ? "2D" : "orthographic";
 
     // Add title
     const title = { type: "scene-title", title: sceneName };

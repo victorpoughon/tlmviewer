@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { TLMScene } from "./scene.ts";
 import { TLMGui } from "./gui.ts";
 import type { CameraRig } from "./cameras/CameraRig.ts";
-import { createXYCamera } from "./cameras/XYCamera.ts";
+import { createCamera2D } from "./cameras/Camera2D.ts";
 import { createOrthographicCamera } from "./cameras/OrthographicCamera.ts";
 import { createPerspectiveCamera } from "./cameras/PerspectiveCamera.ts";
 
@@ -14,6 +14,7 @@ export class TLMViewerApp {
 
     public renderer: THREE.WebGLRenderer;
     public rig: CameraRig;
+    public cameraType: string;
     public viewport: HTMLElement;
     public gui: TLMGui;
 
@@ -35,6 +36,7 @@ export class TLMViewerApp {
         this.viewport.appendChild(this.renderer.domElement);
 
         // Setup the camera rig
+        this.cameraType = camera;
         this.rig = this.createRig(camera);
 
         // LIL GUI
@@ -45,8 +47,8 @@ export class TLMViewerApp {
 
     private createRig(cameraType: string): CameraRig {
         const domElement = this.renderer.domElement;
-        if (cameraType === "XY") {
-            return createXYCamera(domElement);
+        if (cameraType === "2D") {
+            return createCamera2D(domElement);
         } else if (cameraType === "orthographic") {
             return createOrthographicCamera(domElement);
         } else if (cameraType === "perspective") {
@@ -67,6 +69,13 @@ export class TLMViewerApp {
         const rect = this.viewport.getBoundingClientRect();
         const aspect = rect.width / rect.height;
         this.rig.fitToBox(bbox, aspect);
+    }
+
+    public setCamera(type: string): void {
+        this.rig.dispose();
+        this.cameraType = type;
+        this.rig = this.createRig(type);
+        this.resetView();
     }
 
     public registerEventHandlers(container: HTMLElement): void {

@@ -70,3 +70,5 @@ New format:
 ```json
 { "type": "points", "data": [...], "categories": ["kinematic-joint"] }
 ```
+
+- Camera "XY" is now called "2D".

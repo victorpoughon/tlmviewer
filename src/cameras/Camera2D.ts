@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import type { CameraRig } from "./CameraRig.ts";
 
-export function createXYCamera(domElement: HTMLElement): CameraRig {
+export function createCamera2D(domElement: HTMLElement): CameraRig {
     const camera = new THREE.OrthographicCamera(-10, 10, 10, -10, -10000, 10000);
 
     const controls = new OrbitControls(camera, domElement);

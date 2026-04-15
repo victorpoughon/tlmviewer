@@ -11,7 +11,7 @@ function setupApp(container: HTMLElement, data: any): TLMViewerApp {
     const camera = get_default(data, "camera", [
         "orthographic",
         "perspective",
-        "XY",
+        "2D",
     ]);
 
     const scene = new TLMScene(data, mode === "3D" ? 3 : 2, container);
