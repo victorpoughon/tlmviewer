@@ -7,20 +7,8 @@ export type PointsData = BaseElementData & {
     vertices: number[][];
     color: string;
     radius: number;
-    layers: number[];
     categories: string[];
 };
-
-function applyLayerGroup(obj: THREE.Object3D, layers: Array<number>) {
-    obj.traverse((child) => {
-        child.layers.disableAll();
-    });
-    obj.traverse((child) => {
-        for (const layer of layers) {
-            child.layers.enable(layer);
-        }
-    });
-}
 
 function parse(raw: any, _dim: number): PointsData {
     return {
@@ -29,12 +17,11 @@ function parse(raw: any, _dim: number): PointsData {
         vertices: getRequired<number[][]>(raw, "data"),
         color: raw.color ?? "#ffffff",
         radius: raw.radius ?? 0.1,
-        layers: raw.layers ?? [0],
     };
 }
 
 function render(data: PointsData, _dim: number): THREE.Object3D {
-    const { vertices, color, radius, layers } = data;
+    const { vertices, color, radius } = data;
 
     const group = new THREE.Group();
     for (const point of vertices) {
@@ -53,8 +40,6 @@ function render(data: PointsData, _dim: number): THREE.Object3D {
 
         group.add(sphere);
     }
-
-    applyLayerGroup(group, layers);
 
     return group;
 }

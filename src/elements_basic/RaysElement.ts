@@ -15,7 +15,6 @@ export type RaysData = BaseElementData & {
     color: string;
     variables: Record<string, number[]>;
     domain: Record<string, [number, number]>;
-    layers: number[];
     dim: 2 | 3;
     categories: string;
 };
@@ -28,7 +27,6 @@ function parse(raw: any, dim: number): RaysData {
         color: raw.color ?? "#ffa724",
         variables: raw.variables ?? {},
         domain: raw.domain ?? {},
-        layers: raw.layers ?? [0],
         dim: dim as 2 | 3,
     };
 }
@@ -126,10 +124,10 @@ function makeRays(data: RaysData, colorOption: ColorOption): THREE.Group {
 function setRaysColorOption(
     object: THREE.Object3D,
     data: RaysData,
-    layer: number,
+    category: string,
     colorOption: ColorOption,
 ): void {
-    if (data.layers[0] === layer) {
+    if (data.categories === category) {
         object.clear();
         object.add(makeRays(data, colorOption));
     }
@@ -153,7 +151,6 @@ const testData2D: any[] = [
         color: "#ffa724",
         variables: { field: [-2, -1, 0, 1, 2] },
         domain: { field: [-2, 2] },
-        layers: [0],
     },
 ];
 
@@ -170,7 +167,6 @@ const testData3D: any[] = [
         color: "#ffa724",
         variables: {},
         domain: {},
-        layers: [0],
     },
 ];
 
@@ -186,14 +182,13 @@ export const raysDescriptor: ElementDescriptor<RaysData> = {
             }
         },
         setValidRaysColor: (data, object, event) => {
-            setRaysColorOption(object, data, 0, event.value);
-            setRaysColorOption(object, data, 1, event.value);
+            setRaysColorOption(object, data, "rays-valid", event.value);
         },
         setBlockedRaysColor: (data, object, event) => {
-            setRaysColorOption(object, data, 2, event.value);
+            setRaysColorOption(object, data, "rays-blocked", event.value);
         },
         setOutputRaysColor: (data, object, event) => {
-            setRaysColorOption(object, data, 3, event.value);
+            setRaysColorOption(object, data, "rays-output", event.value);
         },
         setRaysOpacity: (_, object, event) => {
             object.traverse((child) => {

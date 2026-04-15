@@ -12,7 +12,6 @@ export type SceneEventMap = {
     setRaysOpacity: { value: number };
     setRaysThickness: { value: number };
     setSurfacesColor: { value: THREE.Color };
-    setBcylVisible: { value: boolean };
     setCategoryVisibility: { category: string; visible: boolean };
     setBackground: { value: THREE.Color }; // TODO
     resetView: {}; // TODO

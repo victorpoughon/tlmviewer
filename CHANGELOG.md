@@ -54,3 +54,19 @@ New format:
 With controls: `{ "show_blocked_rays": false }`
 
 Valid category values for rays: `"rays-valid"`, `"rays-blocked"`, `"rays-output"`.
+
+- The `layers` field has been removed from `points` and `rays` elements.
+
+Points and rays visibility is now controlled via `categories` and the `setCategoryVisibility` event. The `layers` field is no longer used. Kinematic joint points must include `"categories": ["kinematic-joint"]` in their data to respond to the GUI visibility toggle.
+
+Old format:
+
+```json
+{ "type": "points", "data": [...], "layers": [4] }
+```
+
+New format:
+
+```json
+{ "type": "points", "data": [...], "categories": ["kinematic-joint"] }
+```

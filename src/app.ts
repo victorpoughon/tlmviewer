@@ -46,7 +46,6 @@ export class TLMViewerApp {
 
         // LIL GUI
         this.gui = new TLMGui(this, container, this.scene);
-        this.gui.updateCameraLayers();
 
         this.resetView();
     }

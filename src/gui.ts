@@ -12,6 +12,7 @@ type RGBColor = {
 };
 
 export class TLMGui {
+    // @ts-ignore
     private app: TLMViewerApp;
     private scene: TLMScene;
     private controller: any;
@@ -259,17 +260,20 @@ export class TLMGui {
             });
         const controllerVisibleKinematicJoints = folderShow
             .add(this.controller, "showKinematicJoints")
-            .name("Kinematic joints");
+            .name("Kinematic joints")
+            .onChange((value: boolean) => {
+                this.scene.dispatch({
+                    type: "setCategoryVisibility",
+                    category: "kinematic-joint",
+                    visible: value,
+                });
+            });
         const controllerVisibleBcyl = folderShow
             .add(this.controller, "showBcyl")
             .name("Bounding Cylinders")
             .onChange((value: boolean) => {
-                this.scene.dispatch({ type: "setBcylVisible", value: value });
+                this.scene.dispatch({ type: "setCategoryVisibility", category: "bcyl", visible: value });
             });
-        folderShow.onChange((_: Object) => {
-            this.updateCameraLayers();
-        });
-
         // Initialize this.controllers
         this.controllers = {
             colors: {
@@ -317,15 +321,14 @@ export class TLMGui {
             value: this.controller.outputColor,
         });
 
-        this.updateCameraLayers();
-
         this.scene.dispatch({ type: "setCategoryVisibility", category: "rays-valid", visible: true });
         this.scene.dispatch({ type: "setCategoryVisibility", category: "rays-blocked", visible: false });
         this.scene.dispatch({ type: "setCategoryVisibility", category: "rays-output", visible: true });
         this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-x", visible: false });
         this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-y", visible: false });
         this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-z", visible: false });
-        this.scene.dispatch({ type: "setBcylVisible", value: false });
+        this.scene.dispatch({ type: "setCategoryVisibility", category: "kinematic-joint", visible: false });
+        this.scene.dispatch({ type: "setCategoryVisibility", category: "bcyl", visible: false });
 
         this.gui.open(false);
         this.folders.colors.open(true);
@@ -393,17 +396,4 @@ export class TLMGui {
         });
     }
 
-    public updateCameraLayers() {
-        const self = this;
-        const setCameraLayer = function (flag: boolean, id: number) {
-            if (flag) {
-                self.app.camera.layers.enable(id);
-            } else {
-                self.app.camera.layers.disable(id);
-            }
-        };
-
-        this.app.camera.layers.enable(0);
-        setCameraLayer(this.controller.showKinematicJoints, 4);
-    }
 }
