@@ -72,7 +72,7 @@ export class TLMScene {
                 continue;
             }
 
-            const data: BaseElementData = descriptor.parse(elementData);
+            const data: BaseElementData = descriptor.parse(elementData, dim);
             const object3d: THREE.Object3D = descriptor.render(data);
             const entry: SceneEntry = { object: object3d, data: data };
             object3d.userData = entry;
@@ -117,7 +117,7 @@ export class TLMScene {
         }
     }
 
-    public initSceneGraph2(_dim: number) {
+    public initSceneGraph2(dim: number) {
         const elements = getRequired<any[]>(this.root, "data");
         for (const elementData of elements) {
             const descriptor = getMaybeDescriptor(elementData.type);
@@ -130,7 +130,7 @@ export class TLMScene {
                 continue;
             }
 
-            const data: BaseElementData = descriptor.parse(elementData);
+            const data: BaseElementData = descriptor.parse(elementData, dim);
             const object3d: THREE.Object3D = descriptor.render(data);
             const entry: SceneEntry = { object: object3d, data: data };
             object3d.userData = entry;
