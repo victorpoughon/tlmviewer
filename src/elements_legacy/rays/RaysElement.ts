@@ -9,14 +9,7 @@ import { CET_I2, colormap, wavelengthToRgb } from "../../color/index.ts";
 import { getRequired } from "../../utility.ts";
 
 import { AbstractSceneElement } from "../AbstractSceneElement.ts";
-
-// Color option
-// TODO move to viewerEvent.ts?
-export type ColorOption = {
-    show: boolean;
-    colorDim: string | null;
-    trueColor: boolean;
-};
+import { ColorOption } from "../../core/events.ts";
 
 interface RaysData {
     points: number[][];
@@ -165,9 +158,15 @@ export class RaysElement extends AbstractSceneElement {
             this.setThickness(e.value),
         );
 
-        this.addEventListener("setValidRaysColor", e => this.setupValidRays(e.value));
-        this.addEventListener("setBlockedRaysColor", e => this.setupBlockedRays(e.value));
-        this.addEventListener("setOutputRaysColor", e => this.setupOutputRays(e.value));
+        this.addEventListener("setValidRaysColor", (e) =>
+            this.setupValidRays(e.value),
+        );
+        this.addEventListener("setBlockedRaysColor", (e) =>
+            this.setupBlockedRays(e.value),
+        );
+        this.addEventListener("setOutputRaysColor", (e) =>
+            this.setupOutputRays(e.value),
+        );
     }
 
     public setupValidRays(color: ColorOption) {
@@ -185,8 +184,8 @@ export class RaysElement extends AbstractSceneElement {
 
     public setRaysColorOption(layer: number, color: ColorOption) {
         if (this.layer === layer) {
-                this.setColorOption(color);
-            }
+            this.setColorOption(color);
+        }
     }
 
     public static match(elementData: any): boolean {

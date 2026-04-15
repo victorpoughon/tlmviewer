@@ -2,7 +2,7 @@ import { AbstractSceneElement } from "./AbstractSceneElement.ts";
 import { SurfaceBaseElement } from "./SurfaceBaseElement.ts";
 import { BcylElement } from "./bcyl/BcylElement.ts";
 import { RaysElement } from "./rays/RaysElement.ts";
-import type { ColorOption } from "./rays/RaysElement.ts";
+import type { ColorOption } from "../core/events.ts";
 import { SurfaceLatheElement } from "./surfaceLathe/SurfaceLatheElement.ts";
 import { SurfacePlaneElement } from "./surfacePlane/SurfacePlaneElement.ts";
 import { SurfaceSphereRElement } from "./surfaceSphereR/SurfaceSphereRElement.ts";

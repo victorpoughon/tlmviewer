@@ -1,5 +1,10 @@
 import * as THREE from "three";
-import { ColorOption } from "../elements_legacy/index.ts";
+
+export type ColorOption = {
+    show: boolean;
+    colorDim: string | null;
+    trueColor: boolean;
+};
 
 export type SceneEventMap = {
     setValidRaysColor: { value: ColorOption };
