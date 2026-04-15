@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { BaseElementData, ElementDescriptor } from "../types.ts";
-import { getRequired } from "../../utility.ts";
-import { arrayToMatrix4 } from "../SurfaceBaseElement.ts";
+import { BaseElementData, ElementDescriptor } from "../core/types.ts";
+import { getRequired } from "../utility.ts";
+import { arrayToMatrix4 } from "../elements_legacy/SurfaceBaseElement.ts"; // TODO
 
 export type Box3DData = BaseElementData & {
     type: "box3D";
@@ -22,7 +22,14 @@ function render(data: Box3DData): THREE.Object3D {
 
     const group = new THREE.Group();
 
-    const geometry = new THREE.BoxGeometry(size[0], size[1], size[2], 10, 10, 10);
+    const geometry = new THREE.BoxGeometry(
+        size[0],
+        size[1],
+        size[2],
+        10,
+        10,
+        10,
+    );
     const material = new THREE.MeshBasicMaterial({
         color: "lightgreen",
         transparent: true,

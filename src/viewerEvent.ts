@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { ColorOption } from "./elements/index.ts";
+import { ColorOption } from "./elements_legacy/index.ts";
 
 export type ViewerEvent =
     | { type: "setValidRaysColor"; value: ColorOption }
@@ -15,5 +15,5 @@ export type ViewerEvent =
           visible: boolean;
       }
     | { type: "setBcylVisible"; value: boolean }
-    | { type: "setBackground"; value: THREE.Color }  // TODO
-    | { type: "resetView" };  // TODO
+    | { type: "setBackground"; value: THREE.Color } // TODO
+    | { type: "resetView" }; // TODO

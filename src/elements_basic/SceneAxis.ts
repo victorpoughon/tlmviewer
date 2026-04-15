@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { BaseElementData, ElementDescriptor } from "../types.ts";
-import { getOption, getRequired } from "../../utility.ts";
-import { makeLine2 } from "../../lineUtils.ts";
+import { BaseElementData, ElementDescriptor } from "../core/types.ts";
+import { getOption, getRequired } from "../utility.ts";
+import { makeLine2 } from "../lineUtils.ts";
 
 export type SceneAxisData = BaseElementData & {
     type: "scene-axis";

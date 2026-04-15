@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { BaseElementData, ElementDescriptor } from "../types.ts";
-import { getRequired } from "../../utility.ts";
+import { BaseElementData, ElementDescriptor } from "../core/types.ts";
+import { getRequired } from "../utility.ts";
 
 export type AmbientLightData = BaseElementData & {
     type: "ambient-light";

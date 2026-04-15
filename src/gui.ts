@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { GUI, Controller } from "lil-gui";
 
-import { ColorOption } from "./elements/index.ts";
+import { ColorOption } from "./elements_legacy/index.ts";
 import { TLMScene } from "./scene.ts";
 import { TLMViewerApp } from "./app.ts";
 
@@ -134,21 +134,39 @@ export class TLMGui {
             });
 
         controllerColorsValidRays.onChange((value: ColorOption) => {
-            this.scene.dispatch({type: "setValidRaysColor", value});
-            this.scene.dispatch({ type: "setRaysOpacity", value: controllerColorsOpacity.getValue() });
-            this.scene.dispatch({ type: "setRaysThickness", value: controllerColorsThickness.getValue() });
+            this.scene.dispatch({ type: "setValidRaysColor", value });
+            this.scene.dispatch({
+                type: "setRaysOpacity",
+                value: controllerColorsOpacity.getValue(),
+            });
+            this.scene.dispatch({
+                type: "setRaysThickness",
+                value: controllerColorsThickness.getValue(),
+            });
         });
 
         controllerColorsBlockedRays.onChange((value: ColorOption) => {
-            this.scene.dispatch({type: "setBlockedRaysColor", value});
-            this.scene.dispatch({ type: "setRaysOpacity", value: controllerColorsOpacity.getValue() });
-            this.scene.dispatch({ type: "setRaysThickness", value: controllerColorsThickness.getValue() });
+            this.scene.dispatch({ type: "setBlockedRaysColor", value });
+            this.scene.dispatch({
+                type: "setRaysOpacity",
+                value: controllerColorsOpacity.getValue(),
+            });
+            this.scene.dispatch({
+                type: "setRaysThickness",
+                value: controllerColorsThickness.getValue(),
+            });
         });
 
         controllerColorsOutputRays.onChange((value: ColorOption) => {
-            this.scene.dispatch({type: "setOutputRaysColor", value});
-            this.scene.dispatch({ type: "setRaysOpacity", value: controllerColorsOpacity.getValue() });
-            this.scene.dispatch({ type: "setRaysThickness", value: controllerColorsThickness.getValue() });
+            this.scene.dispatch({ type: "setOutputRaysColor", value });
+            this.scene.dispatch({
+                type: "setRaysOpacity",
+                value: controllerColorsOpacity.getValue(),
+            });
+            this.scene.dispatch({
+                type: "setRaysThickness",
+                value: controllerColorsThickness.getValue(),
+            });
         });
 
         const controllerColorsBackground = folderColors
@@ -168,7 +186,7 @@ export class TLMGui {
             .name("Surfaces")
             .onChange((value: RGBColor) => {
                 const color = new THREE.Color(value.r, value.g, value.b);
-                this.scene.dispatch({type: "setSurfacesColor", value: color});
+                this.scene.dispatch({ type: "setSurfacesColor", value: color });
             });
 
         const folderShow = this.gui.addFolder("Visible");
@@ -176,20 +194,35 @@ export class TLMGui {
             .add(this.controller, "showSurfaces")
             .name("Surfaces")
             .onChange((value: boolean) => {
-                this.scene.dispatch({type: "setSurfacesVisible", value: value});
+                this.scene.dispatch({
+                    type: "setSurfacesVisible",
+                    value: value,
+                });
             });
         const controllerVisibleOpticalAxis = folderShow
             .add(this.controller, "showOpticalAxis")
             .name("Optical axis")
             .onChange((value: boolean) => {
-                this.scene.dispatch({type: "setAxisVisible", axis: "x", visible: value});
+                this.scene.dispatch({
+                    type: "setAxisVisible",
+                    axis: "x",
+                    visible: value,
+                });
             });
         const controllerVisibleOtherAxes = folderShow
             .add(this.controller, "showOtherAxes")
             .name("Other axes")
             .onChange((value: boolean) => {
-                this.scene.dispatch({type: "setAxisVisible", axis: "y", visible: value});
-                this.scene.dispatch({type: "setAxisVisible", axis: "z", visible: value});
+                this.scene.dispatch({
+                    type: "setAxisVisible",
+                    axis: "y",
+                    visible: value,
+                });
+                this.scene.dispatch({
+                    type: "setAxisVisible",
+                    axis: "z",
+                    visible: value,
+                });
             });
         const controllerVisibleKinematicJoints = folderShow
             .add(this.controller, "showKinematicJoints")
@@ -198,7 +231,7 @@ export class TLMGui {
             .add(this.controller, "showBcyl")
             .name("Bounding Cylinders")
             .onChange((value: boolean) => {
-                this.scene.dispatch({type: "setBcylVisible", value: value});
+                this.scene.dispatch({ type: "setBcylVisible", value: value });
             });
         folderShow.onChange((_: Object) => {
             this.updateCameraLayers();
@@ -235,13 +268,22 @@ export class TLMGui {
 
     public setDefaultGUIState() {
         // Set default GUI state
-        this.scene.dispatch({type: "setValidRaysColor", value: this.controller.validColor});
-        this.scene.dispatch({type: "setBlockedRaysColor", value: this.controller.blockedColor});
-        this.scene.dispatch({type: "setOutputRaysColor", value: this.controller.outputColor});
+        this.scene.dispatch({
+            type: "setValidRaysColor",
+            value: this.controller.validColor,
+        });
+        this.scene.dispatch({
+            type: "setBlockedRaysColor",
+            value: this.controller.blockedColor,
+        });
+        this.scene.dispatch({
+            type: "setOutputRaysColor",
+            value: this.controller.outputColor,
+        });
 
         this.updateCameraLayers();
 
-        this.scene.dispatch({type: "setBcylVisible", value: false});
+        this.scene.dispatch({ type: "setBcylVisible", value: false });
 
         this.gui.open(false);
         this.folders.colors.open(true);

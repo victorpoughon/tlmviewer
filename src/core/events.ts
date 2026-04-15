@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { ColorOption } from "./index.ts";
+import { ColorOption } from "../elements_legacy/index.ts";
 
 export type SceneEventMap = {
     setValidRaysColor: { value: ColorOption };

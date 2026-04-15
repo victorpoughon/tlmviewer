@@ -6,11 +6,11 @@ import { getRequired } from "./utility.ts";
 import {
     AbstractSceneElement,
     matchingElementTypes,
-} from "./elements/index.ts";
+} from "./elements_legacy/index.ts";
 import { ViewerEvent } from "./viewerEvent.ts";
-import { defaultSceneElementsData } from "./elements/defaultSceneElements.ts";
-import { getMaybeDescriptor } from "./elements/registry.ts";
-import { BaseElementData, SceneEntry } from "./elements/types.ts";
+import { defaultSceneElementsData } from "./defaultSceneElements.ts";
+import { getMaybeDescriptor } from "./elements_registry/registry.ts";
+import { BaseElementData, SceneEntry } from "./core/types.ts";
 
 // Extract available variables from the scene
 function extractVariables(root: any): string[] {
@@ -91,7 +91,7 @@ export class TLMScene {
             // Emit a warning for unknown element types
             if (matches.length === 0) {
                 console.warn(
-                    `tlmviewer: Unknown scene element ${elementData.type}`,
+                    `tlmviewer: Unknown (legacy) scene element ${elementData.type}`,
                 );
             }
 
@@ -125,7 +125,7 @@ export class TLMScene {
             // Emit a warning for unknown element types
             if (descriptor === undefined) {
                 console.warn(
-                    `tlmviewer: (initSceneGraph2) Unknown scene element ${JSON.stringify(elementData)}`,
+                    `tlmviewer: (initSceneGraph2) Unknown scene element ${elementData.type}`,
                 );
                 continue;
             }
