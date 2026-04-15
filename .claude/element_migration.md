@@ -4,14 +4,14 @@ Migrate old class-based elements (extending `AbstractSceneElement`) to the new f
 
 ## Reference files
 
-- New elements examples: `src/elements/SceneAxis.ts`, `src/elements/DirectionalLight.ts`
-- Descriptor type: `src/elements/types.ts` (`ElementDescriptor<T>`)
-- New registry: `src/elements/registry.ts`
-- Old registry: `src/elements/index.ts`
+- New elements examples: `src/elements_basic/SceneAxis.ts`, `src/elements_basic/DirectionalLight.ts`
+- Descriptor type: `src/core/types.ts` (`ElementDescriptor<T>`)
+- New registry: `src/elements_registry/registry.ts`
+- Old registry: `src/elements_legacy/index.ts`
 
 ## Steps
 
-### 1. Create `src/elements/basics/<ElementName>.ts`
+### 1. Create `src/elements_basics/<ElementName>.ts`
 
 The file exports a data type and a descriptor. Structure:
 
@@ -22,19 +22,18 @@ Key differences from the old class:
 - The old `static match()` method is gone; matching is handled by the `type` field in the descriptor.
 - The old constructor parameters (`dim`, `container`, `threeScene`) are not passed to `render` (yet).
 
-### 2. Register in `src/elements/registry.ts`
+### 2. Register in `src/elements_registry/registry.ts`
 
 - Import the data type and descriptor.
 - Add the data type to the `SceneElementData` union.
 - Add the descriptor to the `allDescriptors` array.
 
-### 3. Remove from old registry `src/elements/index.ts`
+### 3. Remove from old registry `src/elements_legacy/index.ts`
 
 - Remove the import of the old class.
 - Remove it from the `export {}` block.
 - Remove it from `_allSceneElementTypes`.
-- Remove it from `src/elements/testScenes.ts` legacy scenes.
 
-### 4. Delete the old file
+### 4. Delete the old element folder
 
-Delete the old class file (e.g. `src/elements/lights/DirectionalLight.ts`).
+Delete the old class file (e.g. `src/elements_legacy/<element name>`).
