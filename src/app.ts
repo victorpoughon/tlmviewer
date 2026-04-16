@@ -6,23 +6,7 @@ import type { CameraRig } from "./cameras/CameraRig.ts";
 import { createCamera2D } from "./cameras/Camera2D.ts";
 import { createOrthographicCamera } from "./cameras/OrthographicCamera.ts";
 import { createPerspectiveCamera } from "./cameras/PerspectiveCamera.ts";
-import {
-    createAxialCameraXX, createAxialCameraXY, createAxialCameraXZ,
-    createAxialCameraYX, createAxialCameraYY, createAxialCameraYZ,
-    createAxialCameraZX, createAxialCameraZY, createAxialCameraZZ,
-} from "./cameras/AxialCamera.ts";
-
-const axialFactories: Record<string, (d: HTMLElement) => CameraRig> = {
-    "axial-xx": createAxialCameraXX,
-    "axial-xy": createAxialCameraXY,
-    "axial-xz": createAxialCameraXZ,
-    "axial-yx": createAxialCameraYX,
-    "axial-yy": createAxialCameraYY,
-    "axial-yz": createAxialCameraYZ,
-    "axial-zx": createAxialCameraZX,
-    "axial-zy": createAxialCameraZY,
-    "axial-zz": createAxialCameraZZ,
-};
+import { axialFactories } from "./cameras/AxialCamera.ts";
 
 import "./viewer.css";
 

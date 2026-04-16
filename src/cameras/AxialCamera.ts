@@ -3,8 +3,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import type { CameraRig } from "./CameraRig.ts";
 
 export function createAxialCamera(
-    axis: THREE.Vector3,  // unit vector — orbit target stays on this axis through origin
-    up: THREE.Vector3,    // unit vector — screen-up direction
+    axis: THREE.Vector3, // unit vector — orbit target stays on this axis through origin
+    up: THREE.Vector3, // unit vector — screen-up direction
     domElement: HTMLElement,
 ): CameraRig {
     const camera = new THREE.OrthographicCamera(
@@ -162,12 +162,33 @@ const X = new THREE.Vector3(1, 0, 0);
 const Y = new THREE.Vector3(0, 1, 0);
 const Z = new THREE.Vector3(0, 0, 1);
 
-export const createAxialCameraXX = (d: HTMLElement) => createAxialCamera(X, X, d);
-export const createAxialCameraXY = (d: HTMLElement) => createAxialCamera(X, Y, d);
-export const createAxialCameraXZ = (d: HTMLElement) => createAxialCamera(X, Z, d);
-export const createAxialCameraYX = (d: HTMLElement) => createAxialCamera(Y, X, d);
-export const createAxialCameraYY = (d: HTMLElement) => createAxialCamera(Y, Y, d);
-export const createAxialCameraYZ = (d: HTMLElement) => createAxialCamera(Y, Z, d);
-export const createAxialCameraZX = (d: HTMLElement) => createAxialCamera(Z, X, d);
-export const createAxialCameraZY = (d: HTMLElement) => createAxialCamera(Z, Y, d);
-export const createAxialCameraZZ = (d: HTMLElement) => createAxialCamera(Z, Z, d);
+export const createAxialCameraXX = (d: HTMLElement) =>
+    createAxialCamera(X, X, d);
+export const createAxialCameraXY = (d: HTMLElement) =>
+    createAxialCamera(X, Y, d);
+export const createAxialCameraXZ = (d: HTMLElement) =>
+    createAxialCamera(X, Z, d);
+export const createAxialCameraYX = (d: HTMLElement) =>
+    createAxialCamera(Y, X, d);
+export const createAxialCameraYY = (d: HTMLElement) =>
+    createAxialCamera(Y, Y, d);
+export const createAxialCameraYZ = (d: HTMLElement) =>
+    createAxialCamera(Y, Z, d);
+export const createAxialCameraZX = (d: HTMLElement) =>
+    createAxialCamera(Z, X, d);
+export const createAxialCameraZY = (d: HTMLElement) =>
+    createAxialCamera(Z, Y, d);
+export const createAxialCameraZZ = (d: HTMLElement) =>
+    createAxialCamera(Z, Z, d);
+
+export const axialFactories: Record<string, (d: HTMLElement) => CameraRig> = {
+    "axial-xx": createAxialCameraXX,
+    "axial-xy": createAxialCameraXY,
+    "axial-xz": createAxialCameraXZ,
+    "axial-yx": createAxialCameraYX,
+    "axial-yy": createAxialCameraYY,
+    "axial-yz": createAxialCameraYZ,
+    "axial-zx": createAxialCameraZX,
+    "axial-zy": createAxialCameraZY,
+    "axial-zz": createAxialCameraZZ,
+};
