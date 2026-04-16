@@ -43,6 +43,10 @@ import {
     SurfaceSagData,
 } from "../elements_surfaces/SurfaceSag.ts";
 import {
+    surfaceBSplineDescriptor,
+    SurfaceBSplineData,
+} from "../elements_surfaces/SurfaceBSpline.ts";
+import {
     SceneTitleData,
     sceneTitleDescriptor,
 } from "../elements_basic/SceneTitle.ts";
@@ -61,7 +65,8 @@ export type SceneElementData =
     | SurfaceLatheData
     | SurfaceDiskData
     | SurfaceSagData
-    | SurfaceSphereRData;
+    | SurfaceSphereRData
+    | SurfaceBSplineData;
 
 // List of all scene elements descriptors
 export const allDescriptors = [
@@ -78,6 +83,7 @@ export const allDescriptors = [
     surfaceDiskDescriptor,
     surfaceSagDescriptor,
     surfaceSphereRDescriptor,
+    surfaceBSplineDescriptor,
 ] as const;
 
 const descriptorMap = new Map<string, ElementDescriptor<any>>(
