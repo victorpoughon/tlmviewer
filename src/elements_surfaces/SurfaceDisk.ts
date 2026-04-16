@@ -13,21 +13,21 @@ import {
     defaultSurfaceEvents,
 } from "./surface_utils.ts";
 
-export type SurfacePlaneData = SurfaceBaseData & {
-    type: "surface-plane";
+export type SurfaceDiskData = SurfaceBaseData & {
+    type: "surface-disk";
     radius: number;
 };
 
-function parse(raw: any, _dim: number): SurfacePlaneData {
+function parse(raw: any, _dim: number): SurfaceDiskData {
     return {
         ...parseSurfaceBaseData(raw),
-        type: "surface-plane",
+        type: "surface-disk",
         radius: getRequired<number>(raw, "radius"),
     };
 }
 
 function makeGeometry2D(
-    data: SurfacePlaneData,
+    data: SurfaceDiskData,
     tf: THREE.Matrix4,
 ): [LineGeometry, THREE.Matrix4] {
     const { radius } = data;
@@ -42,7 +42,7 @@ function makeGeometry2D(
 }
 
 function makeGeometry3D(
-    data: SurfacePlaneData,
+    data: SurfaceDiskData,
     tf: THREE.Matrix4,
 ): [THREE.BufferGeometry, THREE.Matrix4, string | null] {
     const base = new THREE.Matrix4().makeRotationY(Math.PI / 2);
@@ -52,7 +52,7 @@ function makeGeometry3D(
 
 const testData2D = [
     {
-        type: "surface-plane",
+        type: "surface-disk",
         radius: 5,
         matrix: [
             [1, 0, 0],
@@ -61,7 +61,7 @@ const testData2D = [
         ],
     },
     {
-        type: "surface-plane",
+        type: "surface-disk",
         radius: 5,
         matrix: [
             [0.866, -0.5, 15],
@@ -73,7 +73,7 @@ const testData2D = [
 
 const testData3D = [
     {
-        type: "surface-plane",
+        type: "surface-disk",
         radius: 5,
         matrix: [
             [1, 0, 0, 0],
@@ -83,7 +83,7 @@ const testData3D = [
         ],
     },
     {
-        type: "surface-plane",
+        type: "surface-disk",
         radius: 5,
         clip_planes: [
             [0, -1, 0, 4],
@@ -100,8 +100,8 @@ const testData3D = [
     },
 ];
 
-export const surfacePlaneDescriptor: ElementDescriptor<SurfacePlaneData> = {
-    type: "surface-plane",
+export const surfaceDiskDescriptor: ElementDescriptor<SurfaceDiskData> = {
+    type: "surface-disk",
     includeInDefaultCamera: true,
     parse,
     render: makeSurfaceRender(makeGeometry2D, makeGeometry3D),

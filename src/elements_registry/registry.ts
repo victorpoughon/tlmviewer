@@ -27,9 +27,9 @@ import {
 } from "../elements_basic/Cylinder.ts";
 import { raysDescriptor, RaysData } from "../elements_basic/RaysElement.ts";
 import {
-    surfacePlaneDescriptor,
-    SurfacePlaneData,
-} from "../elements_surfaces/SurfacePlane.ts";
+    surfaceDiskDescriptor,
+    SurfaceDiskData,
+} from "../elements_surfaces/SurfaceDisk.ts";
 import {
     surfaceLatheDescriptor,
     SurfaceLatheData,
@@ -59,7 +59,7 @@ export type SceneElementData =
     | SceneAxisData
     | SceneTitleData
     | SurfaceLatheData
-    | SurfacePlaneData
+    | SurfaceDiskData
     | SurfaceSagData
     | SurfaceSphereRData;
 
@@ -75,7 +75,7 @@ export const allDescriptors = [
     sceneAxisDescriptor,
     sceneTitleDescriptor,
     surfaceLatheDescriptor,
-    surfacePlaneDescriptor,
+    surfaceDiskDescriptor,
     surfaceSagDescriptor,
     surfaceSphereRDescriptor,
 ] as const;

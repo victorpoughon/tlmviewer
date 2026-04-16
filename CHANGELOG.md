@@ -91,3 +91,9 @@ New format:
 ```json
 { "controls": { "show_axis_x": true, "show_axis_y": false, "show_axis_z": false } }
 ```
+
+- Element type `"surface-plane"` is renamed to `"surface-disk"`.
+
+```json
+{ "type": "surface-disk", "radius": 5, "matrix": [...] }
+```
