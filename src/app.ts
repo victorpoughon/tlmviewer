@@ -6,7 +6,23 @@ import type { CameraRig } from "./cameras/CameraRig.ts";
 import { createCamera2D } from "./cameras/Camera2D.ts";
 import { createOrthographicCamera } from "./cameras/OrthographicCamera.ts";
 import { createPerspectiveCamera } from "./cameras/PerspectiveCamera.ts";
-import { createAxialCamera } from "./cameras/AxialCamera.ts";
+import {
+    createAxialCameraXX, createAxialCameraXY, createAxialCameraXZ,
+    createAxialCameraYX, createAxialCameraYY, createAxialCameraYZ,
+    createAxialCameraZX, createAxialCameraZY, createAxialCameraZZ,
+} from "./cameras/AxialCamera.ts";
+
+const axialFactories: Record<string, (d: HTMLElement) => CameraRig> = {
+    "axial-xx": createAxialCameraXX,
+    "axial-xy": createAxialCameraXY,
+    "axial-xz": createAxialCameraXZ,
+    "axial-yx": createAxialCameraYX,
+    "axial-yy": createAxialCameraYY,
+    "axial-yz": createAxialCameraYZ,
+    "axial-zx": createAxialCameraZX,
+    "axial-zy": createAxialCameraZY,
+    "axial-zz": createAxialCameraZZ,
+};
 
 import "./viewer.css";
 
@@ -54,8 +70,8 @@ export class TLMViewerApp {
             return createOrthographicCamera(domElement);
         } else if (cameraType === "perspective") {
             return createPerspectiveCamera(domElement);
-        } else if (cameraType === "axial") {
-            return createAxialCamera(domElement);
+        } else if (axialFactories[cameraType]) {
+            return axialFactories[cameraType](domElement);
         } else {
             throw new Error(`Unknown camera type '${cameraType}'`);
         }

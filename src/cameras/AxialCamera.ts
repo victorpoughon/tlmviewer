@@ -2,7 +2,11 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import type { CameraRig } from "./CameraRig.ts";
 
-export function createAxialCamera(domElement: HTMLElement): CameraRig {
+export function createAxialCamera(
+    axis: THREE.Vector3,  // unit vector — orbit target stays on this axis through origin
+    up: THREE.Vector3,    // unit vector — screen-up direction
+    domElement: HTMLElement,
+): CameraRig {
     const camera = new THREE.OrthographicCamera(
         -10,
         10,
@@ -11,23 +15,20 @@ export function createAxialCamera(domElement: HTMLElement): CameraRig {
         -10000,
         10000,
     );
-    camera.position.set(0, 50, 50);
-    camera.lookAt(0, 0, 0);
+    camera.up.copy(up);
 
     const controls = new OrbitControls(camera, domElement);
-    controls.enablePan = false; // Replaced by custom X-axis pan below
+    controls.enablePan = false; // Replaced by custom axis pan below
 
-    // Enforce target on X axis after any orbit change
+    // Enforce target on the axis through origin after any orbit change
     controls.addEventListener("change", () => {
-        controls.target.y = 0;
-        controls.target.z = 0;
+        controls.target.projectOnVector(axis);
     });
 
-    // Custom right-click pan: move camera and target along world X only.
-    // We project the 2D screen-space drag vector onto the world X axis using the
+    // Custom right-click pan: move camera and target along the axis only.
+    // We project the 2D screen-space drag vector onto the axis using the
     // camera's screen-right and screen-up directions, so panning always feels
-    // natural regardless of orbit angle (including near-end-on views where X
-    // appears vertical on screen).
+    // natural regardless of orbit angle.
     let panStart = new THREE.Vector2();
 
     const onPointerDown = (e: PointerEvent) => {
@@ -46,37 +47,36 @@ export function createAxialCamera(domElement: HTMLElement): CameraRig {
             (camera.zoom * domElement.clientWidth);
 
         // Camera basis vectors in world space.
-        // cameraRight  = screen-right direction in world
-        // cameraScreenUp = screen-up direction in world (NOT camera.up = world Y)
-        const worldY = new THREE.Vector3(0, 1, 0);
+        // cameraRight    = screen-right direction in world
+        // cameraScreenUp = screen-up direction in world (NOT camera.up)
         const forward = new THREE.Vector3();
         camera.getWorldDirection(forward);
         const cameraRight = new THREE.Vector3()
-            .crossVectors(forward, worldY)
+            .crossVectors(forward, up)
             .normalize();
-
         const cameraScreenUp = new THREE.Vector3()
             .crossVectors(cameraRight, forward)
             .normalize();
 
-        // Least-squares inverse mapping from screen drag (dx, dy) to world X shift.
+        // Least-squares inverse mapping from screen drag (dx, dy) to axis shift.
         //
-        // Moving the camera by Δx along world X shifts a fixed world point on screen by:
-        //   Δscreen = (-cameraRight.x · Δx, +cameraScreenUp.x · Δx) / scale
+        // Moving the camera by Δ along `axis` shifts a fixed world point on screen by:
+        //   Δscreen = (-cameraRight·axis · Δ, +cameraScreenUp·axis · Δ) / scale
         //
-        // Solving for Δx given the observed drag (dx, dy):
-        //   Δx = (-cameraRight.x·dx + cameraScreenUp.x·dy) / (cameraRight.x² + cameraScreenUp.x²) · scale
+        // Solving for Δ given the observed drag (dx, dy):
+        //   Δ = (-rDot·dx + uDot·dy) / (rDot² + uDot²) · scale
         //
-        // The denominator is cos²(angle between view direction and world X). It amplifies
-        // the shift at shallow angles so the drag always feels like grabbing the scene content.
-        // It also goes to zero when X is pure depth (end-on view), in which case we skip.
-        const num = -cameraRight.x * dx + cameraScreenUp.x * dy;
-        const denom = cameraRight.x ** 2 + cameraScreenUp.x ** 2;
+        // The denominator is cos²(angle between view direction and axis). It amplifies
+        // the shift at shallow angles so the drag always feels like grabbing the content.
+        // It goes to zero when axis is pure depth (end-on view), in which case we skip.
+        const rDot = cameraRight.dot(axis);
+        const uDot = cameraScreenUp.dot(axis);
+        const denom = rDot ** 2 + uDot ** 2;
         if (denom < 1e-6) return;
-        const xShift = (num / denom) * scale;
+        const shift = ((-rDot * dx + uDot * dy) / denom) * scale;
 
-        controls.target.x += xShift;
-        camera.position.x += xShift;
+        controls.target.addScaledVector(axis, shift);
+        camera.position.addScaledVector(axis, shift);
         controls.update();
     };
 
@@ -94,20 +94,45 @@ export function createAxialCamera(domElement: HTMLElement): CameraRig {
             bbox.getSize(size);
             const marginFactor = 1.15;
 
-            camera.zoom = 1;
-            controls.target.set(center.x, 0, 0);
-            camera.position.set(center.x, 0, 100);
+            // Project bbox extents onto axis (horizontal) and up (vertical)
+            const hsize =
+                Math.abs(axis.x) * size.x +
+                Math.abs(axis.y) * size.y +
+                Math.abs(axis.z) * size.z;
+            const vsize =
+                Math.abs(up.x) * size.x +
+                Math.abs(up.y) * size.y +
+                Math.abs(up.z) * size.z;
 
-            if (size.x > aspect * size.y) {
-                camera.left = (marginFactor * size.x) / -2;
-                camera.right = (marginFactor * size.x) / 2;
-                camera.top = (marginFactor * ((1 / aspect) * size.x)) / 2;
-                camera.bottom = (marginFactor * ((1 / aspect) * size.x)) / -2;
+            camera.zoom = 1;
+
+            // Target: project bbox center onto axis through origin
+            const t = axis.dot(center);
+            controls.target.copy(axis).multiplyScalar(t);
+
+            // Camera offset: perpendicular to both axis and up.
+            // When axis = up, cross product is zero — fall back to any perpendicular.
+            let offset = new THREE.Vector3().crossVectors(axis, up);
+            if (offset.lengthSq() < 1e-10) {
+                const ref =
+                    Math.abs(axis.x) < 0.9
+                        ? new THREE.Vector3(1, 0, 0)
+                        : new THREE.Vector3(0, 1, 0);
+                offset.crossVectors(axis, ref);
+            }
+            offset.normalize();
+            camera.position.copy(controls.target).addScaledVector(offset, 100);
+
+            if (hsize > aspect * vsize) {
+                camera.left = (marginFactor * hsize) / -2;
+                camera.right = (marginFactor * hsize) / 2;
+                camera.top = (marginFactor * ((1 / aspect) * hsize)) / 2;
+                camera.bottom = (marginFactor * ((1 / aspect) * hsize)) / -2;
             } else {
-                camera.left = (marginFactor * (aspect * size.y)) / -2;
-                camera.right = (marginFactor * (aspect * size.y)) / 2;
-                camera.top = (marginFactor * size.y) / 2;
-                camera.bottom = (marginFactor * size.y) / -2;
+                camera.left = (marginFactor * (aspect * vsize)) / -2;
+                camera.right = (marginFactor * (aspect * vsize)) / 2;
+                camera.top = (marginFactor * vsize) / 2;
+                camera.bottom = (marginFactor * vsize) / -2;
             }
 
             camera.updateProjectionMatrix();
@@ -130,3 +155,19 @@ export function createAxialCamera(domElement: HTMLElement): CameraRig {
         },
     };
 }
+
+// Convenience factories — all 9 axis/up combinations
+
+const X = new THREE.Vector3(1, 0, 0);
+const Y = new THREE.Vector3(0, 1, 0);
+const Z = new THREE.Vector3(0, 0, 1);
+
+export const createAxialCameraXX = (d: HTMLElement) => createAxialCamera(X, X, d);
+export const createAxialCameraXY = (d: HTMLElement) => createAxialCamera(X, Y, d);
+export const createAxialCameraXZ = (d: HTMLElement) => createAxialCamera(X, Z, d);
+export const createAxialCameraYX = (d: HTMLElement) => createAxialCamera(Y, X, d);
+export const createAxialCameraYY = (d: HTMLElement) => createAxialCamera(Y, Y, d);
+export const createAxialCameraYZ = (d: HTMLElement) => createAxialCamera(Y, Z, d);
+export const createAxialCameraZX = (d: HTMLElement) => createAxialCamera(Z, X, d);
+export const createAxialCameraZY = (d: HTMLElement) => createAxialCamera(Z, Y, d);
+export const createAxialCameraZZ = (d: HTMLElement) => createAxialCamera(Z, Z, d);

@@ -73,6 +73,11 @@ New format:
 
 - Camera "XY" is now called "2D".
 
+- Camera `"axial"` is renamed to `"axial-xy"`. All 9 axis/up combinations are now available:
+  `"axial-xx"`, `"axial-xy"`, `"axial-xz"`, `"axial-yx"`, `"axial-yy"`, `"axial-yz"`,
+  `"axial-zx"`, `"axial-zy"`, `"axial-zz"`. The first letter is the orbit axis, the second
+  is the screen-up direction.
+
 - The `controls` keys `show_optical_axis` and `show_other_axes` are replaced by `show_axis_x`, `show_axis_y`, and `show_axis_z`.
 
 Old format:

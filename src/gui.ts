@@ -112,7 +112,12 @@ export class TLMGui {
         this.gui.add(this.controller, "resetView").name("Reset Camera");
 
         this.gui
-            .add(this.controller, "camera", ["2D", "orthographic", "perspective", "axial"])
+            .add(this.controller, "camera", [
+                "2D", "orthographic", "perspective",
+                "axial-xx", "axial-xy", "axial-xz",
+                "axial-yx", "axial-yy", "axial-yz",
+                "axial-zx", "axial-zy", "axial-zz",
+            ])
             .name("Camera")
             .onChange((value: string) => {
                 app.setCamera(value);
