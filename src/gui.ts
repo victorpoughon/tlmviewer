@@ -112,12 +112,20 @@ export class TLMGui {
         this.gui.add(this.controller, "resetView").name("Reset Camera");
 
         this.gui
-            .add(this.controller, "camera", [
-                "2D", "orthographic", "perspective",
-                "axial-xx", "axial-xy", "axial-xz",
-                "axial-yx", "axial-yy", "axial-yz",
-                "axial-zx", "axial-zy", "axial-zz",
-            ])
+            .add(this.controller, "camera", {
+                "2D": "2D",
+                Orthographic: "orthographic",
+                Perspective: "perspective",
+                "Axial X (↑ X)": "axial-xx",
+                "Axial X (↑ Y)": "axial-xy",
+                "Axial X (↑ Z)": "axial-xz",
+                "Axial Y (↑ X)": "axial-yx",
+                "Axial Y (↑ Y)": "axial-yy",
+                "Axial Y (↑ Z)": "axial-yz",
+                "Axial Z (↑ X)": "axial-zx",
+                "Axial Z (↑ Y)": "axial-zy",
+                "Axial Z (↑ Z)": "axial-zz",
+            })
             .name("Camera")
             .onChange((value: string) => {
                 app.setCamera(value);
@@ -292,7 +300,11 @@ export class TLMGui {
             .add(this.controller, "showBcyl")
             .name("Bounding Cylinders")
             .onChange((value: boolean) => {
-                this.scene.dispatch({ type: "setCategoryVisibility", category: "bcyl", visible: value });
+                this.scene.dispatch({
+                    type: "setCategoryVisibility",
+                    category: "bcyl",
+                    visible: value,
+                });
             });
         // Initialize this.controllers
         this.controllers = {
@@ -342,14 +354,46 @@ export class TLMGui {
             value: this.controller.outputColor,
         });
 
-        this.scene.dispatch({ type: "setCategoryVisibility", category: "rays-valid", visible: true });
-        this.scene.dispatch({ type: "setCategoryVisibility", category: "rays-blocked", visible: false });
-        this.scene.dispatch({ type: "setCategoryVisibility", category: "rays-output", visible: true });
-        this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-x", visible: false });
-        this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-y", visible: false });
-        this.scene.dispatch({ type: "setCategoryVisibility", category: "axis-z", visible: false });
-        this.scene.dispatch({ type: "setCategoryVisibility", category: "kinematic-joint", visible: false });
-        this.scene.dispatch({ type: "setCategoryVisibility", category: "bcyl", visible: false });
+        this.scene.dispatch({
+            type: "setCategoryVisibility",
+            category: "rays-valid",
+            visible: true,
+        });
+        this.scene.dispatch({
+            type: "setCategoryVisibility",
+            category: "rays-blocked",
+            visible: false,
+        });
+        this.scene.dispatch({
+            type: "setCategoryVisibility",
+            category: "rays-output",
+            visible: true,
+        });
+        this.scene.dispatch({
+            type: "setCategoryVisibility",
+            category: "axis-x",
+            visible: false,
+        });
+        this.scene.dispatch({
+            type: "setCategoryVisibility",
+            category: "axis-y",
+            visible: false,
+        });
+        this.scene.dispatch({
+            type: "setCategoryVisibility",
+            category: "axis-z",
+            visible: false,
+        });
+        this.scene.dispatch({
+            type: "setCategoryVisibility",
+            category: "kinematic-joint",
+            visible: false,
+        });
+        this.scene.dispatch({
+            type: "setCategoryVisibility",
+            category: "bcyl",
+            visible: false,
+        });
 
         this.gui.open(false);
         this.folders.colors.open(true);
@@ -419,5 +463,4 @@ export class TLMGui {
             }
         });
     }
-
 }
