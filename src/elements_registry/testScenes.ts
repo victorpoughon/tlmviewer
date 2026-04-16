@@ -17,8 +17,9 @@ function buildScene(
             camera,
             data: [...elements, title],
             controls: {
-                show_optical_axis: "true",
-                show_other_axes: "true",
+                show_x_axis: "true",
+                show_y_axis: "true",
+                show_z_axis: "true",
                 show_bounding_cylinders: "true",
             },
         },
