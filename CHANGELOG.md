@@ -72,3 +72,17 @@ New format:
 ```
 
 - Camera "XY" is now called "2D".
+
+- The `controls` keys `show_optical_axis` and `show_other_axes` are replaced by `show_axis_x`, `show_axis_y`, and `show_axis_z`.
+
+Old format:
+
+```json
+{ "controls": { "show_optical_axis": true, "show_other_axes": false } }
+```
+
+New format:
+
+```json
+{ "controls": { "show_axis_x": true, "show_axis_y": false, "show_axis_z": false } }
+```

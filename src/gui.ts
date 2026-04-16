@@ -36,8 +36,9 @@ export class TLMGui {
             blockedRays: Controller;
             outputRays: Controller;
             surfaces: Controller;
-            opticalAxis: Controller;
-            otherAxes: Controller;
+            axisX: Controller;
+            axisY: Controller;
+            axisZ: Controller;
             kinematicJoints: Controller;
             bcyl: Controller;
         };
@@ -90,8 +91,9 @@ export class TLMGui {
             backgroundColor: { r: 0, g: 0, b: 0 },
             surfacesColor: { r: 0, g: 1, b: 1 },
 
-            showOpticalAxis: false,
-            showOtherAxes: false,
+            showAxisX: false,
+            showAxisY: false,
+            showAxisZ: false,
 
             showValidRays: true,
             showBlockedRays: false,
@@ -241,9 +243,9 @@ export class TLMGui {
                     visible: value,
                 });
             });
-        const controllerVisibleOpticalAxis = folderShow
-            .add(this.controller, "showOpticalAxis")
-            .name("Optical axis")
+        const controllerVisibleAxisX = folderShow
+            .add(this.controller, "showAxisX")
+            .name("Axis X")
             .onChange((value: boolean) => {
                 this.scene.dispatch({
                     type: "setCategoryVisibility",
@@ -251,15 +253,20 @@ export class TLMGui {
                     visible: value,
                 });
             });
-        const controllerVisibleOtherAxes = folderShow
-            .add(this.controller, "showOtherAxes")
-            .name("Other axes")
+        const controllerVisibleAxisY = folderShow
+            .add(this.controller, "showAxisY")
+            .name("Axis Y")
             .onChange((value: boolean) => {
                 this.scene.dispatch({
                     type: "setCategoryVisibility",
                     category: "axis-y",
                     visible: value,
                 });
+            });
+        const controllerVisibleAxisZ = folderShow
+            .add(this.controller, "showAxisZ")
+            .name("Axis Z")
+            .onChange((value: boolean) => {
                 this.scene.dispatch({
                     type: "setCategoryVisibility",
                     category: "axis-z",
@@ -298,8 +305,9 @@ export class TLMGui {
                 blockedRays: controllerVisibleBlockedRays,
                 outputRays: controllerVisibleOutputRays,
                 surfaces: controllerVisibleSurfaces,
-                opticalAxis: controllerVisibleOpticalAxis,
-                otherAxes: controllerVisibleOtherAxes,
+                axisX: controllerVisibleAxisX,
+                axisY: controllerVisibleAxisY,
+                axisZ: controllerVisibleAxisZ,
                 kinematicJoints: controllerVisibleKinematicJoints,
                 bcyl: controllerVisibleBcyl,
             },
@@ -383,11 +391,14 @@ export class TLMGui {
         set("show_surfaces", (v: boolean) => {
             self.controllers.visible.surfaces.load(v);
         });
-        set("show_optical_axis", (v: boolean) => {
-            self.controllers.visible.opticalAxis.load(v);
+        set("show_axis_x", (v: boolean) => {
+            self.controllers.visible.axisX.load(v);
         });
-        set("show_other_axes", (v: boolean) => {
-            self.controllers.visible.otherAxes.load(v);
+        set("show_axis_y", (v: boolean) => {
+            self.controllers.visible.axisY.load(v);
+        });
+        set("show_axis_z", (v: boolean) => {
+            self.controllers.visible.axisZ.load(v);
         });
         set("show_kinematic_joints", (v: boolean) => {
             self.controllers.visible.kinematicJoints.load(v);
