@@ -16,13 +16,13 @@ export type RaysData = BaseElementData & {
     variables: Record<string, number[]>;
     domain: Record<string, [number, number]>;
     dim: 2 | 3;
-    categories: string;
+    category: string;
 };
 
 function parse(raw: any, dim: number): RaysData {
     return {
         type: "rays",
-        categories: raw.categories ?? "rays-valid",
+        category: raw.category ?? "rays-valid",
         points: getRequired<number[][]>(raw, "points"),
         color: raw.color ?? "#ffa724",
         variables: raw.variables ?? {},
@@ -127,7 +127,7 @@ function setRaysColorOption(
     category: string,
     colorOption: ColorOption,
 ): void {
-    if (data.categories === category) {
+    if (data.category === category) {
         object.clear();
         object.add(makeRays(data, colorOption));
     }
@@ -177,7 +177,7 @@ export const raysDescriptor: ElementDescriptor<RaysData> = {
     render,
     events: {
         setCategoryVisibility: (data, object, event) => {
-            if (data.categories === event.category) {
+            if (data.category === event.category) {
                 object.visible = event.visible;
             }
         },

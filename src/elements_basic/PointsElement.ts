@@ -7,13 +7,13 @@ export type PointsData = BaseElementData & {
     vertices: number[][];
     color: string;
     radius: number;
-    categories: string[];
+    category: string;
 };
 
 function parse(raw: any, _dim: number): PointsData {
     return {
         type: "points",
-        categories: raw.categories ?? [],
+        category: raw.category ?? "",
         vertices: getRequired<number[][]>(raw, "data"),
         color: raw.color ?? "#ffffff",
         radius: raw.radius ?? 0.1,
@@ -75,10 +75,10 @@ export const pointsDescriptor: ElementDescriptor<PointsData> = {
     render,
     events: {
         setCategoryVisibility: (data, object, event) => {
-            if (data.categories.includes(event.category)) {
+            if (data.category === event.category) {
                 object.visible = event.visible;
             }
-        }
+        },
     },
     testData2D,
     testData3D,
