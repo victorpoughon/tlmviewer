@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import type { CameraRig } from "./CameraRig.ts";
+import type { CameraRig, CameraState } from "./CameraRig.ts";
 
 export function createCamera2D(domElement: HTMLElement): CameraRig {
     const camera = new THREE.OrthographicCamera(-10, 10, 10, -10, -10000, 10000);
@@ -54,6 +54,26 @@ export function createCamera2D(domElement: HTMLElement): CameraRig {
 
         dispose(): void {
             controls.dispose();
+        },
+
+        getState(): CameraState {
+            return {
+                position: [camera.position.x, camera.position.y, camera.position.z],
+                target: [controls.target.x, controls.target.y, controls.target.z],
+                zoom: camera.zoom,
+                left: camera.left, right: camera.right,
+                top: camera.top, bottom: camera.bottom,
+            };
+        },
+
+        setState(state: CameraState): void {
+            camera.position.set(...state.position);
+            controls.target.set(...state.target);
+            camera.zoom = state.zoom;
+            camera.left = state.left; camera.right = state.right;
+            camera.top = state.top; camera.bottom = state.bottom;
+            camera.updateProjectionMatrix();
+            controls.update();
         },
     };
 }

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import type { CameraRig } from "./CameraRig.ts";
+import type { CameraRig, CameraState } from "./CameraRig.ts";
 
 export function createPerspectiveCamera(domElement: HTMLElement): CameraRig {
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
@@ -43,6 +43,21 @@ export function createPerspectiveCamera(domElement: HTMLElement): CameraRig {
 
         dispose(): void {
             controls.dispose();
+        },
+
+        getState(): CameraState {
+            return {
+                position: [camera.position.x, camera.position.y, camera.position.z],
+                target: [controls.target.x, controls.target.y, controls.target.z],
+                zoom: camera.zoom,
+                left: 0, right: 0, top: 0, bottom: 0,
+            };
+        },
+
+        setState(state: CameraState): void {
+            camera.position.set(...state.position);
+            controls.target.set(...state.target);
+            controls.update();
         },
     };
 }

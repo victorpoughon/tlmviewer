@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import type { CameraRig } from "./CameraRig.ts";
+import type { CameraRig, CameraState } from "./CameraRig.ts";
 
 export function createAxialCamera(
     axis: THREE.Vector3, // unit vector — orbit target stays on this axis through origin
@@ -152,6 +152,26 @@ export function createAxialCamera(
             domElement.removeEventListener("pointerdown", onPointerDown);
             domElement.removeEventListener("pointermove", onPointerMove);
             controls.dispose();
+        },
+
+        getState(): CameraState {
+            return {
+                position: [camera.position.x, camera.position.y, camera.position.z],
+                target: [controls.target.x, controls.target.y, controls.target.z],
+                zoom: camera.zoom,
+                left: camera.left, right: camera.right,
+                top: camera.top, bottom: camera.bottom,
+            };
+        },
+
+        setState(state: CameraState): void {
+            camera.position.set(...state.position);
+            controls.target.set(...state.target);
+            camera.zoom = state.zoom;
+            camera.left = state.left; camera.right = state.right;
+            camera.top = state.top; camera.bottom = state.bottom;
+            camera.updateProjectionMatrix();
+            controls.update();
         },
     };
 }

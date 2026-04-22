@@ -1,9 +1,19 @@
 import { TLMScene } from "./scene.ts";
 import { TLMViewerApp } from "./app.ts";
 import { get_default } from "./core/utility.ts";
+import type { CameraState } from "./cameras/CameraRig.ts";
 import viewerTemplate from "./viewer.html?raw";
 
-export function renderScene(container: HTMLElement, data: unknown): void {
+export type RenderHandle = {
+    getCameraState(): CameraState;
+    dispose(): void;
+};
+
+export function renderScene(
+    container: HTMLElement,
+    data: unknown,
+    cameraState?: CameraState,
+): RenderHandle {
     try {
         const d = data as any;
         container.innerHTML = viewerTemplate;
@@ -16,14 +26,24 @@ export function renderScene(container: HTMLElement, data: unknown): void {
         ]);
 
         const scene = new TLMScene(d, mode === "3D" ? 3 : 2, container);
-        const app = new TLMViewerApp(container, scene, camera);
+        const app = new TLMViewerApp(container, scene, camera, cameraState);
 
         const controls = d["controls"] ?? {};
         app.gui.setControlsFromJson(controls);
 
-        window.addEventListener("resize", () => app.onWindowResize());
+        const onResize = () => app.onWindowResize();
+        window.addEventListener("resize", onResize);
         app.registerEventHandlers(container);
-        app.animate();
+        const cancelAnimation = app.animate();
+
+        return {
+            getCameraState: () => app.rig.getState(),
+            dispose: () => {
+                cancelAnimation();
+                window.removeEventListener("resize", onResize);
+                app.dispose();
+            },
+        };
     } catch (error) {
         container.innerHTML =
             "<span style='color: red'>tlmviewer error: " + error + "</span>";

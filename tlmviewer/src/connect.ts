@@ -1,6 +1,7 @@
 import { PROTOCOL_VERSION } from "tlmprotocol";
 import type { MessageType } from "tlmprotocol";
 import { renderScene } from "./render.ts";
+import type { RenderHandle } from "./render.ts";
 
 export interface ConnectOptions {
     topic?: string;
@@ -21,6 +22,7 @@ export function connect(
     let reconnectDelay = 1000;
     let stopped = false;
     let hasScene = false;
+    let handle: RenderHandle | null = null;
 
     function connectWs(): void {
         if (!hasScene) showStatus(container, "Connecting…");
@@ -51,7 +53,9 @@ export function connect(
 
             if (envelope.type === "scene") {
                 hasScene = true;
-                renderScene(container, envelope.payload);
+                const savedState = handle?.getCameraState();
+                handle?.dispose();
+                handle = renderScene(container, envelope.payload, savedState);
             }
         };
 
@@ -73,5 +77,6 @@ export function connect(
     return () => {
         stopped = true;
         ws?.close();
+        handle?.dispose();
     };
 }

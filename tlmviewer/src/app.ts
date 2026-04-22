@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 import { TLMScene } from "./scene.ts";
 import { TLMGui } from "./gui.ts";
-import type { CameraRig } from "./cameras/CameraRig.ts";
+import type { CameraRig, CameraState } from "./cameras/CameraRig.ts";
 import { createCamera2D } from "./cameras/Camera2D.ts";
 import { createOrthographicCamera } from "./cameras/OrthographicCamera.ts";
 import { createPerspectiveCamera } from "./cameras/PerspectiveCamera.ts";
@@ -19,7 +19,7 @@ export class TLMViewerApp {
     public viewport: HTMLElement;
     public gui: TLMGui;
 
-    constructor(container: HTMLElement, scene: TLMScene, camera: string) {
+    constructor(container: HTMLElement, scene: TLMScene, camera: string, cameraState?: CameraState) {
         const viewport =
             container.getElementsByClassName("tlmviewer-viewport")[0];
 
@@ -43,7 +43,11 @@ export class TLMViewerApp {
         // LIL GUI
         this.gui = new TLMGui(this, container, this.scene);
 
-        this.resetView();
+        if (cameraState) {
+            this.rig.setState(cameraState);
+        } else {
+            this.resetView();
+        }
     }
 
     private createRig(cameraType: string): CameraRig {
@@ -88,14 +92,19 @@ export class TLMViewerApp {
         });
     }
 
-    // Start the animation loop
-    public animate(): void {
-        const loop = () => {
-            this.rig.controls.update(); // Update the controls for damping
-            this.renderer.render(this.scene.scene, this.rig.camera); // Render the scene
-            requestAnimationFrame(loop); // Call the next frame
-        };
+    public dispose(): void {
+        this.rig.dispose();
+        this.renderer.dispose();
+    }
 
-        loop(); // Start the loop
+    public animate(): () => void {
+        let animId: number;
+        const loop = () => {
+            this.rig.controls.update();
+            this.renderer.render(this.scene.scene, this.rig.camera);
+            animId = requestAnimationFrame(loop);
+        };
+        animId = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(animId);
     }
 }
