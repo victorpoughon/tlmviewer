@@ -38,7 +38,8 @@ export function connect(
             let envelope: any;
             try {
                 envelope = JSON.parse(event.data as string);
-            } catch {
+            } catch (e) {
+                console.error("tlmviewer: failed to parse message", e);
                 return;
             }
 
@@ -51,15 +52,22 @@ export function connect(
             if (topic !== undefined && envelope.topic !== topic) return;
             if (filterType !== undefined && envelope.type !== filterType) return;
 
+            console.log(`tlmviewer: received topic=${envelope.topic} type=${envelope.type}`);
+
             if (envelope.type === "scene") {
                 hasScene = true;
                 const savedState = handle?.getCameraState();
                 handle?.dispose();
-                handle = renderScene(container, envelope.payload, savedState);
+                try {
+                    handle = renderScene(container, envelope.payload, savedState);
+                } catch (e) {
+                    console.error("tlmviewer: renderScene failed", e);
+                }
             }
         };
 
-        ws.onerror = () => {
+        ws.onerror = (e) => {
+            console.error("tlmviewer: WebSocket error", e);
             ws?.close();
         };
 
