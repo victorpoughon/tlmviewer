@@ -6,7 +6,8 @@ import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
 import CustomShaderMaterial from "three-custom-shader-material/vanilla";
 
-import { BaseElementData, ElementEventRecord } from "../core/types.ts";
+import type { SurfaceBaseData } from "protocol";
+import { ElementEventRecord } from "../core/types.ts";
 import {
     arrayToMatrix4,
     getTransform2D,
@@ -14,11 +15,7 @@ import {
 } from "../core/geometry.ts";
 import { getRequired } from "../core/utility.ts";
 
-// Base data type shared by all surface elements
-export type SurfaceBaseData = BaseElementData & {
-    matrix: number[][];
-    clipPlanes: [number, number, number, number][];
-};
+export type { SurfaceBaseData } from "protocol";
 
 // Parse the fields common to all surfaces from raw JSON
 export function parseSurfaceBaseData(raw: any): SurfaceBaseData {

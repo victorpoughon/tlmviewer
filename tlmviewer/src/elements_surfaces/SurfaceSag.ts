@@ -5,19 +5,13 @@ import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 
+import type { SurfaceSagData } from "protocol";
 import {
-    SurfaceBaseData,
     parseSurfaceBaseData,
     makeSurfaceRender,
     defaultSurfaceEvents,
 } from "./surface_utils.ts";
 import { parseSagFunction, glslRender } from "./sagFunctions.ts";
-
-export type SurfaceSagData = SurfaceBaseData & {
-    type: "surface-sag";
-    diameter: number;
-    sagFunctionData: any;
-};
 
 function parse(raw: any, _dim: number): SurfaceSagData {
     return {
@@ -58,7 +52,7 @@ function makeGeometry2D(
 ): [LineGeometry, THREE.Matrix4] {
     const { diameter } = data;
     const tau = diameter / 2;
-    const sag = parseSagFunction(data.sagFunctionData, tau).sagFunction2D(tau);
+    const sag = parseSagFunction(data.sagFunctionData as any, tau).sagFunction2D(tau);
 
     const geometry = sagGeometry2D(sag, -diameter / 2, diameter / 2, 100, 1.0);
 
@@ -78,7 +72,7 @@ function makeGeometry3D(
     );
 
     const tau = diameter / 2;
-    const sag = parseSagFunction(data.sagFunctionData, tau);
+    const sag = parseSagFunction(data.sagFunctionData as any, tau);
     const vertexShader = glslRender(
         sag.shaderG(tau),
         sag.shaderGgrad(tau),

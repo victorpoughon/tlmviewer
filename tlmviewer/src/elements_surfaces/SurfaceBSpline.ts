@@ -7,21 +7,12 @@ import { ParametricGeometry } from "three/addons/geometries/ParametricGeometry.j
 import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 
+import type { SurfaceBSplineData } from "protocol";
 import {
-    SurfaceBaseData,
     parseSurfaceBaseData,
     makeSurfaceRender,
     defaultSurfaceEvents,
 } from "./surface_utils.ts";
-
-export type SurfaceBSplineData = SurfaceBaseData & {
-    type: "surface-bspline";
-    points: number[][][]; // shape [nrows][ncols][3] — control point grid
-    weights: number[][]; // shape [nrows][ncols] — weights
-    degree: [number, number]; // [degree_u, degree_v]
-    knotType: "clamped" | "unclamped";
-    samples: [number, number]; // [slices, stacks] tessellation resolution
-};
 
 function linspace(start: number, stop: number, num: number): number[] {
     if (num === 0) return [];

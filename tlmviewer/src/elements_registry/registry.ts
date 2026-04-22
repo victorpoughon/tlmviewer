@@ -1,72 +1,21 @@
 import { ElementDescriptor } from "../core/types.ts";
 
-import {
-    ambientLightDescriptor,
-    AmbientLightData,
-} from "../elements_basic/AmbientLight.ts";
-import {
-    directionalLightDescriptor,
-    DirectionalLightData,
-} from "../elements_basic/DirectionalLight.ts";
-import {
-    sceneAxisDescriptor,
-    SceneAxisData,
-} from "../elements_basic/SceneAxis.ts";
-import {
-    arrowsDescriptor,
-    ArrowsData,
-} from "../elements_basic/ArrowsElement.ts";
-import { box3DDescriptor, Box3DData } from "../elements_basic/Box3D.ts";
-import {
-    pointsDescriptor,
-    PointsData,
-} from "../elements_basic/PointsElement.ts";
-import {
-    cylinderDescriptor,
-    CylinderData,
-} from "../elements_basic/Cylinder.ts";
-import { raysDescriptor, RaysData } from "../elements_basic/RaysElement.ts";
-import {
-    surfaceDiskDescriptor,
-    SurfaceDiskData,
-} from "../elements_surfaces/SurfaceDisk.ts";
-import {
-    surfaceLatheDescriptor,
-    SurfaceLatheData,
-} from "../elements_surfaces/SurfaceLathe.ts";
-import {
-    surfaceSphereRDescriptor,
-    SurfaceSphereRData,
-} from "../elements_surfaces/SurfaceSphereR.ts";
-import {
-    surfaceSagDescriptor,
-    SurfaceSagData,
-} from "../elements_surfaces/SurfaceSag.ts";
-import {
-    surfaceBSplineDescriptor,
-    SurfaceBSplineData,
-} from "../elements_surfaces/SurfaceBSpline.ts";
-import {
-    SceneTitleData,
-    sceneTitleDescriptor,
-} from "../elements_basic/SceneTitle.ts";
+import { ambientLightDescriptor } from "../elements_basic/AmbientLight.ts";
+import { directionalLightDescriptor } from "../elements_basic/DirectionalLight.ts";
+import { sceneAxisDescriptor } from "../elements_basic/SceneAxis.ts";
+import { arrowsDescriptor } from "../elements_basic/ArrowsElement.ts";
+import { box3DDescriptor } from "../elements_basic/Box3D.ts";
+import { pointsDescriptor } from "../elements_basic/PointsElement.ts";
+import { cylinderDescriptor } from "../elements_basic/Cylinder.ts";
+import { raysDescriptor } from "../elements_basic/RaysElement.ts";
+import { surfaceDiskDescriptor } from "../elements_surfaces/SurfaceDisk.ts";
+import { surfaceLatheDescriptor } from "../elements_surfaces/SurfaceLathe.ts";
+import { surfaceSphereRDescriptor } from "../elements_surfaces/SurfaceSphereR.ts";
+import { surfaceSagDescriptor } from "../elements_surfaces/SurfaceSag.ts";
+import { surfaceBSplineDescriptor } from "../elements_surfaces/SurfaceBSpline.ts";
+import { sceneTitleDescriptor } from "../elements_basic/SceneTitle.ts";
 
-// Union of all scene elements data types
-export type SceneElementData =
-    | AmbientLightData
-    | ArrowsData
-    | Box3DData
-    | CylinderData
-    | DirectionalLightData
-    | PointsData
-    | RaysData
-    | SceneAxisData
-    | SceneTitleData
-    | SurfaceLatheData
-    | SurfaceDiskData
-    | SurfaceSagData
-    | SurfaceSphereRData
-    | SurfaceBSplineData;
+export type { SceneElementData } from "protocol";
 
 // List of all scene elements descriptors
 export const allDescriptors = [

@@ -6,18 +6,12 @@ import { ElementDescriptor } from "../core/types.ts";
 import { samples2DToPoints } from "../core/geometry.ts";
 import { getRequired } from "../core/utility.ts";
 
+import type { SurfaceSphereRData } from "protocol";
 import {
-    SurfaceBaseData,
     parseSurfaceBaseData,
     makeSurfaceRender,
     defaultSurfaceEvents,
 } from "./surface_utils.ts";
-
-export type SurfaceSphereRData = SurfaceBaseData & {
-    type: "surface-sphere-r";
-    R: number;
-    diameter: number;
-};
 
 function parse(raw: any, _dim: number): SurfaceSphereRData {
     return {

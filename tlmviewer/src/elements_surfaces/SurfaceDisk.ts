@@ -6,17 +6,12 @@ import { ElementDescriptor } from "../core/types.ts";
 import { samples2DToPoints } from "../core/geometry.ts";
 import { getRequired } from "../core/utility.ts";
 
+import type { SurfaceDiskData } from "protocol";
 import {
-    SurfaceBaseData,
     parseSurfaceBaseData,
     makeSurfaceRender,
     defaultSurfaceEvents,
 } from "./surface_utils.ts";
-
-export type SurfaceDiskData = SurfaceBaseData & {
-    type: "surface-disk";
-    radius: number;
-};
 
 function parse(raw: any, _dim: number): SurfaceDiskData {
     return {

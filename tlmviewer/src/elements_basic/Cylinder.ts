@@ -1,18 +1,11 @@
 import * as THREE from "three";
-import { BaseElementData, ElementDescriptor } from "../core/types.ts";
+import type { CylinderData } from "protocol";
+import { ElementDescriptor } from "../core/types.ts";
 import { arrayToMatrix4, homogeneousMatrix3to4 } from "../core/geometry.ts";
 import { getRequired } from "../core/utility.ts";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
-
-export type CylinderData = BaseElementData & {
-    type: "cylinder";
-    matrix: number[][];
-    xmin: number;
-    xmax: number;
-    radius: number;
-};
 
 function parse(raw: any, _dim: number): CylinderData {
     return {

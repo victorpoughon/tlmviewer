@@ -1,11 +1,7 @@
 import * as THREE from "three";
-import { BaseElementData, ElementDescriptor } from "../core/types.ts";
+import type { SceneTitleData } from "protocol";
+import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
-
-export type SceneTitleData = BaseElementData & {
-    type: "scene-title";
-    title: string;
-};
 
 function parse(raw: any, _dim: number): SceneTitleData {
     return {

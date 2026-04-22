@@ -1,13 +1,8 @@
 import * as THREE from "three";
-import { BaseElementData, ElementDescriptor } from "../core/types.ts";
+import type { Box3DData } from "protocol";
+import { ElementDescriptor } from "../core/types.ts";
 import { arrayToMatrix4 } from "../core/geometry.ts";
 import { getRequired } from "../core/utility.ts";
-
-export type Box3DData = BaseElementData & {
-    type: "box3D";
-    size: [number, number, number];
-    matrix: number[][];
-};
 
 function parse(raw: any, _dim: number): Box3DData {
     return {

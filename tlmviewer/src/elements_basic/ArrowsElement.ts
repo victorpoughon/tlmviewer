@@ -1,11 +1,7 @@
 import * as THREE from "three";
-import { BaseElementData, ElementDescriptor } from "../core/types.ts";
+import type { ArrowsData } from "protocol";
+import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
-
-export type ArrowsData = BaseElementData & {
-    type: "arrows";
-    arrows: number[][];
-};
 
 function parse(raw: any, dim: number): ArrowsData {
     const arrows = getRequired<number[][]>(raw, "data");

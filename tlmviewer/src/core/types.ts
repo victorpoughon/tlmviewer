@@ -1,9 +1,8 @@
 import * as THREE from "three";
 import { SceneEventType, SceneEvent } from "./events.ts";
 
-export type BaseElementData = {
-    type: string;
-};
+import type { BaseElementData } from "protocol";
+export type { BaseElementData };
 
 // Handler for a specific event type
 export type EventHandler<

@@ -1,14 +1,7 @@
 import * as THREE from "three";
-import { BaseElementData, ElementDescriptor } from "../core/types.ts";
+import type { PointsData } from "protocol";
+import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
-
-export type PointsData = BaseElementData & {
-    type: "points";
-    vertices: number[][];
-    color: string;
-    radius: number;
-    category: string;
-};
 
 function parse(raw: any, _dim: number): PointsData {
     return {

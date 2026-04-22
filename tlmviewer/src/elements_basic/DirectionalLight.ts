@@ -1,13 +1,7 @@
 import * as THREE from "three";
-import { BaseElementData, ElementDescriptor } from "../core/types.ts";
+import type { DirectionalLightData } from "protocol";
+import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
-
-export type DirectionalLightData = BaseElementData & {
-    type: "directional-light";
-    color: string;
-    intensity: number;
-    position: [number, number, number];
-};
 
 function parse(raw: any, _dim: number): DirectionalLightData {
     const position = getRequired<number[]>(raw, "position");

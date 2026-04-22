@@ -4,6 +4,11 @@ import { defineConfig } from "vite";
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
 export default defineConfig({
+    resolve: {
+        alias: {
+            protocol: resolve(__dirname, "../protocol/src/index.ts"),
+        },
+    },
     build: {
         lib: {
             entry: resolve(__dirname, "src/main.ts"),

@@ -6,17 +6,12 @@ import { ElementDescriptor } from "../core/types.ts";
 import { samples2DToPoints } from "../core/geometry.ts";
 import { getRequired } from "../core/utility.ts";
 
+import type { SurfaceLatheData } from "protocol";
 import {
-    SurfaceBaseData,
     parseSurfaceBaseData,
     makeSurfaceRender,
     defaultSurfaceEvents,
 } from "./surface_utils.ts";
-
-export type SurfaceLatheData = SurfaceBaseData & {
-    type: "surface-lathe";
-    samples: number[][];
-};
 
 function parse(raw: any, _dim: number): SurfaceLatheData {
     return {

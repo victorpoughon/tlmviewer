@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { BaseElementData, ElementDescriptor } from "../core/types.ts";
+import type { RaysData } from "protocol";
+import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
@@ -9,15 +10,6 @@ import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js
 import { CET_I2, colormap, wavelengthToRgb } from "../color/index.ts";
 import { ColorOption } from "../core/events.ts";
 
-export type RaysData = BaseElementData & {
-    type: "rays";
-    points: number[][];
-    color: string;
-    variables: Record<string, number[]>;
-    domain: Record<string, [number, number]>;
-    dim: 2 | 3;
-    category: string;
-};
 
 function parse(raw: any, dim: number): RaysData {
     return {
