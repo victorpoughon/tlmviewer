@@ -1,4 +1,6 @@
-import { allDescriptors } from "./registry.ts";
+import tlmviewer from "tlmviewer";
+
+const { allDescriptors } = tlmviewer.testing;
 
 function buildScene(
     sceneName: string,

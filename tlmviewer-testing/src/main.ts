@@ -1,5 +1,5 @@
-import tlmviewer from "../src/main.ts";
-import { builtinScenes } from "../src/elements_registry/testScenes.ts";
+import tlmviewer from "tlmviewer";
+import { builtinScenes } from "./builtinScenes.ts";
 
 async function fetchManifest(): Promise<any> {
     return fetch("/testscenes.json")

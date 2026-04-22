@@ -1,7 +1,6 @@
-import {
-    parseSagFunction,
-    glslRender,
-} from "../src/elements/SurfaceSagElement.ts";
+import tlmviewer from "tlmviewer";
+
+const { parseSagFunction, glslRender } = tlmviewer.testing;
 
 // const str = `{
 //                 "sag-type": "sum",

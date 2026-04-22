@@ -1,5 +1,7 @@
 import { TLMScene } from "./scene.ts";
 import { TLMViewerApp } from "./app.ts";
+import { allDescriptors } from "./elements_registry/registry.ts";
+import { parseSagFunction, glslRender } from "./elements_surfaces/sagFunctions.ts";
 
 import { get_default } from "./core/utility.ts";
 
@@ -88,6 +90,11 @@ export default {
     embed: embed,
     load: load,
     loadAll: loadAll,
+    testing: {
+        allDescriptors,
+        parseSagFunction,
+        glslRender,
+    },
 };
 
 // @ts-ignore
