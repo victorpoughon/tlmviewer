@@ -29,7 +29,7 @@ Step-by-step path to the architecture in `target_architecture.md`. Each step is 
 - Wire it into `tlmviewer/tsconfig.json` paths so `tlmviewer/src/` can `import { Envelope } from "../protocol"`.
 - No server yet; no runtime behavior change.
 
-**Test**: `npm run build` still succeeds. Import the types from `src/` in a scratch file to confirm resolution.
+**Test**: `npm run build` still succeeds. Import the types from `tlmviewer/src/` in a scratch file to confirm resolution.
 
 **Exit criteria**: types exist, build green, nothing else changed.
 
@@ -37,7 +37,7 @@ Step-by-step path to the architecture in `target_architecture.md`. Each step is 
 
 **Goal**: browser can receive scenes over WebSocket and re-render via Step 1's infra. Still no real server — use `websocat` or a 10-line Node script to test.
 
-- New file `src/connect.ts`, exported from `main.ts`.
+- New file `tlmviewer/src/connect.ts`, exported from `main.ts` alongside `embed`, `load`, `loadAll`, and `testing`.
 - Signature: `connect(container, wsUrl, { topic?: string, type?: MessageType })`.
 - Opens `WebSocket`, auto-reconnect with exponential backoff (cap ~10s).
 - Shows "waiting for scene…" placeholder until first matching message.
@@ -51,22 +51,22 @@ Step-by-step path to the architecture in `target_architecture.md`. Each step is 
 
 **Exit criteria**: manual end-to-end live update works against an ad-hoc WS server.
 
-## Step 4 — tlmserver MVP in `server/`
+## Step 4 — tlmserver MVP in `tlmserver/`
 
 **Goal**: real relay server implementing the protocol, with per-topic `latest`/`append` semantics.
 
-- New dir `server/` with its own `package.json` (or a workspace entry — defer workspaces until it actually hurts; a sibling `package.json` is fine for now).
+- New workspace `tlmserver/` with its own `package.json` (follows the workspace pattern established in the monorepo).
 - Stack: Node stdlib `http` + `ws` library. No framework needed.
 - Endpoints:
   - `POST /push` — parse envelope, validate `v` + required fields, store in per-topic state (map keyed by topic, value = `{mode, latest?, buffer?}`), broadcast to all WS clients.
   - `GET /ws` — upgrade to WebSocket; on connect, replay stored state across all topics (last message for `latest`, full ring buffer for `append`).
-  - `GET /` — serve a minimal static HTML page that loads the built tlmviewer and calls `connect(document.body, "ws://host/ws")`.
+  - `GET /` — serve a minimal static HTML page that loads the built tlmviewer and calls `connect(document.body, "ws://host/ws")`. Can reuse the `tlmviewer-static` build or a small inline page.
 - Imports envelope types from `../protocol/`.
 - Config: `--port` (default 8765), `--host` (default `127.0.0.1`, warn on `0.0.0.0`), `--ring-size` (default 1000 for `append` topics).
-- CLI entry point: `bin/tlmserver.ts`.
+- CLI entry point: `tlmserver/bin/tlmserver.ts`.
 
 **Test**:
-- Start server: `node server/bin/tlmserver.ts`.
+- Start server: `node tlmserver/bin/tlmserver.ts`.
 - `curl -X POST localhost:8765/push -d @test-scene.json -H 'content-type: application/json'` → browser tab at `localhost:8765/` updates.
 - Open two browser tabs → both update.
 - Open a tab *after* pushing → replay delivers the latest scene (for `mode: latest`).
@@ -94,7 +94,7 @@ Step-by-step path to the architecture in `target_architecture.md`. Each step is 
 
 **Goal**: Python users install and run tlmserver without needing Node.
 
-- Build path: `bun build server/bin/tlmserver.ts --compile --outfile tlmserver` (or `pkg`, whichever works cleanly on Linux/macOS/Windows).
+- Build path: `bun build tlmserver/bin/tlmserver.ts --compile --outfile tlmserver` (or `pkg`, whichever works cleanly on Linux/macOS/Windows).
 - Add to CI: on tag, build binaries for the three OSes and attach to the GitHub release.
 - Document install as `curl -L <release-url> -o tlmserver && chmod +x tlmserver` in tlmserver's README section.
 - Also keep `npm install -g tlmserver` publishing as a secondary path for Node users.

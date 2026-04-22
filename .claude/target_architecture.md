@@ -25,7 +25,7 @@ All code lives in this single npm-workspaces monorepo.
 
 - **tlmviewer** — pure 3D viewer library. Exposes `embed`, `load`, `loadAll` (existing) plus `connect(container, wsUrl, opts)` for live mode. Imports types from `protocol/`.
 - **tlmserver** — standalone Node binary. Accepts scene (and later plot/log/…) pushes over HTTP, broadcasts to WebSocket clients. Distributed as a standalone binary (e.g. via `bun build --compile`) so Python users don't need a Node install.
-- **protocol/** — single source of truth for the envelope shape, protocol version constant, and topic/mode helpers. Both `src/` and `server/` import from it.
+- **protocol/** — single source of truth for the envelope shape, protocol version constant, and topic/mode helpers. Both `tlmviewer/` and `tlmserver/` import from it.
 - **tlmstudio** (future) — sibling TS app. Embeds tlmviewer, adds plot/log/image panes with drag-and-drop layout. Connects to tlmserver the same way a browser tlmviewer client does.
 - **Python push helper** — ~20 lines of `httpx.post`. Lives inside torchlensmaker itself, not a separate Python package.
 
