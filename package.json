@@ -1,11 +1,17 @@
 {
-  "name": "tlmviewer-monorepo",
-  "private": true,
-  "workspaces": ["tlmprotocol", "tlmviewer", "tlmviewer-testing", "tlmviewer-static", "tlmserver"],
-  "scripts": {
-    "dev": "npm run dev -w tlmviewer-testing",
-    "dev:static": "npm run dev -w tlmviewer-static",
-    "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
-  }
+    "name": "tlmviewer-monorepo",
+    "private": true,
+    "workspaces": [
+        "tlmprotocol",
+        "tlmviewer",
+        "tlmviewer-testing",
+        "tlmviewer-static",
+        "tlmserver"
+    ],
+    "scripts": {
+        "dev:testing": "npm run dev -w tlmviewer-testing",
+        "dev:static": "npm run dev -w tlmviewer-static",
+        "build": "npm run build --workspaces --if-present",
+        "test": "npm run test --workspaces --if-present"
+    }
 }
