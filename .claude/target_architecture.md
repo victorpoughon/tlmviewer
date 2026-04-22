@@ -20,12 +20,12 @@ All code lives in this single npm-workspaces monorepo.
   tlmviewer-static/    # hosted drop-a-JSON static viewer (not published)
   (future) tlmstudio/  # TS: tlmstudio shell app
   (future) tlmserver/  # TS/Node: tlmserver — generic WS relay
-  (future) protocol/   # TS: shared envelope types, topic helpers, version constant
+  (future) protocol/   # TS: shared envelope types, scene element types, topic helpers, version constant
 ```
 
-- **tlmviewer** — pure 3D viewer library. Exposes `embed`, `load`, `loadAll` (existing) plus `connect(container, wsUrl, opts)` for live mode. Imports types from `protocol/`.
+- **tlmviewer** — pure 3D viewer library. Exposes `embed`, `load`, `loadAll` (existing) plus `connect(container, wsUrl, opts)` for live mode. Imports scene element types and envelope types from `protocol/` rather than defining them internally.
 - **tlmserver** — standalone Node binary. Accepts scene (and later plot/log/…) pushes over HTTP, broadcasts to WebSocket clients. Distributed as a standalone binary (e.g. via `bun build --compile`) so Python users don't need a Node install.
-- **protocol/** — single source of truth for the envelope shape, protocol version constant, and topic/mode helpers. Both `tlmviewer/` and `tlmserver/` import from it.
+- **protocol/** — single source of truth for: the envelope shape and protocol version constant; scene element types (sphere, lens, …); topic/mode helpers. Both `tlmviewer/` and `tlmserver/` import from it. Also importable by any external TypeScript scene generator without pulling in the rendering stack.
 - **tlmstudio** (future) — sibling TS app. Embeds tlmviewer, adds plot/log/image panes with drag-and-drop layout. Connects to tlmserver the same way a browser tlmviewer client does.
 - **Python push helper** — ~20 lines of `httpx.post`. Lives inside torchlensmaker itself, not a separate Python package.
 
@@ -49,7 +49,7 @@ Single envelope format, transport-agnostic (used identically over HTTP push and 
 | `type` | `"scene"` \| `"plot"` \| `"log"` \| `"image"` \| … | Payload kind. tlmviewer handles `scene`, ignores others. |
 | `topic` | string | Named stream (e.g. `"main"`, `"optimizer-loss"`). Routes to panes in tlmstudio. |
 | `mode` | `"latest"` \| `"append"` | Per-topic semantics: `latest` = replace + replay last on connect; `append` = ring buffer + replay all on connect. |
-| `payload` | any | Type-specific body. For `scene`, this is the existing tlmviewer scene JSON. |
+| `payload` | any | Type-specific body. For `scene`, this is a scene object typed by `SceneData` in `protocol/scene.ts`. |
 
 Per-type defaults: `scene`/`plot`/`image` = `latest`; `log` = `append`.
 

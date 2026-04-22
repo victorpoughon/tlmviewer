@@ -18,20 +18,24 @@ Step-by-step path to the architecture in `target_architecture.md`. Each step is 
 
 ## Step 2 — Add `protocol/` directory with shared types
 
-**Goal**: single source of truth for the envelope shape, importable from both viewer and (future) server.
+**Goal**: single source of truth for the envelope shape and scene element types, importable from both viewer and (future) server, and by external TypeScript scene generators without pulling in the rendering stack.
 
-- New dir `protocol/` with `index.ts` exporting:
-  - `PROTOCOL_VERSION = 1`
-  - `type Envelope<T = unknown>`
-  - `type MessageType = "scene" | "plot" | "log" | "image"` (open-ended via string widening later)
-  - `type Mode = "latest" | "append"`
-  - Helper: `defaultModeForType(type)`.
-- Wire it into `tlmviewer/tsconfig.json` paths so `tlmviewer/src/` can `import { Envelope } from "../protocol"`.
+- New dir `protocol/` with two files:
+  - `envelope.ts` exporting:
+    - `PROTOCOL_VERSION = 1`
+    - `type Envelope<T = unknown>`
+    - `type MessageType = "scene" | "plot" | "log" | "image"` (open-ended via string widening later)
+    - `type Mode = "latest" | "append"`
+    - Helper: `defaultModeForType(type)`.
+  - `scene.ts` exporting scene element types extracted from `tlmviewer/src/` internals (e.g. `SceneData`, element union types, field shapes). These are the types for the `payload` field of a `scene` envelope.
+  - `index.ts` re-exporting everything from both files.
+- Migrate `tlmviewer/src/` to import its scene element types from `../protocol/scene` rather than defining them locally. `tlmviewer` is now the consumer, not the owner, of these types.
+- Wire into `tlmviewer/tsconfig.json` paths so `tlmviewer/src/` can `import { Envelope, SceneData } from "../protocol"`.
 - No server yet; no runtime behavior change.
 
-**Test**: `npm run build` still succeeds. Import the types from `tlmviewer/src/` in a scratch file to confirm resolution.
+**Test**: `npm run build` still succeeds. Import the types from `tlmviewer/src/` in a scratch file to confirm resolution. Confirm `protocol/` has no dependency on `tlmviewer/` (one-way dependency only).
 
-**Exit criteria**: types exist, build green, nothing else changed.
+**Exit criteria**: types exist, build green, `tlmviewer` imports scene types from `protocol/`, nothing else changed.
 
 ## Step 3 — Add `tlmviewer.connect(container, wsUrl, opts)`
 
