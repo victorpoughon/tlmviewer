@@ -6,7 +6,7 @@ import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 
 import CustomShaderMaterial from "three-custom-shader-material/vanilla";
 
-import type { SurfaceBaseData } from "protocol";
+import type { SurfaceBaseData } from "tlmprotocol";
 import { ElementEventRecord } from "../core/types.ts";
 import {
     arrayToMatrix4,
@@ -15,7 +15,7 @@ import {
 } from "../core/geometry.ts";
 import { getRequired } from "../core/utility.ts";
 
-export type { SurfaceBaseData } from "protocol";
+export type { SurfaceBaseData } from "tlmprotocol";
 
 // Parse the fields common to all surfaces from raw JSON
 export function parseSurfaceBaseData(raw: any): SurfaceBaseData {

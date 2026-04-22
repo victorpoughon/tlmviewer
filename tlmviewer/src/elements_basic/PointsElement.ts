@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { PointsData } from "protocol";
+import type { PointsData } from "tlmprotocol";
 import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { SceneAxisData } from "protocol";
+import type { SceneAxisData } from "tlmprotocol";
 import { ElementDescriptor } from "../core/types.ts";
 import { getOption, getRequired } from "../core/utility.ts";
 import { makeLine2 } from "../core/lineUtils.ts";

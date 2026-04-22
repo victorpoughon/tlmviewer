@@ -6,7 +6,7 @@ import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 export default defineConfig({
     resolve: {
         alias: {
-            protocol: resolve(__dirname, "../protocol/src/index.ts"),
+            tlmprotocol: resolve(__dirname, "../tlmprotocol/src/index.ts"),
         },
     },
     build: {

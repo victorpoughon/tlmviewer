@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { AmbientLightData } from "protocol";
+import type { AmbientLightData } from "tlmprotocol";
 import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 

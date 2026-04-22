@@ -5,7 +5,7 @@ import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 
-import type { SurfaceSagData } from "protocol";
+import type { SurfaceSagData } from "tlmprotocol";
 import {
     parseSurfaceBaseData,
     makeSurfaceRender,

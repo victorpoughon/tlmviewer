@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { SceneTitleData } from "protocol";
+import type { SceneTitleData } from "tlmprotocol";
 import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 

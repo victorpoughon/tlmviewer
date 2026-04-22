@@ -15,7 +15,7 @@ import { surfaceSagDescriptor } from "../elements_surfaces/SurfaceSag.ts";
 import { surfaceBSplineDescriptor } from "../elements_surfaces/SurfaceBSpline.ts";
 import { sceneTitleDescriptor } from "../elements_basic/SceneTitle.ts";
 
-export type { SceneElementData } from "protocol";
+export type { SceneElementData } from "tlmprotocol";
 
 // List of all scene elements descriptors
 export const allDescriptors = [

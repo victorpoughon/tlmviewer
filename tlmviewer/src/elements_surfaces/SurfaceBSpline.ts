@@ -7,7 +7,7 @@ import { ParametricGeometry } from "three/addons/geometries/ParametricGeometry.j
 import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 
-import type { SurfaceBSplineData } from "protocol";
+import type { SurfaceBSplineData } from "tlmprotocol";
 import {
     parseSurfaceBaseData,
     makeSurfaceRender,

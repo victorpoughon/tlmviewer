@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { Box3DData } from "protocol";
+import type { Box3DData } from "tlmprotocol";
 import { ElementDescriptor } from "../core/types.ts";
 import { arrayToMatrix4 } from "../core/geometry.ts";
 import { getRequired } from "../core/utility.ts";

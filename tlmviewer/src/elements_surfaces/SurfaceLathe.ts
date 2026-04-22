@@ -6,7 +6,7 @@ import { ElementDescriptor } from "../core/types.ts";
 import { samples2DToPoints } from "../core/geometry.ts";
 import { getRequired } from "../core/utility.ts";
 
-import type { SurfaceLatheData } from "protocol";
+import type { SurfaceLatheData } from "tlmprotocol";
 import {
     parseSurfaceBaseData,
     makeSurfaceRender,

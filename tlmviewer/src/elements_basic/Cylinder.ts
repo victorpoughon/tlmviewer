@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { CylinderData } from "protocol";
+import type { CylinderData } from "tlmprotocol";
 import { ElementDescriptor } from "../core/types.ts";
 import { arrayToMatrix4, homogeneousMatrix3to4 } from "../core/geometry.ts";
 import { getRequired } from "../core/utility.ts";

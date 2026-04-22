@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { RaysData } from "protocol";
+import type { RaysData } from "tlmprotocol";
 import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 

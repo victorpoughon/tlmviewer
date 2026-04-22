@@ -3,7 +3,7 @@
     "baseUrl": ".",
     "paths": {
       "tlmviewer": ["../tlmviewer/src/main.ts"],
-      "protocol": ["../protocol/src/index.ts"]
+      "tlmprotocol": ["../tlmprotocol/src/index.ts"]
     },
     "target": "ES2020",
     "useDefineForClassFields": true,

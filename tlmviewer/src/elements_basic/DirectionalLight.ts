@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { DirectionalLightData } from "protocol";
+import type { DirectionalLightData } from "tlmprotocol";
 import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { ArrowsData } from "protocol";
+import type { ArrowsData } from "tlmprotocol";
 import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 
