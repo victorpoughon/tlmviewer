@@ -11,14 +11,16 @@ End-state design for live/interactive tlmviewer usage and the future tlmstudio a
 
 ## Components
 
-All code lives in this single repo (monorepo-ish; workspaces introduced only when needed).
+All code lives in this single npm-workspaces monorepo.
 
 ```
-tlmviewer/
-  src/           # TS: 3D viewer library (existing)
-  server/        # TS/Node: tlmserver — generic WS relay
-  protocol/      # TS: shared envelope types, topic helpers, version constant
-  (future) studio/  # TS: tlmstudio shell app
+<repo root>/
+  tlmviewer/           # published npm library: embed, load, loadAll, connect
+  tlmviewer-testing/   # internal dev/test app (not published)
+  tlmviewer-static/    # hosted drop-a-JSON static viewer (not published)
+  (future) tlmstudio/  # TS: tlmstudio shell app
+  (future) tlmserver/  # TS/Node: tlmserver — generic WS relay
+  (future) protocol/   # TS: shared envelope types, topic helpers, version constant
 ```
 
 - **tlmviewer** — pure 3D viewer library. Exposes `embed`, `load`, `loadAll` (existing) plus `connect(container, wsUrl, opts)` for live mode. Imports types from `protocol/`.

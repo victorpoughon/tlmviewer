@@ -17,8 +17,8 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org/
       - run: npm ci
-      - run: npm run build
-      - run: ls -R dist
-      - run: npm publish
+      - run: npm run build -w tlmviewer
+      - run: ls -R tlmviewer/dist
+      - run: npm publish -w tlmviewer
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

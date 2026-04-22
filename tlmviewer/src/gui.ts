@@ -458,7 +458,9 @@ export class TLMGui {
 
         // Finish with visibility of the gui itself
         set("show_controls", (v: boolean) => {
-            if (!v) {
+            if (v) {
+                self.gui.show();
+            } else {
                 self.gui.hide();
             }
         });

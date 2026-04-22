@@ -4,6 +4,7 @@
   "workspaces": ["tlmviewer", "tlmviewer-testing", "tlmviewer-static"],
   "scripts": {
     "dev": "npm run dev -w tlmviewer-testing",
+    "dev:static": "npm run dev -w tlmviewer-static",
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present"
   }

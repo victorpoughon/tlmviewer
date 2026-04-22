@@ -26,7 +26,7 @@ Step-by-step path to the architecture in `target_architecture.md`. Each step is 
   - `type MessageType = "scene" | "plot" | "log" | "image"` (open-ended via string widening later)
   - `type Mode = "latest" | "append"`
   - Helper: `defaultModeForType(type)`.
-- Wire it into `tsconfig.json` paths so `src/` can `import { Envelope } from "../protocol"`.
+- Wire it into `tlmviewer/tsconfig.json` paths so `tlmviewer/src/` can `import { Envelope } from "../protocol"`.
 - No server yet; no runtime behavior change.
 
 **Test**: `npm run build` still succeeds. Import the types from `src/` in a scratch file to confirm resolution.
