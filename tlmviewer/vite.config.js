@@ -1,9 +1,7 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
 
-// Vite plugins
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
-import version from "vite-plugin-package-version";
 
 export default defineConfig({
     build: {
@@ -17,6 +15,5 @@ export default defineConfig({
     },
     plugins: [
         cssInjectedByJsPlugin(),
-        version(),
     ],
 });

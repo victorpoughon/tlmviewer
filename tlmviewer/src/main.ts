@@ -1,5 +1,6 @@
 import { TLMScene } from "./scene.ts";
 import { TLMViewerApp } from "./app.ts";
+import { version } from "../package.json";
 import { allDescriptors } from "./elements_registry/registry.ts";
 import { parseSagFunction, glslRender } from "./elements_surfaces/sagFunctions.ts";
 
@@ -97,5 +98,4 @@ export default {
     },
 };
 
-// @ts-ignore
-console.log(`tlmviewer-${import.meta.env.PACKAGE_VERSION} loaded`);
+console.log(`tlmviewer-${version} loaded`);
