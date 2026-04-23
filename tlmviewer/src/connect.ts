@@ -52,7 +52,7 @@ export function connect(
             if (topic !== undefined && envelope.topic !== topic) return;
             if (filterType !== undefined && envelope.type !== filterType) return;
 
-            console.log(`tlmviewer: received topic=${envelope.topic} type=${envelope.type}`);
+            console.log(`tlmviewer: received topic=${envelope.topic} type=${envelope.type} v=${envelope.v}`);
 
             if (envelope.type === "scene") {
                 hasScene = true;
