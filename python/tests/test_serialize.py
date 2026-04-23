@@ -88,6 +88,12 @@ def test_scene_to_json_is_valid_json():
     assert parsed["data"][0]["title"] == "hello"
 
 
+@pytest.mark.parametrize("element", ELEMENTS)
+def test_scene_to_json_all_element_types(element):
+    scene = tlmv.Scene(data=[element])
+    json.loads(tlmv.scene_to_json(scene))
+
+
 # ── Empty clip_planes not omitted (it's always present) ───────────────────────
 
 def test_empty_clip_planes_serialized():
