@@ -1,4 +1,5 @@
 import json
+import os
 import urllib.request
 import urllib.error
 
@@ -15,7 +16,13 @@ def push_scene(
     port: int = 8765,
     topic: str = "main",
 ) -> None:
-    """Push a Scene to a running tlmserver."""
+    """Push a Scene to a running tlmserver.
+
+    If the environment variable TLMVIEWER_PUSH_SCENE_ALLOW_FAIL is set,
+    connection errors are silently ignored instead of raised.
+    """
+    allow_fail = "TLMVIEWER_PUSH_SCENE_ALLOW_FAIL" in os.environ
+
     envelope = {
         "v": PROTOCOL_VERSION,
         "type": "scene",
@@ -38,6 +45,8 @@ def push_scene(
             if not result.get("ok"):
                 raise RuntimeError(f"tlmserver returned unexpected response: {result}")
     except urllib.error.HTTPError as e:
+        if allow_fail:
+            return
         try:
             detail = json.loads(e.read()).get("error", e.reason)
         except Exception:
@@ -46,6 +55,8 @@ def push_scene(
             f"tlmserver rejected the push (HTTP {e.code}): {detail}"
         ) from e
     except urllib.error.URLError as e:
+        if allow_fail:
+            return
         raise ConnectionRefusedError(
             f"Could not connect to tlmserver at {url}: {e.reason}"
         ) from e

@@ -80,3 +80,32 @@ def test_push_raises_runtime_error_on_unexpected_response():
     with patch("urllib.request.urlopen", return_value=_mock_response({"ok": False, "msg": "unexpected"})):
         with pytest.raises(RuntimeError):
             tlmv.push_scene(SIMPLE_SCENE)
+
+
+# ── TLMVIEWER_PUSH_SCENE_ALLOW_FAIL ───────────────────────────────────────────
+
+def test_allow_fail_silences_url_error(monkeypatch):
+    import socket
+    monkeypatch.setenv("TLMVIEWER_PUSH_SCENE_ALLOW_FAIL", "1")
+    error = urllib.error.URLError(reason=socket.gaierror("connection refused"))
+    with patch("urllib.request.urlopen", side_effect=error):
+        tlmv.push_scene(SIMPLE_SCENE)  # must not raise
+
+
+def test_allow_fail_silences_http_error(monkeypatch):
+    monkeypatch.setenv("TLMVIEWER_PUSH_SCENE_ALLOW_FAIL", "1")
+    error = urllib.error.HTTPError(
+        url="http://127.0.0.1:8765/push", code=400, msg="Bad Request",
+        hdrs=None, fp=BytesIO(b"{}"),
+    )
+    with patch("urllib.request.urlopen", side_effect=error):
+        tlmv.push_scene(SIMPLE_SCENE)  # must not raise
+
+
+def test_allow_fail_not_set_still_raises(monkeypatch):
+    monkeypatch.delenv("TLMVIEWER_PUSH_SCENE_ALLOW_FAIL", raising=False)
+    import socket
+    error = urllib.error.URLError(reason=socket.gaierror("connection refused"))
+    with patch("urllib.request.urlopen", side_effect=error):
+        with pytest.raises(ConnectionRefusedError):
+            tlmv.push_scene(SIMPLE_SCENE)

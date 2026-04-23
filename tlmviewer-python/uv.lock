@@ -91,7 +91,7 @@ wheels = [
 [[package]]
 name = "tlmviewer"
 version = "0.0.14"
-source = { virtual = "." }
+source = { editable = "." }
 
 [package.dev-dependencies]
 dev = [
