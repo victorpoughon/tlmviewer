@@ -1,40 +1,26 @@
-"""
-tlmviewer Python helper — push scenes to a running tlmserver.
-"""
-
 import json
 import urllib.request
 import urllib.error
-from typing import Any
+
+from .types import Scene
+from .serialize import scene_to_dict
 
 PROTOCOL_VERSION = 2
 
 
 def push_scene(
-    scene: dict[str, Any],
+    scene: Scene,
     *,
     host: str = "127.0.0.1",
     port: int = 8765,
     topic: str = "main",
 ) -> None:
-    """Push a scene dict to a running tlmserver.
-
-    Args:
-        scene:  Scene payload (dict with a "data" key containing element list).
-        host:   tlmserver host (default: 127.0.0.1).
-        port:   tlmserver port (default: 8765).
-        topic:  Topic name (default: "main").
-
-    Raises:
-        ConnectionRefusedError: Server is not reachable.
-        ValueError: Server rejected the envelope (bad version, missing fields, etc.).
-        RuntimeError: Unexpected HTTP error from the server.
-    """
+    """Push a Scene to a running tlmserver."""
     envelope = {
         "v": PROTOCOL_VERSION,
         "type": "scene",
         "topic": topic,
-        "payload": scene,
+        "payload": scene_to_dict(scene),
     }
 
     body = json.dumps(envelope).encode()
@@ -56,7 +42,9 @@ def push_scene(
             detail = json.loads(e.read()).get("error", e.reason)
         except Exception:
             detail = e.reason
-        raise ValueError(f"tlmserver rejected the push (HTTP {e.code}): {detail}") from e
+        raise ValueError(
+            f"tlmserver rejected the push (HTTP {e.code}): {detail}"
+        ) from e
     except urllib.error.URLError as e:
         raise ConnectionRefusedError(
             f"Could not connect to tlmserver at {url}: {e.reason}"

@@ -1,0 +1,13 @@
+[project]
+name = "tlmviewer"
+version = "0.0.14"
+description = "Python API for tlmviewer"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ruff>=0.15.11",
+]
