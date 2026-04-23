@@ -7,7 +7,7 @@ import urllib.request
 import urllib.error
 from typing import Any
 
-PROTOCOL_VERSION = 1
+PROTOCOL_VERSION = 2
 
 
 def push_scene(
@@ -16,7 +16,6 @@ def push_scene(
     host: str = "127.0.0.1",
     port: int = 8765,
     topic: str = "main",
-    mode: str = "latest",
 ) -> None:
     """Push a scene dict to a running tlmserver.
 
@@ -25,7 +24,6 @@ def push_scene(
         host:   tlmserver host (default: 127.0.0.1).
         port:   tlmserver port (default: 8765).
         topic:  Topic name (default: "main").
-        mode:   "latest" (replace) or "append" (ring buffer).
 
     Raises:
         ConnectionRefusedError: Server is not reachable.
@@ -36,7 +34,6 @@ def push_scene(
         "v": PROTOCOL_VERSION,
         "type": "scene",
         "topic": topic,
-        "mode": mode,
         "payload": scene,
     }
 

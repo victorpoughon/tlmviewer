@@ -12,7 +12,6 @@ import type { Envelope } from "tlmprotocol";
 const args = process.argv.slice(2);
 let port = 8765;
 let host = "127.0.0.1";
-let ringSize = 1000;
 
 for (let i = 0; i < args.length; i++) {
     if (args[i] === "--port" && args[i + 1]) {
@@ -24,8 +23,6 @@ for (let i = 0; i < args.length; i++) {
                 "Warning: binding to 0.0.0.0 exposes the server to all network interfaces",
             );
         }
-    } else if (args[i] === "--ring-size" && args[i + 1]) {
-        ringSize = parseInt(args[++i]);
     }
 }
 
@@ -42,40 +39,6 @@ function findTlmviewerUmd(): string | null {
         return umd ? path.join(distDir, umd) : null;
     } catch {
         return null;
-    }
-}
-
-// ── Per-topic state ───────────────────────────────────────────────────────────
-
-type TopicState =
-    | { mode: "latest"; latest: string }
-    | { mode: "append"; buffer: string[] };
-
-const topicStore = new Map<string, TopicState>();
-
-function storeEnvelope(envelope: Envelope, raw: string): void {
-    const { topic, mode } = envelope;
-    if (mode === "latest") {
-        topicStore.set(topic, { mode: "latest", latest: raw });
-    } else {
-        const existing = topicStore.get(topic);
-        const buffer =
-            existing?.mode === "append" ? existing.buffer : ([] as string[]);
-        buffer.push(raw);
-        if (buffer.length > ringSize) buffer.shift();
-        topicStore.set(topic, { mode: "append", buffer });
-    }
-}
-
-function replayTo(ws: WebSocket): void {
-    for (const state of topicStore.values()) {
-        if (state.mode === "latest") {
-            ws.send(state.latest);
-        } else {
-            for (const msg of state.buffer) {
-                ws.send(msg);
-            }
-        }
     }
 }
 
@@ -139,20 +102,22 @@ const server = http.createServer((req, res) => {
                 return;
             }
 
-            if (!envelope.type || !envelope.topic || !envelope.mode) {
+            if (!envelope.type || !envelope.topic) {
                 res.writeHead(400, { "Content-Type": "application/json" });
                 res.end(
                     JSON.stringify({
-                        error: "missing required fields: type, topic, mode",
+                        error: "missing required fields: type, topic",
                     }),
                 );
                 return;
             }
 
-            storeEnvelope(envelope, body);
-            broadcast(body);
-
-            console.log(`push  topic=${envelope.topic} type=${envelope.type} mode=${envelope.mode} clients=${clients.size}`);
+            if (clients.size === 0) {
+                console.warn(`push  topic=${envelope.topic} type=${envelope.type} — no clients connected, message dropped`);
+            } else {
+                broadcast(body);
+                console.log(`push  topic=${envelope.topic} type=${envelope.type} clients=${clients.size}`);
+            }
 
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ ok: true }));
@@ -192,7 +157,6 @@ wss.on("connection", (ws, req) => {
     clients.add(ws);
     const clientAddr = req.socket.remoteAddress ?? "unknown";
     console.log(`ws    connect    client=${clientAddr} total=${clients.size}`);
-    replayTo(ws);
     ws.on("close", () => {
         clients.delete(ws);
         console.log(`ws    disconnect client=${clientAddr} total=${clients.size}`);
