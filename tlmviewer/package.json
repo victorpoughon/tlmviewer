@@ -23,6 +23,9 @@
     "prepare": "npm run build",
     "test": "node --import tsx/esm --test **/*.test.ts"
   },
+  "dependencies": {
+    "tlmprotocol": "file:../tlmprotocol"
+  },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "@types/three": "^0.175.0",
