@@ -32,7 +32,15 @@ ELEMENTS = [
     tlmv.SurfaceDisk(radius=5.0, matrix=ID_MATRIX),
     tlmv.SurfaceLathe(samples=[[0, 0], [1, 1]], matrix=ID_MATRIX),
     tlmv.SurfaceSphereR(R=10.0, diameter=5.0, matrix=ID_MATRIX),
-    tlmv.SurfaceSag(diameter=5.0, sag_function={"sag-type": "spherical", "C": 0.1}, matrix=ID_MATRIX),
-    tlmv.SurfaceBSpline(points=[[[0, 0, 0]]], weights=[[1.0]], degree=(2, 2), knot_type="clamped", samples=(10, 10), matrix=ID_MATRIX),
+    tlmv.SurfaceSag(
+        diameter=5.0, sag_function={"sag-type": "spherical", "C": 0.1}, matrix=ID_MATRIX
+    ),
+    tlmv.SurfaceBSpline(
+        points=[[[0, 0, 0]]],
+        weights=[[1.0]],
+        degree=(2, 2),
+        knot_type="clamped",
+        samples=(10, 10),
+        matrix=ID_MATRIX,
+    ),
 ]
-
