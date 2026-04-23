@@ -4,7 +4,7 @@ import { ElementDescriptor } from "../core/types.ts";
 import { getRequired } from "../core/utility.ts";
 
 function parse(raw: any, dim: number): ArrowsData {
-    const arrows = getRequired<number[][]>(raw, "data");
+    const arrows = getRequired<number[][]>(raw, "arrows");
     const expectedSize = dim * 2 + 1;
     for (let i = 0; i < arrows.length; i++) {
         if (arrows[i].length !== expectedSize) {
